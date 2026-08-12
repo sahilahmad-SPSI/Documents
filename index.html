@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painting Rover — Straight-Line Path Investigation</title>
+<style>
+:root{
+  color-scheme: light;
+  --surface-1:#fcfcfb; --page:#f9f9f7; --card:#ffffff;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10); --border-strong:rgba(11,11,11,0.18);
+  --series-1:#2a78d6; --series-2:#eb6834;
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --code-bg:#f4f4f1; --hl:#fff6d6; --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.05);
+}
+html[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:#1a1a19; --page:#0d0d0d; --card:#151514;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10); --border-strong:rgba(255,255,255,0.20);
+  --series-1:#3987e5; --series-2:#d95926;
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --code-bg:#111110; --hl:#3a3320; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--page); color:var(--text-primary);
+  font:15px/1.62 system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+
+/* ---------- header ---------- */
+header.top{border-bottom:1px solid var(--border);background:var(--card)}
+.top-inner{max-width:1120px;margin:0 auto;padding:26px 24px 20px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.top h1{margin:0 0 4px;font-size:25px;font-weight:650;letter-spacing:-0.015em;line-height:1.25}
+.top .sub{margin:0;color:var(--text-secondary);font-size:14.5px}
+.top .metaline{margin:12px 0 0;color:var(--text-muted);font-size:12.5px;display:flex;gap:18px;flex-wrap:wrap}
+.top .metaline b{color:var(--text-secondary);font-weight:550}
+.top-actions{margin-left:auto;display:flex;gap:8px}
+.btn{
+  border:1px solid var(--border-strong);background:transparent;color:var(--text-secondary);
+  border-radius:7px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap
+}
+.btn:hover{background:var(--surface-1);color:var(--text-primary)}
+
+/* ---------- tabs ---------- */
+nav.tabs{position:sticky;top:0;z-index:40;background:var(--card);border-bottom:1px solid var(--border)}
+.tabs-inner{max-width:1120px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+.tab{
+  appearance:none;border:0;background:none;font:inherit;font-size:14px;font-weight:520;
+  color:var(--text-secondary);padding:13px 15px;cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;margin-bottom:-1px
+}
+.tab:hover{color:var(--text-primary)}
+.tab[aria-selected="true"]{color:var(--text-primary);border-bottom-color:var(--series-1);font-weight:600}
+.tab .n{display:inline-block;min-width:17px;height:17px;line-height:17px;text-align:center;border-radius:5px;
+  background:var(--surface-1);border:1px solid var(--border);font-size:11px;margin-right:7px;color:var(--text-muted)}
+.tab[aria-selected="true"] .n{background:var(--series-1);border-color:var(--series-1);color:#fff}
+
+section.panel{display:none;padding-top:30px}
+section.panel.active{display:block}
+
+/* ---------- typography ---------- */
+h2{font-size:21px;font-weight:640;letter-spacing:-0.012em;margin:38px 0 6px;line-height:1.3}
+h2:first-child{margin-top:6px}
+h3{font-size:16.5px;font-weight:620;margin:30px 0 6px;line-height:1.35}
+h4{font-size:14px;font-weight:640;margin:18px 0 5px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em}
+p{margin:9px 0}
+.lede{font-size:16.5px;line-height:1.6;color:var(--text-secondary);margin:6px 0 20px;max-width:78ch}
+.small{font-size:13px;color:var(--text-secondary)}
+.muted{color:var(--text-muted)}
+ul,ol{margin:9px 0;padding-left:22px}
+li{margin:5px 0}
+a{color:var(--series-1)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;
+  background:var(--code-bg);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+strong{font-weight:640}
+
+/* ---------- cards / boxes ---------- */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin:16px 0;box-shadow:var(--shadow)}
+.callout{border:1px solid var(--border);border-left:3px solid var(--series-1);border-radius:8px;padding:14px 18px;margin:16px 0;background:var(--card)}
+.callout.crit{border-left-color:var(--critical)}
+.callout.warn{border-left-color:var(--warning)}
+.callout.good{border-left-color:var(--good)}
+.callout h4{margin-top:0;color:var(--text-primary);text-transform:none;letter-spacing:0;font-size:15px}
+.callout p:last-child{margin-bottom:0}
+
+/* ---------- stat tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0}
+.tile{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:15px 17px}
+.tile .lab{font-size:12.5px;color:var(--text-secondary);margin-bottom:5px;line-height:1.35}
+.tile .val{font-size:29px;font-weight:640;letter-spacing:-0.02em;line-height:1.1}
+.tile .val .u{font-size:15px;font-weight:520;color:var(--text-secondary);margin-left:2px}
+.tile .note{font-size:12px;color:var(--text-muted);margin-top:5px;line-height:1.4}
+.hero{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 26px;margin:18px 0;box-shadow:var(--shadow)}
+.hero .lab{font-size:13.5px;color:var(--text-secondary);margin-bottom:6px}
+.hero .val{font-size:56px;font-weight:660;letter-spacing:-0.03em;line-height:1;color:var(--critical)}
+.hero .val .u{font-size:23px;font-weight:520;color:var(--text-secondary);margin-left:4px;letter-spacing:0}
+.hero .note{font-size:13.5px;color:var(--text-secondary);margin-top:10px;max-width:70ch}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:14px 0;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-weight:620;color:var(--text-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.045em;
+   background:var(--surface-1);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:hover{background:var(--surface-1)}
+
+/* ---------- chips ---------- */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:2.5px 9px;
+  border-radius:999px;border:1px solid var(--border-strong);white-space:nowrap;letter-spacing:.01em}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.chip.crit{color:var(--critical)}
+.chip.warn{color:var(--serious)}
+.chip.info{color:var(--series-1)}
+.chip.good{color:var(--good)}
+.chip.flat{border-style:dashed;color:var(--text-muted)}
+.chip.flat::before{display:none}
+
+/* ---------- defect blocks ---------- */
+.defect{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:20px 0;overflow:hidden;box-shadow:var(--shadow)}
+.defect > .hd{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.defect > .hd .t{font-size:16.5px;font-weight:640;letter-spacing:-0.01em;flex:1 1 320px;line-height:1.35}
+.defect > .bd{padding:4px 20px 18px}
+.defect .loc{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--text-muted);
+  padding:8px 20px;background:var(--surface-1);border-bottom:1px solid var(--border)}
+.cost{margin-top:14px;padding:11px 14px;border-radius:8px;background:var(--surface-1);border:1px solid var(--border);
+  font-size:13.5px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.cost b{font-size:16px;font-weight:660;font-variant-numeric:tabular-nums}
+
+/* ---------- code ---------- */
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:9px;padding:13px 15px;overflow-x:auto;
+  margin:11px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.4px;line-height:1.6}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+pre .c{color:var(--text-muted)}
+pre .bad{background:var(--hl);border-radius:3px;padding:1px 3px;font-weight:600}
+.codelabel{font-size:11.5px;font-weight:640;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin:14px 0 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+
+/* ---------- charts ---------- */
+figure.fig{margin:20px 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px 14px;box-shadow:var(--shadow)}
+figure.fig .ftitle{font-size:15px;font-weight:620;margin-bottom:2px;letter-spacing:-0.008em}
+figure.fig .fsub{font-size:13px;color:var(--text-secondary);margin-bottom:14px;max-width:80ch}
+figure.fig figcaption{font-size:12.5px;color:var(--text-muted);margin-top:11px;line-height:1.5;max-width:85ch}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 10px;font-size:13px;color:var(--text-secondary)}
+.legend .k{display:inline-flex;align-items:center;gap:7px}
+.legend .sw{width:14px;height:3px;border-radius:2px;flex:none}
+.legend .sw.dot{width:10px;height:10px;border-radius:3px}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--border-strong);
+  border-radius:8px;padding:8px 11px;font-size:12.5px;box-shadow:0 4px 16px rgba(0,0,0,.14);opacity:0;
+  transition:opacity .1s;white-space:nowrap;z-index:5;line-height:1.5}
+.tip .tt{font-weight:640;margin-bottom:3px}
+.tip .r{display:flex;gap:9px;align-items:center;justify-content:space-between}
+.tip .r .k{display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary)}
+.tip .r .sw{width:9px;height:9px;border-radius:3px;flex:none}
+.tip .r b{font-variant-numeric:tabular-nums}
+details.tableview{margin-top:10px}
+details.tableview summary{cursor:pointer;font-size:12.5px;color:var(--text-secondary);padding:4px 0}
+details.tableview summary:hover{color:var(--text-primary)}
+
+/* ---------- misc ---------- */
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 16px;font-size:13.5px;margin:10px 0}
+.kv dt{color:var(--text-secondary);white-space:nowrap}
+.kv dd{margin:0}
+.conf{font-size:11px;font-weight:700;letter-spacing:.03em;padding:1px 6px;border-radius:4px;border:1px solid var(--border-strong);
+  color:var(--text-muted);white-space:nowrap;vertical-align:2px}
+.conf.c{color:var(--good);border-color:var(--good)}
+.conf.l{color:var(--series-1);border-color:var(--series-1)}
+.conf.g{color:var(--serious);border-color:var(--serious)}
+footer.foot{border-top:1px solid var(--border);margin-top:50px;padding-top:22px;font-size:12.5px;color:var(--text-muted)}
+footer.foot a{color:var(--text-secondary)}
+footer.foot ul{padding-left:18px}
+.signoff{margin-top:26px;padding-top:20px;border-top:1px solid var(--border);
+  display:flex;gap:44px;flex-wrap:wrap;break-inside:avoid}
+.signoff-line{display:flex;flex-direction:column;gap:3px}
+.signoff .k{font-size:11px;font-weight:640;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)}
+.signoff .v{font-size:15px;font-weight:620;color:var(--text-primary);letter-spacing:-0.005em}
+
+@media print{
+  nav.tabs,.top-actions,.tip,details.tableview{display:none!important}
+  section.panel{display:block!important;page-break-before:always;padding-top:0}
+  section.panel:first-of-type{page-break-before:auto}
+  body{background:#fff;font-size:11pt}
+  .card,.defect,figure.fig,.hero,.tile{box-shadow:none;break-inside:avoid}
+  .tw{break-inside:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <h1>Painting Rover — Why It Does Not Run in a Straight Line</h1>
+      <p class="sub">Root-cause investigation, quantified error budget, and a costed fix plan. Includes a formal recommendation on the Pixhawk&nbsp;/&nbsp;Cube&nbsp;Orange proposal.</p>
+      <p class="metaline">
+        <span><b>Prepared for</b> HOD &amp; Rover Team</span>
+        <span><b>Date</b> 12 August 2026</span>
+        <span><b>Status</b> Findings — awaiting field measurements</span>
+      </p>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="themeBtn" type="button">Dark mode</button>
+      <button class="btn" onclick="window.print()" type="button">Print / PDF</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-inner" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  data-panel="p1"><span class="n">1</span>Summary</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="p2"><span class="n">2</span>Findings — what is causing the error</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="p3"><span class="n">3</span>Pixhawk / Cube Orange</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="p4"><span class="n">4</span>Fix plan &amp; code changes</button>
+    <button class="tab" role="tab" aria-selected="false" data-panel="p5"><span class="n">5</span>Open questions</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============================== TAB 1 : SUMMARY ============================== -->
+<section class="panel active" id="p1">
+
+  <p class="lede">
+    The rover does not run straight because of <strong>four defects in our own control software</strong>, not because
+    of a missing sensor. The inclinometer we already have is roughly <strong>29&times; more accurate than the job
+    requires</strong>. A Pixhawk / Cube Orange cannot fix this and, for reasons of basic geometry, cannot be used at
+    all on a vertical wall.
+  </p>
+
+  <div class="hero">
+    <div class="lab">Worst-case sideways drift over a single 10 m vertical pass, caused by software defects alone</div>
+    <div class="val">1,305<span class="u">mm</span></div>
+    <div class="note">
+      Arithmetic, not estimate. Our lane-change routine accepts any heading inside a <strong>15&deg;-wide</strong>
+      window as &ldquo;straight&rdquo;. Worst case that leaves the rover 7.5&deg; off vertical at the start of a stripe.
+      Over a 10 m pass, 7.5&deg; = 1,305 mm of sideways drift. <span class="conf c">CERTAIN</span>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile">
+      <div class="lab">What our sensor can actually resolve</div>
+      <div class="val">0.007<span class="u">&deg;</span></div>
+      <div class="note">SCL3300 in Mode&nbsp;1 = 0.12 mm of error per metre travelled</div>
+    </div>
+    <div class="tile">
+      <div class="lab">What the painting job needs</div>
+      <div class="val">0.20<span class="u">&deg;</span></div>
+      <div class="note">= 35 mm over a 10 m pass, i.e. &frac14; of a 150 mm overlap step</div>
+    </div>
+    <div class="tile">
+      <div class="lab">Margin we already own</div>
+      <div class="val">29<span class="u">&times;</span></div>
+      <div class="note">The hardware is not the constraint. The software is.</div>
+    </div>
+    <div class="tile">
+      <div class="lab">Cost of the recommended hardware addition</div>
+      <div class="val">&#8377;1,999</div>
+      <div class="note">One ICM-42688-P gyro chip, vs &#8377;51,999 for a Cube Orange Plus</div>
+    </div>
+  </div>
+
+  <h2>The verdict in three lines</h2>
+  <div class="callout crit">
+    <h4>1. The heading signal we steer on has no sign.</h4>
+    <p>
+      The value the Teensy sends to the Raspberry Pi reads <strong>exactly the same</strong> whether the rover has
+      drifted 2&deg; to the left or 2&deg; to the right. The steering loop physically cannot know which way to
+      correct. This is a property of the sensor register we chose, proven from the Murata datasheet formula and
+      verified numerically to nine decimal places. <span class="conf c">CERTAIN</span>
+    </p>
+  </div>
+  <div class="callout crit">
+    <h4>2. We throw away a free, perfect reference once per pass.</h4>
+    <p>
+      On a vertical wall, gravity <em>is</em> an absolute heading reference &mdash; drift-free, immune to steel, and
+      needing no GPS. Our code captures the setpoint as <code>target_heading = x_angle</code> at the instant the
+      operator pushes the stick, so the rover holds <em>whatever angle it happened to be at</em>, re-datumed every
+      single pass. Each stripe is individually straight and collectively a fan. <span class="conf c">CERTAIN</span>
+    </p>
+  </div>
+  <div class="callout crit">
+    <h4>3. Pixhawk / Cube Orange cannot be used here at all.</h4>
+    <p>
+      ArduPilot defines &ldquo;heading&rdquo; as rotation about the Earth&rsquo;s <em>vertical</em> axis. When our
+      rover climbs, its forward axis <em>is</em> that vertical axis &mdash; a mathematical singularity. The thing we
+      actually need to control is rotation about the <em>wall normal</em>, a horizontal axis, for which ArduRover has
+      no control channel. This is before we even reach the GPS and compass problems. See Tab&nbsp;3.
+      <span class="conf c">CERTAIN</span>
+    </p>
+  </div>
+
+  <h2>Where the error comes from</h2>
+  <p class="small">
+    All figures are the sideways drift produced over a single 10&nbsp;m vertical pass by each cause acting alone.
+    Formula: <code>drift = pass_length &times; sin(heading&nbsp;error)</code>.
+  </p>
+
+  <figure class="fig">
+    <div class="ftitle">Sideways drift over a 10 m pass, by cause</div>
+    <div class="fsub">The two sensor-physics contributions are at the bottom. Everything above them is software we wrote and can change this month.</div>
+    <div class="legend" id="lg-causes"></div>
+    <div class="chart" id="ch-causes"></div>
+    <figcaption>
+      Target line at 35 mm = the 0.20&deg; accuracy the job needs. The sensor&rsquo;s own noise floor (1.2 mm) is
+      invisible at this scale &mdash; that is the point. Uncalibrated sensor offset is a hardware property but is
+      removed by a one-time calibration, not by new hardware.
+    </figcaption>
+    <details class="tableview"><summary>Show as table</summary>
+      <div class="tw"><table>
+        <thead><tr><th>Cause</th><th>Type</th><th class="num">Heading error</th><th class="num">Drift over 10 m</th></tr></thead>
+        <tbody>
+          <tr><td>Lane-change accepts a 15&deg;-wide &ldquo;zero&rdquo; window</td><td>Software defect</td><td class="num">7.50&deg;</td><td class="num">1,305 mm</td></tr>
+          <tr><td>P-only controller leaves a standing error</td><td>Software defect</td><td class="num">2.00&deg;</td><td class="num">349 mm</td></tr>
+          <tr><td>Sensor offset never calibrated out</td><td>Sensor limit (fixable by calibration)</td><td class="num">0.573&deg;</td><td class="num">100 mm</td></tr>
+          <tr><td>Sensor electrical noise floor</td><td>Sensor limit (irreducible)</td><td class="num">0.0068&deg;</td><td class="num">1.2 mm</td></tr>
+        </tbody>
+      </table></div>
+    </details>
+  </figure>
+
+  <div class="callout warn">
+    <h4>Not on the chart, because it is not a bounded number</h4>
+    <p>
+      The unsigned-heading defect (Finding&nbsp;1) does not produce a fixed error &mdash; it makes the control loop
+      <strong>unstable in one direction</strong>. In simulation, starting 3&deg; off vertical, the loop runs away to
+      the plot limit instead of correcting. There is no &ldquo;how many millimetres&rdquo; for this one; the answer
+      is &ldquo;as far as it gets before someone stops it.&rdquo; See Tab&nbsp;2, Finding&nbsp;1.
+    </p>
+  </div>
+
+  <h2>The physics we are not using — in plain English</h2>
+  <div class="card">
+    <p>
+      Imagine holding a spirit level flat on a table. Turn it left or right and nothing on the bubble changes &mdash;
+      gravity cannot tell you which way a flat object is <em>pointing</em>. That is why cars and drones need a compass
+      or GPS.
+    </p>
+    <p>
+      Now stick that same level flat against a vertical wall. Rotate it a couple of degrees and the bubble moves
+      <em>immediately and by a lot</em>. On a wall, gravity tells you the pointing direction directly, at the maximum
+      sensitivity physically possible &mdash; <strong>1 g of signal per radian of angle</strong>.
+    </p>
+    <p>
+      Our rover is on a vertical wall. So our inclinometer is already a perfect compass for this job: no drift, no
+      GPS, and completely unaffected by the steel of the gas holder. We verified numerically that this reading does
+      not change at all as the rover moves around the curved circumference of the tank &mdash; the curvature is
+      invisible to it. <span class="conf c">CERTAIN</span>
+    </p>
+    <p class="small muted">
+      Formula: with <code>f</code> = forward (up the wall) and <code>l</code> = lateral (across the wall),
+      heading error <code>&phi; = atan2(a<sub>l</sub>, a<sub>f</sub>)</code>. Sensitivity, range and drift are all optimal.
+      Full derivation in Tab&nbsp;2.
+    </p>
+  </div>
+
+  <h2>What we are asking for</h2>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Ask</th><th>Cost</th><th>Effort</th><th class="num">Expected result</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>Half a day of instrumented field measurement (chalk line + logging) before any change</td><td>&#8377;0</td><td>0.5 day</td><td class="num">Confirms which cause dominates</td></tr>
+      <tr><td class="num">1</td><td>Fix the four software defects (patches already written)</td><td>&#8377;0</td><td>2&ndash;3 days</td><td class="num">&le; 0.2&deg; &rarr; &le; 35 mm / 10 m</td></tr>
+      <tr><td class="num">2</td><td>Add one ICM-42688-P gyro chip for vibration immunity</td><td>&#8377;1,999</td><td>1 week</td><td class="num">Removes the last oscillation source</td></tr>
+      <tr><td class="num">3</td><td><strong>Do not</strong> purchase a Cube Orange Plus</td><td>saves &#8377;51,999</td><td>&mdash;</td><td class="num">Cannot work on a vertical wall</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>How to read the confidence tags in this document</h3>
+  <p class="small">
+    <span class="conf c">CERTAIN</span> backed by our own source code, a manufacturer datasheet, or arithmetic.
+    <span class="conf l">LIKELY</span> strong inference from the evidence, not directly measured.
+    <span class="conf g">GUESSING</span> an assumption filling a gap &mdash; each of these appears as a question in Tab&nbsp;5.
+  </p>
+
+</section>
+
+
+<!-- ============================== TAB 2 : FINDINGS ============================== -->
+<section class="panel" id="p2">
+
+  <p class="lede">
+    Five defects, ranked by how much error each one can produce. Every one is quoted from our own repository with the
+    file and line number. Four of the five are single-figure code changes.
+  </p>
+
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>Defect</th><th>File</th><th class="num">Worst-case cost</th><th>Fix effort</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Heading signal has no sign</strong> &mdash; +2&deg; and &minus;2&deg; read identically</td><td><code>…​ACS712_Relay.ino</code> L104</td><td class="num">Loop diverges<br><span class="muted">(unbounded)</span></td><td>1 line + firmware reflash</td></tr>
+      <tr><td class="num">2</td><td><strong>Setpoint captured per pass</strong> instead of absolute vertical</td><td><code>Straight mode_testing2.py</code> L809, 816, 838, 845, 1033</td><td class="num">up to 1,305 mm</td><td>5 lines</td></tr>
+      <tr><td class="num">3</td><td><strong>Lane-change &ldquo;zero zone&rdquo; is 15&deg; wide</strong> and off-centre by &minus;2.5&deg;</td><td><code>Straight mode_testing2.py</code> L522&ndash;529</td><td class="num">1,305 mm</td><td>1 function</td></tr>
+      <tr><td class="num">4</td><td><strong>Index step is a stopwatch, not a distance</strong> &mdash; overlap varies 141&ndash;172 mm</td><td><code>Straight mode_testing2.py</code> L605&ndash;608, 669&ndash;672</td><td class="num">&plusmn;10% overlap</td><td>1 function</td></tr>
+      <tr><td class="num">5</td><td><strong>P-only controller</strong> cannot cancel a constant disturbance</td><td><code>Straight mode_testing2.py</code> L118, 462</td><td class="num">349 mm <span class="muted">(at 2&deg;)</span></td><td>6 lines</td></tr>
+      <tr><td class="num">6</td><td>Control-loop latency and jitter, ~90&ndash;320 ms</td><td>architecture</td><td class="num">Secondary</td><td>Half a day</td></tr>
+    </tbody>
+  </table></div>
+
+  <!-- ---------- FINDING 1 ---------- -->
+  <div class="defect">
+    <div class="hd">
+      <div class="t">Finding 1 &mdash; The heading value we steer on carries no direction</div>
+      <span class="chip crit">Critical</span><span class="conf c">CERTAIN</span>
+    </div>
+    <div class="loc">CODE/Teensy Code/SCL3300_tilt_sensordata_send_ACS712_Relay.ino &rarr; line 104 &nbsp;·&nbsp; CODE/RPI Code/Straight mode_testing2.py &rarr; lines 379&ndash;380, 460</div>
+    <div class="bd">
+
+      <h4>What the code does today</h4>
+<pre><code><span class="c">// Teensy, line 104 — this is the number the whole system steers on</span>
+float x = inclinometer.<span class="bad">getCalculatedAngleX()</span>;
+…
+RPI_SERIAL.print("X:"); RPI_SERIAL.print(x, 2);
+
+<span class="c"># Raspberry Pi, lines 379–380</span>
+raw_angle = float(p[2:])
+x_angle   = (raw_angle - heading_offset) % 360
+
+<span class="c"># Raspberry Pi, line 460 — steering decision made from it</span>
+error = heading_error(target_heading, angle_snapshot)</code></pre>
+
+      <h4>Why it cannot work</h4>
+      <p>
+        <code>getCalculatedAngleX()</code> returns the SCL3300&rsquo;s <strong>ANG_X register</strong>. The Murata
+        datasheet (§2.5) defines it as:
+      </p>
+<pre><code>ANG_X = atan( acc_x / <span class="bad">√(acc_y² + acc_z²)</span> )</code></pre>
+      <p>
+        The denominator is a <strong>magnitude</strong>, so it is always positive. The register therefore reports
+        &ldquo;how far the X axis is above the horizontal plane&rdquo; &mdash; a quantity that is <em>identical</em>
+        whether the rover leans left or right.
+      </p>
+
+      <h4>Proof — computed, not argued</h4>
+      <div class="tw"><table>
+        <thead><tr><th>True heading error</th><th class="num">What our code reads (ANG on the travel axis)</th><th class="num">What it should read (lateral axis)</th></tr></thead>
+        <tbody>
+          <tr><td>&minus;2.0&deg; (drifting right)</td><td class="num"><strong>+88.0000&deg;</strong></td><td class="num">&minus;2.0000&deg;</td></tr>
+          <tr><td>&minus;1.0&deg;</td><td class="num"><strong>+89.0000&deg;</strong></td><td class="num">&minus;1.0000&deg;</td></tr>
+          <tr><td>0.0&deg; (perfectly vertical)</td><td class="num">+90.0000&deg;</td><td class="num">0.0000&deg;</td></tr>
+          <tr><td>+1.0&deg;</td><td class="num"><strong>+89.0000&deg;</strong></td><td class="num">+1.0000&deg;</td></tr>
+          <tr><td>+2.0&deg; (drifting left)</td><td class="num"><strong>+88.0000&deg;</strong></td><td class="num">+2.0000&deg;</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">
+        Bit-identical for &plusmn;0.5&deg;, &plusmn;1&deg;, &plusmn;2&deg; and &plusmn;5&deg;, confirmed to 1&times;10<sup>&minus;9</sup>.
+        The controller receives the same number for opposite errors and applies the same correction to both.
+      </p>
+
+      <h4>What that does to the machine</h4>
+      <figure class="fig" style="margin-left:0;margin-right:0">
+        <div class="ftitle">Closed-loop simulation: rover starts 3&deg; off vertical, no disturbance</div>
+        <div class="fsub">Identical gains in both runs (KP&nbsp;=&nbsp;25, KI&nbsp;=&nbsp;14.3). The <em>only</em> difference is whether the heading measurement carries a sign.</div>
+        <div class="legend" id="lg-sign"></div>
+        <div class="chart" id="ch-sign"></div>
+        <figcaption>
+          With a signed measurement the rover recovers to 0.00&deg; in about 8 seconds. With the unsigned measurement
+          we ship today, the correction pushes the <em>wrong</em> way and the heading runs off the plot (clamped at
+          &minus;45&deg; for legibility). Plant model: first-order skid-steer yaw,
+          0.045&nbsp;&deg;/s per count/s, derived from our wheel diameter, encoder CPR and track width &mdash; not
+          fitted to data. <span class="conf l">LIKELY</span> for the exact timing; <span class="conf c">CERTAIN</span> for the direction of failure.
+        </figcaption>
+      </figure>
+
+      <h4>Two aggravating factors on top</h4>
+      <ul>
+        <li><strong>Wrong sensor mode.</strong> The Arduino library defaults to <strong>Mode&nbsp;4</strong> if
+          <code>setMode()</code> is never called &mdash; and we never call it. Murata states:
+          <em>&ldquo;Inclination ranges are limited in Mode&nbsp;3 and Mode&nbsp;4 to maximum &plusmn;10&deg;
+          inclination.&rdquo;</em> Our rover sits at <strong>90&deg;</strong>. We are operating the part outside its
+          specified range, in its slowest filter (10&nbsp;Hz, ~16&nbsp;ms of lag) instead of Mode&nbsp;1&rsquo;s
+          40&nbsp;Hz.</li>
+        <li><strong>The <code>% 360</code> wrap hides it.</strong> The library maps negative angles to 270&ndash;360&deg;,
+          and the Pi then does <code>(raw − offset) % 360</code>. The arithmetic survives, so the CSV logs look
+          plausible. That is why this has not been spotted by inspection.</li>
+      </ul>
+
+      <div class="cost"><span>Cost if unfixed:</span> <b>Control loop is unstable in one direction.</b>
+        <span class="muted">No gain tuning can compensate for a missing sign.</span></div>
+    </div>
+  </div>
+
+  <!-- ---------- FINDING 2 ---------- -->
+  <div class="defect">
+    <div class="hd">
+      <div class="t">Finding 2 &mdash; We re-define &ldquo;straight&rdquo; on every single pass</div>
+      <span class="chip crit">Critical</span><span class="conf c">CERTAIN</span>
+    </div>
+    <div class="loc">CODE/RPI Code/Straight mode_testing2.py &rarr; lines 792, 809, 816, 838, 845, 1033</div>
+    <div class="bd">
+      <h4>What the code does today</h4>
+<pre><code><span class="c"># line 809 — keyboard 'up'</span>
+<span class="bad">target_heading  = x_angle</span>          <span class="c"># &lt;- captured from wherever we are right now</span>
+drive_direction = FORWARD_SPEED
+straight_mode   = True
+
+<span class="c"># line 1033 — RC transmitter path, same thing</span>
+if not straight_mode:
+    <span class="bad">target_heading = x_angle</span>
+
+<span class="c"># line 792 — the zero itself is an operator eyeball</span>
+<span class="bad">heading_offset = raw_angle</span></code></pre>
+
+      <h4>Why it is wrong</h4>
+      <p>
+        Gravity hands us an <strong>absolute</strong> reference for free. <code>target_heading = x_angle</code> deletes
+        it and replaces it with a relative one. The rover holds whatever attitude it was in at the moment the stick
+        was pushed &mdash; and this happens again on <em>every</em> stripe.
+      </p>
+      <p>
+        Combined with Finding&nbsp;3 (the 15&deg;-wide acceptance window), each pass begins from a different,
+        uncontrolled angle. Every stripe is individually straight. Collectively they are a fan. This is the single
+        best explanation for &ldquo;it is different every time&rdquo;.
+      </p>
+
+      <div class="split">
+        <div>
+          <p class="codelabel">Today</p>
+<pre><code>target_heading = x_angle</code></pre>
+        </div>
+        <div>
+          <p class="codelabel">Should be</p>
+<pre><code>target_heading = 0.0   <span class="c"># true vertical</span></code></pre>
+        </div>
+      </div>
+      <p class="small">
+        <code>heading_offset</code> is then calibrated <strong>once per job</strong> against a plumb line or laser
+        level at working temperature &mdash; never per pass.
+      </p>
+
+      <div class="cost"><span>Cost if unfixed:</span> <b>up to 1,305 mm</b>
+        <span class="muted">per 10 m pass, and different on every pass, so it cannot be compensated downstream.</span></div>
+    </div>
+  </div>
+
+  <!-- ---------- FINDING 3 ---------- -->
+  <div class="defect">
+    <div class="hd">
+      <div class="t">Finding 3 &mdash; The lane-change accepts anything inside a 15&deg; window as &ldquo;straight&rdquo;</div>
+      <span class="chip crit">Critical</span><span class="conf c">CERTAIN</span>
+    </div>
+    <div class="loc">CODE/RPI Code/Straight mode_testing2.py &rarr; lines 522&ndash;529, and 584 / 621 / 648 / 685</div>
+    <div class="bd">
+      <h4>What the code does today</h4>
+<pre><code>def angle_in_zero_zone(a):  return (<span class="bad">a &gt;= 350 or a &lt;= 5</span>)   <span class="c"># −10° … +5°  → 15° wide</span>
+def angle_in_330_zone(a):   return (325 &lt;= a &lt;= 332)         <span class="c"># 7° wide</span>
+def angle_in_30_zone(a):    return (28  &lt;= a &lt;= 35)          <span class="c"># 7° wide</span></code></pre>
+
+      <h4>Three separate problems in three lines</h4>
+      <ol>
+        <li><strong>Width.</strong> The rover finishes a lane change anywhere in a 15&deg; band, then holds
+          <em>that</em> as vertical. At the 7.5&deg; extreme: <strong>1,305 mm of drift over a 10 m pass.</strong></li>
+        <li><strong>Off-centre.</strong> The band runs from &minus;10&deg; to +5&deg; &mdash; centred on
+          <strong>&minus;2.5&deg;</strong>, not 0&deg;. That is a built-in bias of 436 mm per 10 m pass, always to the
+          same side. <em>If the rover consistently bows one way, this line is the first suspect.</em></li>
+        <li><strong>Bang-bang stop.</strong> <code>_wait_for_zone()</code> polls at 50&nbsp;Hz and cuts the motors the
+          instant the condition is true; the rover then coasts. The final angle is wherever it stopped, not a
+          controlled value.</li>
+      </ol>
+
+      <div class="split">
+        <div>
+          <p class="codelabel">Today — acceptance window</p>
+<pre><code>350° … 5°     <span class="c"># 15.0° wide</span>
+             <span class="c"># centred on −2.5°</span></code></pre>
+        </div>
+        <div>
+          <p class="codelabel">Should be</p>
+<pre><code>|φ| ≤ 0.3°    <span class="c"># 0.6° wide, centred on 0</span>
+held 200 ms   <span class="c"># and approached proportionally</span></code></pre>
+        </div>
+      </div>
+      <p class="small">50&times; tighter, and the turn slows as it approaches instead of slamming to a stop.</p>
+
+      <div class="cost"><span>Cost if unfixed:</span> <b>1,305 mm</b> <span class="muted">worst case; <b>436 mm</b> as a permanent one-sided bias from the off-centre window alone.</span></div>
+    </div>
+  </div>
+
+  <!-- ---------- FINDING 4 ---------- -->
+  <div class="defect">
+    <div class="hd">
+      <div class="t">Finding 4 &mdash; The overlap step is measured with a stopwatch</div>
+      <span class="chip crit">Critical</span><span class="conf c">CERTAIN</span>
+    </div>
+    <div class="loc">CODE/RPI Code/Straight mode_testing2.py &rarr; lines 605&ndash;608 (left) and 669&ndash;672 (right)</div>
+    <div class="bd">
+      <h4>What the code does today</h4>
+<pre><code><span class="c"># Step 3 of the lane change: move sideways</span>
+left_speed  = BACKWARD_SPEED
+right_speed = BACKWARD_SPEED
+<span class="bad">time.sleep(1.0)</span>          <span class="c"># &lt;- this IS the overlap step</span></code></pre>
+
+      <h4>Why it cannot hold 50% overlap</h4>
+      <p>
+        The sideways step is <code>speed &times; time &times; sin(crab&nbsp;angle)</code>, and all three terms are
+        uncontrolled:
+      </p>
+      <ul>
+        <li><strong>Crab angle</strong> lands anywhere in the 7&deg;-wide window (28&deg;&ndash;35&deg;), plus coast overshoot.</li>
+        <li><strong>Time</strong> is wall-clock, so it includes the Roboclaw&rsquo;s acceleration and deceleration ramps &mdash; the distance actually covered is not speed&nbsp;&times;&nbsp;time.</li>
+        <li><strong>Speed</strong> is a commanded counts/s, never verified against the encoders. Wheel slip is invisible.</li>
+      </ul>
+
+      <div class="tw"><table>
+        <thead><tr><th>Crab angle achieved</th><th class="num">Step produced</th><th class="num">Actual overlap<br><span class="muted">(300 mm fan)</span></th><th class="num">Deviation from target</th></tr></thead>
+        <tbody>
+          <tr><td>28&deg; (low end of the window)</td><td class="num">141 mm</td><td class="num">53%</td><td class="num">&minus;6%</td></tr>
+          <tr><td>30&deg; (design intent)</td><td class="num">150 mm</td><td class="num">50%</td><td class="num">&mdash;</td></tr>
+          <tr><td>35&deg; (high end of the window)</td><td class="num">172 mm</td><td class="num">43%</td><td class="num">+15%</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">
+        A 31&nbsp;mm spread on a 150&nbsp;mm step, from the acceptance window alone &mdash; before ramp effects and slip.
+        <span class="conf g">GUESSING</span> the 300 mm fan width; confirm in Tab&nbsp;5&nbsp;Q2 and this table re-computes.
+      </p>
+
+      <div class="callout good">
+        <h4>We already own the fix and are not using it</h4>
+        <p>
+          The schematic shows quadrature encoders wired into <strong>both</strong> Roboclaws
+          (<code>EN1_A/B</code>, <code>EN2_A/B</code> on U4 and U5). The Roboclaw supports
+          <code>SpeedAccelDistanceM1M2</code> &mdash; command a <strong>number of encoder counts</strong> and the
+          controller terminates the move itself. We can also read the achieved counts back afterwards and detect slip.
+          None of this requires new hardware.
+        </p>
+      </div>
+
+      <div class="split">
+        <div>
+          <p class="codelabel">Today</p>
+<pre><code>left_speed  = BACKWARD_SPEED
+right_speed = BACKWARD_SPEED
+time.sleep(1.0)</code></pre>
+        </div>
+        <div>
+          <p class="codelabel">Should be</p>
+<pre><code>counts = round(step_m / sin(φ_measured)
+               * COUNTS_PER_METRE)
+md.SpeedAccelDistanceM1M2(addr, accel,
+    v, counts, v, counts, 1)
+<span class="c"># then verify with ReadEncM1/M2</span></code></pre>
+        </div>
+      </div>
+
+      <div class="cost"><span>Cost if unfixed:</span> <b>&plusmn;10% coating thickness</b>
+        <span class="muted">band-to-band, plus a cumulative sideways position error across the tank.</span></div>
+    </div>
+  </div>
+
+  <!-- ---------- FINDING 5 ---------- -->
+  <div class="defect">
+    <div class="hd">
+      <div class="t">Finding 5 &mdash; A P-only controller cannot cancel a constant pull</div>
+      <span class="chip warn">High</span><span class="conf c">CERTAIN</span>
+    </div>
+    <div class="loc">CODE/RPI Code/Straight mode_testing2.py &rarr; lines 118&ndash;119, 462</div>
+    <div class="bd">
+      <h4>What the code does today</h4>
+<pre><code>KP = 25                    <span class="c"># line 118</span>
+Max_Correction = 600
+…
+<span class="bad">correction = int(KP * error)</span>   <span class="c"># line 462 — proportional only, no I, no D</span></code></pre>
+
+      <h4>The arithmetic, with no plant model needed</h4>
+      <p>
+        With proportional control only, at steady state
+        <code>correction = KP &times; error</code>. If a constant disturbance requires
+        <em>C</em> counts/s of correction to cancel it, the loop must sit at
+        <code>error = C / KP</code> forever. With <code>KP = 25</code>:
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>Correction the disturbance demands</th><th class="num">Permanent heading error</th><th class="num">Drift over a 10 m pass</th></tr></thead>
+        <tbody>
+          <tr><td>25 counts/s</td><td class="num">1.0&deg;</td><td class="num">175 mm</td></tr>
+          <tr><td>50 counts/s</td><td class="num">2.0&deg;</td><td class="num">349 mm</td></tr>
+          <tr><td>120 counts/s <span class="muted">(20% of our correction limit)</span></td><td class="num">4.8&deg;</td><td class="num">837 mm</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">
+        This is control theory, not tuning. Raising KP shrinks the error but never removes it, and a high KP on a
+        latency-limited loop oscillates.
+      </p>
+
+      <h4>What produces a constant disturbance on our rover</h4>
+      <ul>
+        <li><strong>Umbilical drag</strong> &mdash; paint hose, air line, power tether. The pull grows as the rover climbs and changes direction each time it indexes sideways. <span class="conf l">LIKELY</span> our largest single disturbance, and we currently have no instrumentation on it at all.</li>
+        <li><strong>Spray-gun reaction torque</strong>, if the gun is not on the rover centreline.</li>
+        <li><strong>Left/right mismatch</strong> in wheel rolling diameter, gearbox friction, or magnet drag.</li>
+      </ul>
+
+      <figure class="fig" style="margin-left:0;margin-right:0">
+        <div class="ftitle">Closed-loop simulation: constant disturbance applied at t = 0</div>
+        <div class="fsub">Disturbance sized so that the P-only loop settles at exactly 2.0&deg;. Same KP in both runs; the PI run adds an integral term.</div>
+        <div class="legend" id="lg-pi"></div>
+        <div class="chart" id="ch-pi"></div>
+        <figcaption>
+          P-only parks at 2.0&deg; and stays there &mdash; 349 mm of drift over a 10 m pass, every pass, in the same
+          direction. Adding the integral term drives it to 0.00&deg; in about 10 seconds. Gains shown are for the
+          illustrative plant model and <strong>must be re-tuned on the machine</strong>.
+        </figcaption>
+      </figure>
+
+      <div class="cost"><span>Cost if unfixed:</span> <b>349 mm</b> <span class="muted">per 10 m pass at a 2&deg; standing error &mdash; a consistent bow, always the same way.</span></div>
+    </div>
+  </div>
+
+  <!-- ---------- FINDING 6 ---------- -->
+  <div class="defect">
+    <div class="hd">
+      <div class="t">Finding 6 &mdash; Loop latency of roughly 90&ndash;320 ms</div>
+      <span class="chip info">Secondary</span><span class="conf l">LIKELY</span>
+    </div>
+    <div class="loc">Architecture: SCL3300 &rarr; SPI &rarr; Teensy &rarr; USB &rarr; RPi 5 (Linux, Python) &rarr; UART 38400 &rarr; 2&times; Roboclaw</div>
+    <div class="bd">
+      <div class="tw"><table>
+        <thead><tr><th>Stage</th><th class="num">Delay</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>SCL3300 in Mode 4, 10 Hz low-pass</td><td class="num">~16 ms</td><td>Wrong mode; Mode 1&rsquo;s 40 Hz filter is 4&times; faster</td></tr>
+          <tr><td>Teensy <code>delay(5)</code> + SPI + ASCII printing</td><td class="num">5&ndash;8 ms</td><td>Fixed delay in the main loop</td></tr>
+          <tr><td>USB &rarr; Pi <code>readline()</code> &rarr; Python GIL</td><td class="num">5&ndash;30 ms</td><td><code>readline()</code> returns the <em>oldest</em> buffered line, so a stall means steering on stale data with no warning</td></tr>
+          <tr><td><code>_telemetry_csv_file.flush()</code> <strong>inside the sensor thread</strong> (line 241)</td><td class="num">0&ndash;50 ms spikes</td><td>An SD-card write blocks the heading update</td></tr>
+          <tr><td>Motor loop 10 ms + two blocking Roboclaw calls at 38400 baud</td><td class="num">15&ndash;20 ms</td><td>Baud rate is 6&times; lower than the controller supports</td></tr>
+          <tr><td>Roboclaw velocity-PID rise time</td><td class="num">50&ndash;200 ms</td><td>Depends on the acceleration setting</td></tr>
+          <tr><th>Total</th><th class="num">~90&ndash;320 ms</th><th>16&ndash;58&deg; of phase lag at a 0.5 Hz loop bandwidth</th></tr>
+        </tbody>
+      </table></div>
+      <p>
+        Enough to make a well-tuned loop oscillate and an untuned one bow. <strong>But it is number six on the list.</strong>
+        Fixing Findings 1&ndash;4 first may make this acceptable without any architectural change.
+      </p>
+      <div class="cost"><span>Cheapest wins:</span> <b>~10 lines</b>
+        <span class="muted">move CSV logging to a queue; drain the serial buffer to the newest line; raise Roboclaw baud 38400 &rarr; 230400.</span></div>
+    </div>
+  </div>
+
+  <h2>Minor observations worth recording</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Observation</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td><code>ANGLE_THRESHOLD</code> and <code>prevX/prevY/prevZ</code> in the Teensy sketch are computed and stored but never used</td><td>Dead code &mdash; harmless, but misleading to the next reader</td></tr>
+      <tr><td><code>laneChangeLeft()</code> Step 2 is commented <em>&ldquo;Turning right toward 30&deg; zone&rdquo;</em> and then waits for <code>angle_in_330_zone</code></td><td>Labels are crossed. Harmless today, a trap at the next edit</td></tr>
+      <tr><td>Front and rear Roboclaws receive identical left/right commands, with no cross-controller coordination</td><td>Correct for straight running; the axles must scrub during any turn &mdash; an uncontrollable yaw disturbance</td></tr>
+      <tr><td><code>ReadSpeedM1M2</code> and <code>ReadEncM1/M2</code> are never called</td><td>We are throwing away a free slip detector and a free odometer</td></tr>
+      <tr><td>240&nbsp;VAC on the rover, with every emergency-stop path running through Python <span class="conf c">CERTAIN</span></td><td><strong>Safety.</strong> A hardware E-stop that cuts motor power independently of the Pi should be added regardless of anything else in this report</td></tr>
+    </tbody>
+  </table></div>
+
+</section>
+
+
+<!-- ============================== TAB 3 : PIXHAWK ============================== -->
+<section class="panel" id="p3">
+
+  <p class="lede">
+    The proposal is to add a Pixhawk / Cube Orange running ArduRover. <strong>Our recommendation is not to.</strong>
+    There are four independent blockers, any one of which is fatal on its own. Three are structural &mdash; no
+    parameter, firmware version or wiring change removes them.
+  </p>
+
+  <div class="callout crit">
+    <h4>Recommendation</h4>
+    <p>
+      Do not purchase the Cube Orange Plus (&#8377;51,999). ArduRover&rsquo;s navigation stack is built on an
+      assumption our vehicle violates by construction: that the vehicle drives in the horizontal plane. Purchase one
+      <strong>ICM-42688-P gyro (&#8377;1,999)</strong> instead and fit it to the existing Teensy. That single chip
+      delivers the only capability the Cube would genuinely have added.
+    </p>
+  </div>
+
+  <h2>Blocker 1 — The mathematical singularity</h2>
+  <p class="small"><span class="conf c">CERTAIN</span> &mdash; this is the structural one.</p>
+  <div class="card">
+    <p>
+      ArduPilot defines <strong>yaw</strong> as rotation about the <strong>Earth&rsquo;s vertical axis</strong>. Every
+      Rover navigation mode &mdash; <code>AUTO</code>, <code>GUIDED</code>, <code>STEERING</code>, the L1/S-curve path
+      follower, the pivot-turn logic &mdash; is built on <code>ahrs.get_yaw()</code>.
+    </p>
+    <p>
+      When our rover climbs the wall, <strong>its forward axis <em>is</em> the Earth&rsquo;s vertical axis</strong>.
+      Pitch = 90&deg;. At exactly 90&deg; pitch the Euler yaw angle is mathematically undefined (gimbal lock). The
+      internal quaternion stays valid, but the heading number that the navigation controller actually consumes becomes
+      meaningless and flips wildly on sub-degree attitude changes.
+    </p>
+    <p>
+      Meanwhile the quantity we <em>need</em> to control &mdash; rotation about the <strong>wall normal</strong>, which
+      is a <em>horizontal</em> axis in Earth frame &mdash; is not &ldquo;yaw&rdquo; in ArduPilot&rsquo;s frame of
+      reference at all. It is a mixture of roll and yaw for which no Rover controller has a channel.
+    </p>
+    <h4>Could we not just rotate the board?</h4>
+    <p>
+      No. Setting <code>AHRS_ORIENTATION</code> so the board&rsquo;s Z axis lies along the wall normal makes the EKF
+      see a permanent 1&nbsp;g in body-XY. It will integrate that as a real 1&nbsp;g horizontal acceleration and
+      diverge within seconds.
+    </p>
+  </div>
+
+  <h2>Blocker 2 — No legal heading source without GPS or a compass</h2>
+  <p class="small"><span class="conf c">CERTAIN</span> &mdash; from ArduPilot&rsquo;s own compass-less documentation.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Heading source ArduPilot supports</th><th>What it requires</th><th>Available to us?</th></tr></thead>
+    <tbody>
+      <tr><td>GSF (Gaussian Sum Filter)</td><td>Good <strong>GPS</strong> velocity &mdash; docs specify &ldquo;at least UBlox M8 or equivalent&rdquo;</td><td><span class="chip crit">No GPS</span></td></tr>
+      <tr><td>GPS-for-Yaw (moving baseline)</td><td><strong>Two</strong> UBlox F9P receivers</td><td><span class="chip crit">No GPS</span></td></tr>
+      <tr><td>Align-yaw-to-GPS</td><td><strong>GPS</strong>; Plane only, not Rover</td><td><span class="chip crit">No GPS</span></td></tr>
+      <tr><td>Compass / magnetometer</td><td>A usable magnetic field</td><td><span class="chip crit">Steel gas holder</span></td></tr>
+      <tr><td>ExternalNav (<code>EK3_SRC1_YAW = 6</code>)</td><td>A companion computer that <em>already computes the heading</em></td><td><span class="chip warn">Only if we write it ourselves</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    The last row is the important one. The only remaining option requires <em>us</em> to compute the heading on the Pi
+    and feed it in &mdash; at which point the Cube contributes nothing but an IMU.
+  </p>
+
+  <h2>Blocker 3 — No legal position source either</h2>
+  <p class="small"><span class="conf c">CERTAIN</span></p>
+  <p>
+    <code>EK3_SRC1_POSXY</code> accepts GPS, Beacon (UWB), ExternalNav, or Optical Flow. <strong>Wheel encoders are not
+    a position source in ArduPilot.</strong> They only supply body-frame odometry <em>into</em> an EKF that still needs
+    an absolute reference and a heading. Without one of those four, EKF3 never produces a position and no autonomous
+    mode will arm.
+  </p>
+  <p>
+    UWB beacons (Marvelmind) are the only non-GPS option that is plug-and-play in ArduPilot, and
+    <span class="conf g">GUESSING</span> multipath on a steel gas holder surrounded by other assets will be severe. We
+    would not stake the project on it.
+  </p>
+
+  <h2>Blocker 4 — The barometer is 1–2 orders of magnitude too coarse</h2>
+  <p class="small"><span class="conf c">CERTAIN</span></p>
+  <div class="tw"><table>
+    <thead><tr><th>Quantity</th><th class="num">Value</th></tr></thead>
+    <tbody>
+      <tr><td>Pressure-to-altitude scale</td><td class="num">1 hPa &asymp; 8.4 m</td></tr>
+      <tr><td>Good barometer short-term noise (MS5611 / ICP-20100 class)</td><td class="num">&plusmn;100 mm</td></tr>
+      <tr><td>Drift over a working shift with weather</td><td class="num">metres</td></tr>
+      <tr><td><strong>Our required index step</strong></td><td class="num"><strong>150 mm</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    Even at its best the barometer is no better than our whole overlap step. Worse, we are working on a
+    <strong>gas holder</strong> &mdash; a vessel whose bell moves, actively changing the local pressure field. The
+    barometer is not usable here. Distance must come from the wheel encoders we already have.
+  </p>
+
+  <h2>What we need vs what the Cube provides</h2>
+  <div class="tw"><table>
+    <thead><tr><th>What the job needs</th><th>Cube Orange Plus + ArduRover</th><th>Our existing SCL3300 + software fix</th></tr></thead>
+    <tbody>
+      <tr><td>Heading about the <strong>wall normal</strong></td><td><span class="chip crit">Not representable</span> &mdash; ArduPilot&rsquo;s yaw is about the Earth vertical</td><td><span class="chip good">Direct measurement</span>, 1 g/radian sensitivity</td></tr>
+      <tr><td>Works without GPS</td><td><span class="chip crit">No</span> &mdash; every heading source needs it</td><td><span class="chip good">Yes</span> &mdash; gravity is the reference</td></tr>
+      <tr><td>Works next to / on steel</td><td><span class="chip warn">Only if compass disabled</span>, which removes the last heading source</td><td><span class="chip good">Completely immune</span></td></tr>
+      <tr><td>Drift-free over a long pass</td><td><span class="chip warn">Gyro-only drifts</span></td><td><span class="chip good">Zero drift</span> &mdash; it is a measurement, not an integration</td></tr>
+      <tr><td>Accuracy achievable</td><td><span class="chip flat">n/a &mdash; will not arm</span></td><td><span class="chip good">0.007&deg; noise floor</span> (0.12 mm/m)</td></tr>
+      <tr><td>Distance for the overlap step</td><td><span class="chip crit">Barometer unusable</span>; encoders not a position source</td><td><span class="chip good">Roboclaw encoders</span>, already wired</td></tr>
+      <tr><td>Good gyro for vibration rejection</td><td><span class="chip good">Yes</span> &mdash; the one genuine benefit</td><td><span class="chip warn">Needs the &#8377;1,999 add-on</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Cost comparison</h2>
+  <div class="tiles">
+    <div class="tile">
+      <div class="lab">Cube Orange Plus &mdash; delivers no usable capability here</div>
+      <div class="val">&#8377;51,999</div>
+      <div class="note">Robu.in listing, August 2026. Excludes carrier board accessories and integration time.</div>
+    </div>
+    <div class="tile">
+      <div class="lab">ICM-42688-P gyro &mdash; delivers the one capability we actually want</div>
+      <div class="val">&#8377;1,999</div>
+      <div class="note">Robu.in listing. Fits the Teensy&rsquo;s existing SPI bus on a spare chip-select.</div>
+    </div>
+    <div class="tile">
+      <div class="lab">Difference</div>
+      <div class="val">&#8377;50,000</div>
+      <div class="note">26&times; the cost, for a firmware stack we could not run.</div>
+    </div>
+  </div>
+
+  <h2>The one thing the Cube would genuinely have given us</h2>
+  <div class="card">
+    <p>
+      A good <strong>gyroscope</strong>, temperature-stabilised and vibration-isolated, plus ArduPilot&rsquo;s mature
+      logging stack. That capability is real and we do want it &mdash; here is why:
+    </p>
+    <p>
+      An accelerometer measures <strong>specific force</strong>, not gravity. Any sideways acceleration &mdash;
+      including the one produced by our own steering correction &mdash; appears as a phantom heading error of
+      <code>atan(a<sub>lat</sub> / g)</code>. A modest 0.1&nbsp;m/s&sup2; of sideways jerk creates a
+      <strong>0.58&deg;</strong> lie. That is a feedback path running from the actuator straight back into the sensor,
+      and it is why accelerometer-only heading loops on walls either oscillate or have to be detuned into
+      uselessness. <span class="conf c">CERTAIN</span>
+    </p>
+    <p>
+      The fix is a gyro whose sensitive axis lies along the surface normal, blended with the inclinometer:
+    </p>
+<pre><code>phi_hat += gyro_n * dt                          <span class="c"># fast, immune to linear acceleration</span>
+phi_hat += (phi_accel - phi_hat) * (dt / TAU)   <span class="c"># slow, absolute, drift-free</span></code></pre>
+    <p>
+      With <code>TAU = 2 s</code> and a 10&nbsp;&deg;/hr bias-stability gyro, the steady error contributed by gyro
+      drift is <code>10/3600 &times; 2 = <strong>0.0056&deg;</strong></code> &mdash; negligible. We get an
+      acceleration-immune heading <em>and</em> a clean rate signal for the derivative term.
+    </p>
+    <p>
+      <strong>An ICM-42688-P on the Teensy&rsquo;s spare SPI chip-select does exactly this</strong>, with lower latency
+      than a MAVLink hop to a Cube, for &#8377;1,999.
+    </p>
+  </div>
+
+  <h2>If the team still wants to buy a Cube</h2>
+  <p>
+    It is not useless &mdash; it is just mis-specified for this job. The only defensible way to use one would be:
+  </p>
+  <ul>
+    <li>Run it in <code>MANUAL</code> as a <strong>raw sensor and data logger only</strong>: stream
+      <code>RAW_IMU</code> and <code>ATTITUDE_QUATERNION</code> to the Pi over MAVLink.</li>
+    <li>Do <strong>all</strong> control on the Teensy / Pi, exactly as described in Tab 4.</li>
+    <li>Never enable an ArduRover navigation mode, because none of them can represent our heading.</li>
+  </ul>
+  <p>
+    In that configuration we have bought a &#8377;51,999 IMU and logger. It is a defensible purchase for hardware
+    quality and triple redundancy. It is <strong>not</strong> a fix for the straight-line problem, and it should not be
+    presented as one.
+  </p>
+
+</section>
+
+
+<!-- ============================== TAB 4 : FIX PLAN ============================== -->
+<section class="panel" id="p4">
+
+  <p class="lede">
+    Four phases. Phase 0 costs nothing but half a day and tells us which cause dominates. Phase 1 is the whole fix and
+    costs nothing but engineering time. Phase 2 is one &#8377;1,999 chip. Phase 3 and 4 are only needed if measurement
+    shows we are still short.
+  </p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Phase</th><th>What</th><th class="num">Cost</th><th class="num">Effort</th><th class="num">Expected accuracy after</th></tr></thead>
+    <tbody>
+      <tr><td><strong>0</strong></td><td>Measure before changing anything</td><td class="num">&#8377;0</td><td class="num">0.5 day</td><td class="num">&mdash; (establishes the baseline)</td></tr>
+      <tr><td><strong>1</strong></td><td>Fix the four critical software defects</td><td class="num">&#8377;0</td><td class="num">2&ndash;3 days</td><td class="num">&le; 0.2&deg; &rarr; &le; 35 mm / 10 m</td></tr>
+      <tr><td><strong>2</strong></td><td>Add the gyro, blend with the inclinometer</td><td class="num">&#8377;1,999</td><td class="num">1 week</td><td class="num">&le; 0.1&deg; &rarr; &le; 17 mm / 10 m</td></tr>
+      <tr><td><strong>3</strong></td><td>Improve the lane-change manoeuvre mechanically</td><td class="num">TBD</td><td class="num">2&ndash;4 weeks</td><td class="num">Removes turn-slip as a variable</td></tr>
+      <tr><td><strong>4</strong></td><td>Add cross-track position measurement</td><td class="num">TBD</td><td class="num">4+ weeks</td><td class="num">Only if Phases 1&ndash;3 fall short</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Phase 0 — Measure first. Half a day. No code changes.</h2>
+  <div class="callout warn">
+    <h4>This is the highest-value half-day available to us</h4>
+    <p>
+      We currently cannot answer &ldquo;does the rover bow consistently to one side, or wander randomly?&rdquo; That
+      single observation tells us whether the dominant cause is a bias (Findings 2, 3, 5) or the sign defect
+      (Finding 1). Do this before touching any code.
+    </p>
+  </div>
+  <ol>
+    <li><strong>Axis identification.</strong> Flash the new firmware, send the <code>D</code> command, park the rover on
+      the wall, and rotate it about 10&deg; each way by hand about the surface normal. Record which sensor axis gives a
+      <em>signed, linear</em> &plusmn;10&deg; reading &mdash; that is the lateral axis. Confirm the axis we currently
+      use gives the <em>same</em> number for both directions.</li>
+    <li><strong>Static noise and warm-up drift.</strong> Log the computed heading, stationary on the wall, for 30
+      minutes from cold start. This gives the real sensor bias and its temperature drift.</li>
+    <li><strong>Motion corruption.</strong> Log the heading while driving up at painting speed. The difference from the
+      static trace tells us how much gyro we need. <span class="conf l">LIKELY</span> we will see 0.3&ndash;1.5&deg; of
+      accelerometer noise from wheel-magnet cogging and pump vibration.</li>
+    <li><strong>Ground truth.</strong> Chalk-line one full pass and measure the deviation at every 1&nbsp;m.
+      <strong>Consistent bow, or random wander?</strong></li>
+  </ol>
+
+  <h2>Phase 1 — The five code changes</h2>
+  <p>
+    Both patch files are written and delivered: <code>teensy_wall_heading_v2.ino</code> and
+    <code>heading_control_v2.py</code>. Ordered by improvement per hour of work.
+  </p>
+
+  <h3>Change 1 — Read the heading correctly on the Teensy</h3>
+  <div class="split">
+    <div><p class="codelabel">Before</p>
+<pre><code><span class="c">// no setMode() call at all → library defaults to Mode 4</span>
+inclinometer.begin();
+…
+float x = inclinometer.getCalculatedAngleX();
+RPI_SERIAL.print("X:"); RPI_SERIAL.print(x, 2);</code></pre></div>
+    <div><p class="codelabel">After</p>
+<pre><code>inclinometer.setMode(1);   <span class="c">// ±1.2 g, 6000 LSB/g, 40 Hz LPF</span>
+inclinometer.begin();
+inclinometer.setFastReadMode();
+…
+float a_f = SIGN_FORWARD * pickAxis(AXIS_FORWARD, ax, ay, az);
+float a_l = SIGN_LATERAL * pickAxis(AXIS_LATERAL, ax, ay, az);
+float phi = atan2f(a_l, a_f) * 57.2957795f - heading_bias_deg;</code></pre></div>
+  </div>
+  <p class="small">
+    Signed, linear, &plusmn;180&deg;, no saturation, 4&times; less filter lag. Also adds a <code>Z</code> command that
+    averages 500 samples to remove the sensor&rsquo;s offset &mdash; the datasheet allows up to &plusmn;10&nbsp;mg,
+    which is &plusmn;0.573&deg; = 100 mm of drift over a 10 m pass, and is ~84&times; larger than the noise.
+  </p>
+
+  <h3>Change 2 — Hold true vertical, not &ldquo;wherever we were&rdquo;</h3>
+  <div class="split">
+    <div><p class="codelabel">Before &mdash; 5 places</p>
+<pre><code>target_heading = x_angle</code></pre></div>
+    <div><p class="codelabel">After</p>
+<pre><code>target_heading = 0.0
+<span class="c"># heading_offset calibrated ONCE per job</span>
+<span class="c"># against a plumb line, never per pass</span></code></pre></div>
+  </div>
+
+  <h3>Change 3 — Close the turn properly</h3>
+  <div class="split">
+    <div><p class="codelabel">Before</p>
+<pre><code>def angle_in_zero_zone(a):
+    return (a &gt;= 350 or a &lt;= 5)   <span class="c"># 15° wide</span>
+
+<span class="c"># bang-bang: motors cut the instant it's true</span></code></pre></div>
+    <div><p class="codelabel">After</p>
+<pre><code>while True:
+    err = target - phi
+    if abs(err) &lt;= 0.30:              <span class="c"># 0.6° window</span>
+        stop()
+        if held_for(0.20): return True <span class="c"># 200 ms</span>
+    else:
+        cmd = TURN_KP * err            <span class="c"># slows on approach</span>
+        drive(+cmd, -cmd)</code></pre></div>
+  </div>
+  <p class="small">50&times; tighter acceptance, and the turn decelerates into the target instead of coasting past it.</p>
+
+  <h3>Change 4 — Index by encoder counts, not by stopwatch</h3>
+  <div class="split">
+    <div><p class="codelabel">Before</p>
+<pre><code>left_speed  = BACKWARD_SPEED
+right_speed = BACKWARD_SPEED
+time.sleep(1.0)</code></pre></div>
+    <div><p class="codelabel">After</p>
+<pre><code>phi_actual, ok = heading.read()
+travel   = LANE_STEP_M / abs(sin(radians(phi_actual)))
+counts   = round(travel * COUNTS_PER_METRE)
+md.SpeedAccelDistanceM1M2(addr, ACCEL,
+        v, counts, v, counts, 1)
+<span class="c"># wait for ReadBuffers() == 0x80, then</span>
+<span class="c"># verify achieved counts and log any slip</span></code></pre></div>
+  </div>
+
+  <div class="callout">
+    <h4>Also worth revisiting: the crab angle itself</h4>
+    <p>
+      We currently step sideways at about 30&deg;. That means driving <code>step / sin 30&deg; = 2&times;</code> the
+      sideways distance, and losing <code>1.73 &times; step</code> of height in the process &mdash; 260 mm of height
+      lost for a 150 mm sideways step. At <strong>90&deg;</strong> (driving horizontally around the tank) the step
+      distance equals the commanded distance exactly, encoder error is not amplified, and <strong>no height is
+      lost at all</strong>. Because the turn is now closed on an absolute gravity reference, turn error does not
+      accumulate from pass to pass, so the extra turn is cheap.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th class="num">Crab angle</th><th class="num">Distance driven for a 150 mm step</th><th class="num">Height lost</th><th class="num">Encoder-error amplification</th></tr></thead>
+      <tbody>
+        <tr><td class="num">30&deg; <span class="muted">(today)</span></td><td class="num">300 mm</td><td class="num">260 mm</td><td class="num">2.00&times;</td></tr>
+        <tr><td class="num">60&deg;</td><td class="num">173 mm</td><td class="num">87 mm</td><td class="num">1.15&times;</td></tr>
+        <tr><td class="num">90&deg; <span class="muted">(recommended)</span></td><td class="num">150 mm</td><td class="num">0 mm</td><td class="num">1.00&times;</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h3>Change 5 — Add the integral term</h3>
+  <div class="split">
+    <div><p class="codelabel">Before</p>
+<pre><code>KP = 25
+correction = int(KP * error)
+correction = clamp(correction, ±600)</code></pre></div>
+    <div><p class="codelabel">After</p>
+<pre><code>p = KP * err
+if moving:                    <span class="c"># freeze when stopped</span>
+    i_term += KI * err * dt
+i_term = clamp(i_term, ±MAX)  <span class="c"># anti-windup</span>
+corr   = clamp(p + i_term, ±MAX)
+corr   = slew_limit(corr)     <span class="c"># no step torques</span>
+if saturated: i_term = corr - p   <span class="c"># back-calculate</span></code></pre></div>
+  </div>
+
+  <h3>Change 6 — Latency housekeeping (about 10 lines)</h3>
+  <ul>
+    <li>Move CSV logging out of the sensor-reading thread into a <code>queue.Queue</code> + writer thread. Today an SD-card <code>flush()</code> at line 241 blocks the heading update.</li>
+    <li>Drain the serial buffer to the <em>newest</em> line each cycle: <code>while ser.in_waiting &gt; 64: line = ser.readline()</code>. <code>readline()</code> returns the oldest line, so a stall silently feeds us stale data.</li>
+    <li>Raise the Roboclaw baud rate from <strong>38400 to 230400</strong> in BasicMicro Motion Studio.</li>
+    <li>The new firmware timestamps every packet, so the Pi can now <em>measure</em> link latency instead of us guessing at it. It is logged as <code>link_latency_ms</code>.</li>
+  </ul>
+
+  <h2>Tuning procedure — in this order</h2>
+  <div class="tw"><table>
+    <thead><tr><th class="num">Step</th><th>Action</th><th>Success criterion</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>Axis ID (<code>D</code>) and bias calibration (<code>Z</code>) against a plumb line</td><td>Heading reads 0.00 &plusmn; 0.05&deg; when verified vertical</td></tr>
+      <tr><td class="num">1</td><td>KP only, KI = 0, KD = 0. Start at KP = 10, raise until the heading trace just begins to overshoot, then back off to 60% of that</td><td>No sustained oscillation on a full pass</td></tr>
+      <tr><td class="num">2</td><td>Add KI, starting at KP/8. Watch <code>error_deg</code> in the log &mdash; with KP alone there will be a small <em>persistent</em> offset; that is the real disturbance</td><td>Offset returns to zero within ~3 s. Halve KI if it hunts</td></tr>
+      <tr><td class="num">3</td><td>Chalk-line a full pass, measure deviation every 1 m</td><td><strong>&le; 35 mm over 10 m</strong> (= 0.20&deg;)</td></tr>
+      <tr><td class="num">4</td><td>Only then consider KD, and only with a real gyro fitted</td><td>Never differentiate the accelerometer angle &mdash; it is pure noise gain</td></tr>
+      <tr><td class="num">5</td><td>If the trace oscillates at a fixed frequency regardless of gain, we are latency-limited, not gain-limited</td><td>Check <code>link_latency_ms</code>; if routinely &gt; 30 ms, move the inner loop onto the Teensy</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Reference: the accuracy we should hold ourselves to</h2>
+  <div class="tw"><table>
+    <thead><tr><th class="num">Heading error</th><th class="num">Drift per metre</th><th class="num">Over 5 m</th><th class="num">Over 10 m</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0.007&deg;</td><td class="num">0.12 mm</td><td class="num">0.6 mm</td><td class="num">1.2 mm</td><td>Sensor noise floor &mdash; unreachable in practice</td></tr>
+      <tr><td class="num">0.10&deg;</td><td class="num">1.75 mm</td><td class="num">8.7 mm</td><td class="num">17.5 mm</td><td>Target after Phase 2 (gyro fitted)</td></tr>
+      <tr><td class="num">0.20&deg;</td><td class="num">3.49 mm</td><td class="num">17.5 mm</td><td class="num">34.9 mm</td><td><strong>Target after Phase 1 &mdash; the acceptance criterion</strong></td></tr>
+      <tr><td class="num">0.573&deg;</td><td class="num">10.0 mm</td><td class="num">50.0 mm</td><td class="num">100.0 mm</td><td>Uncalibrated sensor offset &mdash; removed by the <code>Z</code> command</td></tr>
+      <tr><td class="num">1.00&deg;</td><td class="num">17.45 mm</td><td class="num">87.3 mm</td><td class="num">174.5 mm</td><td>Fails</td></tr>
+      <tr><td class="num">2.00&deg;</td><td class="num">34.90 mm</td><td class="num">174.5 mm</td><td class="num">349.0 mm</td><td>What P-only leaves us with</td></tr>
+      <tr><td class="num">7.50&deg;</td><td class="num">130.5 mm</td><td class="num">652.6 mm</td><td class="num">1305.3 mm</td><td>What the 15&deg; acceptance window permits</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Phase 3 — Fix the manoeuvre, not just the controller</h2>
+  <p>
+    A point-turn or crab-turn on magnetic wheels is the highest-slip thing this rover does. Every lane change is an
+    opportunity to lose position. Three options, in increasing cost:
+  </p>
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th>What it does</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td><strong>(a) Keep the crab, close it absolutely</strong></td><td>Because gravity is an absolute reference, turn errors do not accumulate from pass to pass &mdash; the rover re-acquires true vertical every time</td><td><span class="chip good">Free</span> Already included in Phase 1. Most of the benefit.</td></tr>
+      <tr><td><strong>(b) Move the gun, not the rover</strong></td><td>A small linear slide carries the spray gun and indexes one overlap step; the rover only repositions every N stripes</td><td><span class="chip good">Recommended</span> <span class="conf l">LIKELY</span> the highest-value mechanical change available. Decouples paint pitch from drive accuracy entirely.</td></tr>
+      <tr><td><strong>(c) Independent steering or mecanum wheels</strong></td><td>True sideways crab motion with no turning</td><td><span class="chip warn">Expensive</span> Mecanum wheels and magnetic adhesion do not work well together.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Phase 4 — Cross-track position, only if still needed</h2>
+  <div class="callout">
+    <h4>What heading control cannot do</h4>
+    <p>
+      Perfect heading control gives a <strong>straight line, but not necessarily the <em>right</em> straight line</strong>.
+      It cannot correct a sideways offset that already exists, and it cannot see pure sideways slip (the rover sliding
+      without rotating). Wheel encoders cannot see that slip either. <span class="conf c">CERTAIN</span>
+    </p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th class="num">Accuracy</th><th>Works near steel?</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Draw-wire (string-pot) encoder</strong> from a fixed anchor</td><td class="num">sub-mm</td><td><span class="chip good">Yes</span></td><td><strong>Recommended.</strong> We already drag an umbilical; one more line costs little. Two anchors give full 2D position.</td></tr>
+      <tr><td>Rotating laser plane + photodiode array on the rover</td><td class="num">~1 mm</td><td><span class="chip good">Yes</span></td><td>Industrial and robust; gives an absolute level/height datum as a bonus.</td></tr>
+      <tr><td>AprilTag fiducials + global-shutter camera</td><td class="num">2&ndash;10 mm</td><td><span class="chip good">Yes</span></td><td>Tags on the base ring and roof. Needs line of sight and lighting.</td></tr>
+      <tr><td>Optical flow on the wall (PAA5100JE)</td><td class="num">drifts</td><td><span class="chip warn">Maybe</span></td><td>The <em>only</em> option that sees true slip. But specular steel and wet paint will fight it. Test before committing.</td></tr>
+      <tr><td>UWB beacons (Marvelmind)</td><td class="num">20&ndash;100 mm</td><td><span class="chip crit">Poor</span></td><td><span class="conf g">GUESSING</span> multipath on a steel gas holder will be severe.</td></tr>
+      <tr><td>Taut guide wire from the roof + passive follower</td><td class="num">sub-mm</td><td><span class="chip good">Yes</span></td><td>Least sophisticated, most reliable; standard on commercial tank crawlers. If the acceptance criterion is coating quality rather than autonomy, this wins on every axis except pride.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Architecture note for the longer term</h2>
+  <p>
+    Today the control loop crosses three hops and a non-real-time operating system:
+  </p>
+<pre><code>SCL3300 → SPI → Teensy → USB → RPi 5 (Linux, Python, GIL) → UART 38400 → 2× Roboclaw</code></pre>
+  <p>
+    <span class="conf l">LIKELY</span> the inner heading loop should move onto the <strong>Teensy</strong>. It already
+    owns the sensor, it is hard real-time, and it can run the loop at 200&nbsp;Hz deterministically. The Pi would then
+    handle supervision: mission sequencing, lane counting, logging, the operator interface and the FlySky link.
+  </p>
+  <p>
+    That means moving the Roboclaw serial link from the Pi&rsquo;s <code>GPIO14/15</code> to a Teensy hardware serial
+    port &mdash; a wiring change on the existing schematic, not a redesign. The Teensy 4.1 has eight hardware serial
+    ports and we currently use one. <strong>Revisit this only if Phase 1 plus the latency housekeeping does not settle
+    the loop.</strong>
+  </p>
+
+</section>
+
+
+<!-- ============================== TAB 5 : QUESTIONS ============================== -->
+<section class="panel" id="p5">
+
+  <p class="lede">
+    These do not change the conclusions in Tabs 2 and 3 &mdash; those rest on our own source code and manufacturer
+    datasheets. They change the <em>numbers</em>: the acceptance criterion, the error budget, and which Phase 3/4
+    option is worth funding.
+  </p>
+
+  <h2>A. Measurements we must take — nobody can answer these from a desk</h2>
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>Question</th><th>Why it matters</th><th>What changes with the answer</th><th>Owner</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="num">A1</td>
+        <td><strong>Chalk-line one full pass and measure deviation every 1 m. Is the error a consistent bow to one side, or a random wander? Does it repeat pass to pass?</strong></td>
+        <td>This is the single most informative measurement available and it takes 20 minutes. A consistent bow points at a bias (Findings 2, 3, 5). A random wander points at the sign defect (Finding 1) or wheel slip.</td>
+        <td>Re-orders the entire fix priority list. <strong>Highest priority item in this document.</strong></td>
+        <td>Rover team</td>
+      </tr>
+      <tr>
+        <td class="num">A2</td>
+        <td>Which physical sensor axis points up the wall, and which points out of it? (Run the <code>D</code> diagnostic and rotate the rover &plusmn;10&deg; by hand.)</td>
+        <td>Determines whether the axis we currently steer on is the unsigned one. Two minutes of work.</td>
+        <td>Confirms or refutes Finding 1 on the actual machine.</td>
+        <td>Rover team</td>
+      </tr>
+      <tr>
+        <td class="num">A3</td>
+        <td>Log the heading stationary on the wall for 30 minutes from cold start.</td>
+        <td>Gives the real sensor bias and its warm-up drift. The datasheet allows up to 0.573&deg;; the real figure is probably much smaller but we do not know it.</td>
+        <td>Sets how often the <code>Z</code> calibration must be repeated during a shift.</td>
+        <td>Rover team</td>
+      </tr>
+      <tr>
+        <td class="num">A4</td>
+        <td>Log the heading while driving up at painting speed, with the pump running.</td>
+        <td>The difference from A3 is the vibration and acceleration corruption of the accelerometer.</td>
+        <td>Decides whether Phase 2 (the gyro) is mandatory or optional.</td>
+        <td>Rover team</td>
+      </tr>
+      <tr>
+        <td class="num">A5</td>
+        <td>Is the Roboclaw velocity PID actually tuned? What are the configured QPPS values per channel, and were the PID constants auto-tuned in BasicMicro Motion Studio?</td>
+        <td>The code calls <code>SpeedM1M2</code>, which <em>is</em> velocity-PID mode &mdash; but with a wrong QPPS the loop saturates and behaves as if open-loop.</td>
+        <td>If untuned, this is a sixth defect and a cheap fix.</td>
+        <td>Rover team</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h2>B. Facts we must supply — these set the acceptance criterion</h2>
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>Question</th><th>Why it matters</th><th>Currently assumed</th></tr></thead>
+    <tbody>
+      <tr><td class="num">B1</td><td><strong>How tall is one vertical stripe, in metres?</strong></td><td>Every drift figure in this document scales linearly with pass length.</td><td><span class="conf g">10 m</span></td></tr>
+      <tr><td class="num">B2</td><td><strong>What is the spray fan width, and what index step does 50% overlap require?</strong></td><td>Sets the accuracy target: cumulative drift should stay under about &frac14; of the step.</td><td><span class="conf g">300 mm fan &rarr; 150 mm step</span></td></tr>
+      <tr><td class="num">B3</td><td><strong>What deviation over a full pass is pass/fail for the coating spec?</strong></td><td>Without this we are engineering to a number we invented (0.20&deg;).</td><td><span class="conf g">35 mm over 10 m</span></td></tr>
+      <tr><td class="num">B4</td><td>Encoder counts per wheel revolution, and effective rolling diameter on the magnets.</td><td>Converts the index step from millimetres into encoder counts. Wrong by 5% = the overlap is wrong by 5%.</td><td><span class="conf g">1000 CPR, 100 mm</span></td></tr>
+      <tr><td class="num">B5</td><td>Track width (left-to-right wheel centres) and wheelbase.</td><td>Sets the yaw gain and therefore the starting KP.</td><td><span class="conf g">400 mm track</span></td></tr>
+      <tr><td class="num">B6</td><td>Gas holder radius.</td><td>Confirms that fore/aft scrub during the sideways move is second-order (it is, for any radius above about 10 m).</td><td><span class="conf g">&gt; 10 m</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>C. Design questions the team must decide</h2>
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>Question</th><th>Why we are asking</th><th>Our recommendation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="num">C1</td>
+        <td><strong>Is there an umbilical &mdash; paint hose, air line, power tether? What does it weigh and how is it managed?</strong></td>
+        <td><span class="conf l">LIKELY</span> a top-three disturbance source, and it is almost never instrumented. Its pull grows with height and changes direction on every index move. This is exactly the constant disturbance that a P-only controller cannot cancel (Finding 5).</td>
+        <td>Answer this before tuning gains. Consider a tether-management arm or a counterweight.</td>
+      </tr>
+      <tr>
+        <td class="num">C2</td>
+        <td><strong>Is the spray gun on the rover centreline?</strong></td>
+        <td>An off-centre gun produces a constant yaw torque proportional to spray pressure &mdash; another disturbance the current controller structurally cannot remove.</td>
+        <td>Centre it if possible; otherwise the integral term must absorb it.</td>
+      </tr>
+      <tr>
+        <td class="num">C3</td>
+        <td>Should the sideways index move be done at 30&deg; (today) or 90&deg;?</td>
+        <td>At 30&deg; we lose 260 mm of height for every 150 mm of sideways step, and encoder error is amplified 2&times;. At 90&deg; neither happens.</td>
+        <td><strong>90&deg;</strong>, now that the turn is closed on an absolute reference.</td>
+      </tr>
+      <tr>
+        <td class="num">C4</td>
+        <td>Do we accept a mechanical guide (taut wire) as a fallback if Phases 1&ndash;2 do not meet the coating spec?</td>
+        <td>It is the most reliable option and standard on commercial tank crawlers, but it constrains how the rover is deployed.</td>
+        <td>Keep it on the table. Decide after Phase 1 measurement, not before.</td>
+      </tr>
+      <tr>
+        <td class="num">C5</td>
+        <td>Is the &#8377;1,999 gyro approved for Phase 2?</td>
+        <td>It is the only hardware purchase we are recommending, and it removes the last known source of loop oscillation.</td>
+        <td>Approve. It is 3.8% of the Cube Orange cost and addresses a mechanism we can quantify.</td>
+      </tr>
+      <tr>
+        <td class="num">C6</td>
+        <td><strong>Safety: can we add a hardware E-stop that cuts motor power independently of the Raspberry Pi?</strong></td>
+        <td>Today every emergency-stop path in <code>Straight mode_testing2.py</code> runs through Python on a non-real-time OS, on a rover carrying 240&nbsp;VAC up a gas holder.</td>
+        <td><strong>Yes, regardless of anything else in this report.</strong></td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h2>What we are NOT waiting on</h2>
+  <div class="callout good">
+    <p>
+      None of the above blocks Phase 1. The four critical defects are proven from our own source code and the Murata
+      datasheet, and the patches are written. The measurements in section&nbsp;A should run <em>in parallel</em> with
+      the code changes, not before them &mdash; except A1 and A2, which are worth the 20 minutes it takes to run them
+      first.
+    </p>
+  </div>
+
+</section>
+
+<footer class="foot">
+  <p><strong>Evidence base</strong></p>
+  <ul>
+    <li>Our own repository: <code>CODE/Teensy Code/SCL3300_tilt_sensordata_send_ACS712_Relay.ino</code>,
+      <code>CODE/RPI Code/Straight mode_testing2.py</code>, <code>CODE/roboclaw_3 (2).py</code>,
+      and both schematic sheets dated 2026-08-12.</li>
+    <li><a href="https://www.farnell.com/datasheets/3812754.pdf">Murata SCL3300-D01 datasheet, Doc. No. 4921</a> &mdash; §2.5 angle-register definitions, operating-mode table, offset specifications.</li>
+    <li><a href="https://www.murata.com/~/media/webrenewal/products/sensor/pdf/datasheet/datasheet_scl3300-d01.ashx?la=en-us">Murata SCL3300-D01 datasheet (current revision)</a></li>
+    <li><a href="https://github.com/DavidArmstrong/SCL3300">SCL3300 Arduino library (David Armstrong)</a> &mdash; <code>angle()</code>, <code>getCalculatedAngleX()</code>, default Mode 4.</li>
+    <li><a href="https://ardupilot.org/rover/docs/common-compassless.html">ArduPilot Rover — Compass-less Operation</a></li>
+    <li><a href="https://ardupilot.org/copter/docs/common-ekf-sources.html">ArduPilot — EKF Source Selection and Switching</a></li>
+    <li><a href="https://ardupilot.org/dev/docs/mavlink-nongps-position-estimation.html">ArduPilot Dev — Non-GPS Position Estimation</a></li>
+    <li><a href="https://ardupilot.org/copter/docs/common-marvelmind.html">ArduPilot — Marvelmind for Non-GPS navigation</a></li>
+    <li><a href="https://github.com/ArduPilot/ardupilot_wiki/blob/master/rover/source/docs/wheel-encoder.rst">ArduPilot Rover wiki — wheel encoders</a></li>
+    <li>Pricing: <a href="https://robu.in/product/cube-orange-plus-flight-controller/">Cube Orange Plus, Robu.in</a> (&#8377;51,999) &middot; <a href="https://robu.in/product/icm-42688-p-tdk-invensense/">ICM-42688-P, Robu.in</a> (&#8377;1,999). Retrieved August 2026.</li>
+  </ul>
+  <p class="small">
+    Simulation figures use a first-order skid-steer yaw model with gain 0.045&nbsp;&deg;/s per count/s, derived from
+    the stated wheel diameter, encoder CPR and track width rather than fitted to measured data. Timings are
+    illustrative; the direction and existence of each failure mode are not.
+  </p>
+
+  <div class="signoff">
+    <div class="signoff-line">
+      <span class="k">Prepared by</span>
+      <span class="v">Sahil &mdash; R&amp;D</span>
+    </div>
+    <div class="signoff-line">
+      <span class="k">Prepared for</span>
+      <span class="v">HOD &amp; Rover Team</span>
+    </div>
+    <div class="signoff-line">
+      <span class="k">Date</span>
+      <span class="v">12 August 2026</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+const SIM = {"meta":{"K_YAW":0.045,"KP":25.0,"KI":14.3,"DIST":2.25,"zeta":0.7},"signVsUnsigned":{"signed":[[0.0,-3.0],[0.1,-2.671],[0.2,-2.36],[0.3,-2.068],[0.4,-1.795],[0.5,-1.54],[0.6,-1.302],[0.7,-1.082],[0.8,-0.879],[0.9,-0.692],[1.0,-0.521],[1.1,-0.365],[1.2,-0.224],[1.3,-0.096],[1.4,0.019],[1.5,0.121],[1.6,0.212],[1.7,0.292],[1.8,0.361],[1.9,0.421],[2.0,0.472],[2.1,0.515],[2.2,0.55],[2.3,0.577],[2.4,0.599],[2.5,0.614],[2.6,0.624],[2.7,0.629],[2.8,0.63],[2.9,0.627],[3.0,0.62],[3.1,0.611],[3.2,0.598],[3.3,0.583],[3.4,0.567],[3.5,0.548],[3.6,0.529],[3.7,0.508],[3.8,0.486],[3.9,0.464],[4.0,0.441],[4.1,0.418],[4.2,0.394],[4.3,0.371],[4.4,0.348],[4.5,0.326],[4.6,0.304],[4.7,0.282],[4.8,0.261],[4.9,0.241],[5.0,0.221],[5.1,0.202],[5.2,0.184],[5.3,0.166],[5.4,0.15],[5.5,0.134],[5.6,0.119],[5.7,0.106],[5.8,0.092],[5.9,0.08],[6.0,0.069],[6.1,0.058],[6.2,0.048],[6.3,0.039],[6.4,0.031],[6.5,0.023],[6.6,0.016],[6.7,0.01],[6.8,0.004],[6.9,-0.001],[7.0,-0.006],[7.1,-0.01],[7.2,-0.013],[7.3,-0.017],[7.4,-0.019],[7.5,-0.021],[7.6,-0.023],[7.7,-0.025],[7.8,-0.026],[7.9,-0.027],[8.0,-0.028],[8.1,-0.028],[8.2,-0.028],[8.3,-0.028],[8.4,-0.028],[8.5,-0.028],[8.6,-0.028],[8.7,-0.027],[8.8,-0.026],[8.9,-0.026],[9.0,-0.025],[9.1,-0.024],[9.2,-0.023],[9.3,-0.022],[9.4,-0.021],[9.5,-0.02],[9.6,-0.019],[9.7,-0.018],[9.8,-0.017],[9.9,-0.016],[10.0,-0.015],[10.1,-0.014],[10.2,-0.013],[10.3,-0.012],[10.4,-0.011],[10.5,-0.01],[10.6,-0.009],[10.7,-0.008],[10.8,-0.007],[10.9,-0.007],[11.0,-0.006],[11.1,-0.005],[11.2,-0.005],[11.3,-0.004],[11.4,-0.004],[11.5,-0.003],[11.6,-0.003],[11.7,-0.002],[11.8,-0.002],[11.9,-0.001],[12.0,-0.001],[12.1,-0.001],[12.2,-0.0],[12.3,-0.0],[12.4,0.0],[12.5,0.0],[12.6,0.0],[12.7,0.001],[12.8,0.001],[12.9,0.001],[13.0,0.001],[13.1,0.001],[13.2,0.001],[13.3,0.001],[13.4,0.001],[13.5,0.001],[13.6,0.001],[13.7,0.001],[13.8,0.001],[13.9,0.001],[14.0,0.001],[14.1,0.001],[14.2,0.001],[14.3,0.001],[14.4,0.001],[14.5,0.001],[14.6,0.001],[14.7,0.001],[14.8,0.001],[14.9,0.001],[15.0,0.001],[15.1,0.001],[15.2,0.001],[15.3,0.001],[15.4,0.001],[15.5,0.001],[15.6,0.001],[15.7,0.001],[15.8,0.001],[15.9,0.0],[16.0,0.0],[16.1,0.0],[16.2,0.0],[16.3,0.0],[16.4,0.0],[16.5,0.0],[16.6,0.0],[16.7,0.0],[16.8,0.0],[16.9,0.0],[17.0,0.0],[17.1,0.0],[17.2,0.0],[17.3,0.0],[17.4,0.0],[17.5,0.0],[17.6,0.0],[17.7,0.0],[17.8,0.0],[17.9,-0.0],[18.0,-0.0],[18.1,-0.0],[18.2,-0.0],[18.3,-0.0],[18.4,-0.0],[18.5,-0.0],[18.6,-0.0],[18.7,-0.0],[18.8,-0.0],[18.9,-0.0],[19.0,-0.0],[19.1,-0.0],[19.2,-0.0],[19.3,-0.0],[19.4,-0.0],[19.5,-0.0],[19.6,-0.0],[19.7,-0.0],[19.8,-0.0],[19.9,-0.0],[20.0,-0.0],[20.1,-0.0],[20.2,-0.0],[20.3,-0.0],[20.4,-0.0],[20.5,-0.0],[20.6,-0.0],[20.7,-0.0],[20.8,-0.0],[20.9,-0.0],[21.0,-0.0],[21.1,-0.0],[21.2,-0.0],[21.3,-0.0],[21.4,-0.0],[21.5,-0.0],[21.6,-0.0],[21.7,-0.0],[21.8,-0.0],[21.9,-0.0],[22.0,-0.0],[22.1,-0.0],[22.2,-0.0],[22.3,-0.0],[22.4,-0.0],[22.5,-0.0],[22.6,-0.0],[22.7,-0.0],[22.8,-0.0],[22.9,-0.0],[23.0,-0.0],[23.1,-0.0],[23.2,-0.0],[23.3,-0.0],[23.4,0.0],[23.5,0.0],[23.6,0.0],[23.7,0.0],[23.8,0.0],[23.9,0.0],[24.0,0.0],[24.1,0.0],[24.2,0.0],[24.3,0.0],[24.4,0.0],[24.5,0.0],[24.6,0.0],[24.7,0.0],[24.8,0.0],[24.9,0.0],[25.0,0.0],[25.1,0.0],[25.2,0.0],[25.3,0.0],[25.4,0.0],[25.5,0.0],[25.6,0.0],[25.7,0.0],[25.8,0.0],[25.9,0.0],[26.0,0.0],[26.1,0.0],[26.2,0.0],[26.3,0.0],[26.4,0.0],[26.5,0.0],[26.6,0.0],[26.7,0.0],[26.8,0.0],[26.9,0.0],[27.0,0.0],[27.1,0.0],[27.2,0.0],[27.3,0.0],[27.4,0.0],[27.5,0.0],[27.6,0.0],[27.7,0.0],[27.8,0.0],[27.9,0.0],[28.0,0.0],[28.1,0.0],[28.2,0.0],[28.3,0.0],[28.4,0.0],[28.5,0.0],[28.6,0.0],[28.7,0.0],[28.8,0.0],[28.9,-0.0],[29.0,-0.0],[29.1,-0.0],[29.2,-0.0],[29.3,-0.0],[29.4,-0.0],[29.5,-0.0],[29.6,-0.0],[29.7,-0.0],[29.8,-0.0],[29.9,-0.0],[30.0,-0.0]],"unsigned":[[0.0,-3.0],[0.1,-3.367],[0.2,-3.801],[0.3,-4.311],[0.4,-4.912],[0.5,-5.617],[0.6,-6.445],[0.7,-7.414],[0.8,-8.549],[0.9,-9.877],[1.0,-11.429],[1.1,-13.243],[1.2,-15.363],[1.3,-17.838],[1.4,-20.538],[1.5,-23.238],[1.6,-25.938],[1.7,-28.638],[1.8,-31.338],[1.9,-34.038],[2.0,-36.738],[2.1,-39.438],[2.2,-42.138],[2.3,-44.838],[2.4,-45.0],[2.5,-45.0],[2.6,-45.0],[2.7,-45.0],[2.8,-45.0],[2.9,-45.0],[3.0,-45.0],[3.1,-45.0],[3.2,-45.0],[3.3,-45.0],[3.4,-45.0],[3.5,-45.0],[3.6,-45.0],[3.7,-45.0],[3.8,-45.0],[3.9,-45.0],[4.0,-45.0],[4.1,-45.0],[4.2,-45.0],[4.3,-45.0],[4.4,-45.0],[4.5,-45.0],[4.6,-45.0],[4.7,-45.0],[4.8,-45.0],[4.9,-45.0],[5.0,-45.0],[5.1,-45.0],[5.2,-45.0],[5.3,-45.0],[5.4,-45.0],[5.5,-45.0],[5.6,-45.0],[5.7,-45.0],[5.8,-45.0],[5.9,-45.0],[6.0,-45.0],[6.1,-45.0],[6.2,-45.0],[6.3,-45.0],[6.4,-45.0],[6.5,-45.0],[6.6,-45.0],[6.7,-45.0],[6.8,-45.0],[6.9,-45.0],[7.0,-45.0],[7.1,-45.0],[7.2,-45.0],[7.3,-45.0],[7.4,-45.0],[7.5,-45.0],[7.6,-45.0],[7.7,-45.0],[7.8,-45.0],[7.9,-45.0],[8.0,-45.0],[8.1,-45.0],[8.2,-45.0],[8.3,-45.0],[8.4,-45.0],[8.5,-45.0],[8.6,-45.0],[8.7,-45.0],[8.8,-45.0],[8.9,-45.0],[9.0,-45.0],[9.1,-45.0],[9.2,-45.0],[9.3,-45.0],[9.4,-45.0],[9.5,-45.0],[9.6,-45.0],[9.7,-45.0],[9.8,-45.0],[9.9,-45.0],[10.0,-45.0],[10.1,-45.0],[10.2,-45.0],[10.3,-45.0],[10.4,-45.0],[10.5,-45.0],[10.6,-45.0],[10.7,-45.0],[10.8,-45.0],[10.9,-45.0],[11.0,-45.0],[11.1,-45.0],[11.2,-45.0],[11.3,-45.0],[11.4,-45.0],[11.5,-45.0],[11.6,-45.0],[11.7,-45.0],[11.8,-45.0],[11.9,-45.0],[12.0,-45.0],[12.1,-45.0],[12.2,-45.0],[12.3,-45.0],[12.4,-45.0],[12.5,-45.0],[12.6,-45.0],[12.7,-45.0],[12.8,-45.0],[12.9,-45.0],[13.0,-45.0],[13.1,-45.0],[13.2,-45.0],[13.3,-45.0],[13.4,-45.0],[13.5,-45.0],[13.6,-45.0],[13.7,-45.0],[13.8,-45.0],[13.9,-45.0],[14.0,-45.0],[14.1,-45.0],[14.2,-45.0],[14.3,-45.0],[14.4,-45.0],[14.5,-45.0],[14.6,-45.0],[14.7,-45.0],[14.8,-45.0],[14.9,-45.0],[15.0,-45.0],[15.1,-45.0],[15.2,-45.0],[15.3,-45.0],[15.4,-45.0],[15.5,-45.0],[15.6,-45.0],[15.7,-45.0],[15.8,-45.0],[15.9,-45.0],[16.0,-45.0],[16.1,-45.0],[16.2,-45.0],[16.3,-45.0],[16.4,-45.0],[16.5,-45.0],[16.6,-45.0],[16.7,-45.0],[16.8,-45.0],[16.9,-45.0],[17.0,-45.0],[17.1,-45.0],[17.2,-45.0],[17.3,-45.0],[17.4,-45.0],[17.5,-45.0],[17.6,-45.0],[17.7,-45.0],[17.8,-45.0],[17.9,-45.0],[18.0,-45.0],[18.1,-45.0],[18.2,-45.0],[18.3,-45.0],[18.4,-45.0],[18.5,-45.0],[18.6,-45.0],[18.7,-45.0],[18.8,-45.0],[18.9,-45.0],[19.0,-45.0],[19.1,-45.0],[19.2,-45.0],[19.3,-45.0],[19.4,-45.0],[19.5,-45.0],[19.6,-45.0],[19.7,-45.0],[19.8,-45.0],[19.9,-45.0],[20.0,-45.0],[20.1,-45.0],[20.2,-45.0],[20.3,-45.0],[20.4,-45.0],[20.5,-45.0],[20.6,-45.0],[20.7,-45.0],[20.8,-45.0],[20.9,-45.0],[21.0,-45.0],[21.1,-45.0],[21.2,-45.0],[21.3,-45.0],[21.4,-45.0],[21.5,-45.0],[21.6,-45.0],[21.7,-45.0],[21.8,-45.0],[21.9,-45.0],[22.0,-45.0],[22.1,-45.0],[22.2,-45.0],[22.3,-45.0],[22.4,-45.0],[22.5,-45.0],[22.6,-45.0],[22.7,-45.0],[22.8,-45.0],[22.9,-45.0],[23.0,-45.0],[23.1,-45.0],[23.2,-45.0],[23.3,-45.0],[23.4,-45.0],[23.5,-45.0],[23.6,-45.0],[23.7,-45.0],[23.8,-45.0],[23.9,-45.0],[24.0,-45.0],[24.1,-45.0],[24.2,-45.0],[24.3,-45.0],[24.4,-45.0],[24.5,-45.0],[24.6,-45.0],[24.7,-45.0],[24.8,-45.0],[24.9,-45.0],[25.0,-45.0],[25.1,-45.0],[25.2,-45.0],[25.3,-45.0],[25.4,-45.0],[25.5,-45.0],[25.6,-45.0],[25.7,-45.0],[25.8,-45.0],[25.9,-45.0],[26.0,-45.0],[26.1,-45.0],[26.2,-45.0],[26.3,-45.0],[26.4,-45.0],[26.5,-45.0],[26.6,-45.0],[26.7,-45.0],[26.8,-45.0],[26.9,-45.0],[27.0,-45.0],[27.1,-45.0],[27.2,-45.0],[27.3,-45.0],[27.4,-45.0],[27.5,-45.0],[27.6,-45.0],[27.7,-45.0],[27.8,-45.0],[27.9,-45.0],[28.0,-45.0],[28.1,-45.0],[28.2,-45.0],[28.3,-45.0],[28.4,-45.0],[28.5,-45.0],[28.6,-45.0],[28.7,-45.0],[28.8,-45.0],[28.9,-45.0],[29.0,-45.0],[29.1,-45.0],[29.2,-45.0],[29.3,-45.0],[29.4,-45.0],[29.5,-45.0],[29.6,-45.0],[29.7,-45.0],[29.8,-45.0],[29.9,-45.0],[30.0,-45.0]]},"pVsPI":{"p_only":[[0.0,0.0],[0.1,0.213],[0.2,0.404],[0.3,0.574],[0.4,0.726],[0.5,0.862],[0.6,0.984],[0.7,1.092],[0.8,1.189],[0.9,1.275],[1.0,1.353],[1.1,1.422],[1.2,1.483],[1.3,1.539],[1.4,1.588],[1.5,1.632],[1.6,1.671],[1.7,1.706],[1.8,1.738],[1.9,1.766],[2.0,1.791],[2.1,1.813],[2.2,1.833],[2.3,1.851],[2.4,1.867],[2.5,1.881],[2.6,1.894],[2.7,1.905],[2.8,1.915],[2.9,1.924],[3.0,1.932],[3.1,1.939],[3.2,1.946],[3.3,1.952],[3.4,1.957],[3.5,1.961],[3.6,1.966],[3.7,1.969],[3.8,1.973],[3.9,1.975],[4.0,1.978],[4.1,1.98],[4.2,1.982],[4.3,1.984],[4.4,1.986],[4.5,1.988],[4.6,1.989],[4.7,1.99],[4.8,1.991],[4.9,1.992],[5.0,1.993],[5.1,1.994],[5.2,1.994],[5.3,1.995],[5.4,1.995],[5.5,1.996],[5.6,1.996],[5.7,1.997],[5.8,1.997],[5.9,1.997],[6.0,1.998],[6.1,1.998],[6.2,1.998],[6.3,1.998],[6.4,1.999],[6.5,1.999],[6.6,1.999],[6.7,1.999],[6.8,1.999],[6.9,1.999],[7.0,1.999],[7.1,1.999],[7.2,1.999],[7.3,1.999],[7.4,2.0],[7.5,2.0],[7.6,2.0],[7.7,2.0],[7.8,2.0],[7.9,2.0],[8.0,2.0],[8.1,2.0],[8.2,2.0],[8.3,2.0],[8.4,2.0],[8.5,2.0],[8.6,2.0],[8.7,2.0],[8.8,2.0],[8.9,2.0],[9.0,2.0],[9.1,2.0],[9.2,2.0],[9.3,2.0],[9.4,2.0],[9.5,2.0],[9.6,2.0],[9.7,2.0],[9.8,2.0],[9.9,2.0],[10.0,2.0],[10.1,2.0],[10.2,2.0],[10.3,2.0],[10.4,2.0],[10.5,2.0],[10.6,2.0],[10.7,2.0],[10.8,2.0],[10.9,2.0],[11.0,2.0],[11.1,2.0],[11.2,2.0],[11.3,2.0],[11.4,2.0],[11.5,2.0],[11.6,2.0],[11.7,2.0],[11.8,2.0],[11.9,2.0],[12.0,2.0],[12.1,2.0],[12.2,2.0],[12.3,2.0],[12.4,2.0],[12.5,2.0],[12.6,2.0],[12.7,2.0],[12.8,2.0],[12.9,2.0],[13.0,2.0],[13.1,2.0],[13.2,2.0],[13.3,2.0],[13.4,2.0],[13.5,2.0],[13.6,2.0],[13.7,2.0],[13.8,2.0],[13.9,2.0],[14.0,2.0],[14.1,2.0],[14.2,2.0],[14.3,2.0],[14.4,2.0],[14.5,2.0],[14.6,2.0],[14.7,2.0],[14.8,2.0],[14.9,2.0],[15.0,2.0],[15.1,2.0],[15.2,2.0],[15.3,2.0],[15.4,2.0],[15.5,2.0],[15.6,2.0],[15.7,2.0],[15.8,2.0],[15.9,2.0],[16.0,2.0],[16.1,2.0],[16.2,2.0],[16.3,2.0],[16.4,2.0],[16.5,2.0],[16.6,2.0],[16.7,2.0],[16.8,2.0],[16.9,2.0],[17.0,2.0],[17.1,2.0],[17.2,2.0],[17.3,2.0],[17.4,2.0],[17.5,2.0],[17.6,2.0],[17.7,2.0],[17.8,2.0],[17.9,2.0],[18.0,2.0],[18.1,2.0],[18.2,2.0],[18.3,2.0],[18.4,2.0],[18.5,2.0],[18.6,2.0],[18.7,2.0],[18.8,2.0],[18.9,2.0],[19.0,2.0],[19.1,2.0],[19.2,2.0],[19.3,2.0],[19.4,2.0],[19.5,2.0],[19.6,2.0],[19.7,2.0],[19.8,2.0],[19.9,2.0],[20.0,2.0],[20.1,2.0],[20.2,2.0],[20.3,2.0],[20.4,2.0],[20.5,2.0],[20.6,2.0],[20.7,2.0],[20.8,2.0],[20.9,2.0],[21.0,2.0],[21.1,2.0],[21.2,2.0],[21.3,2.0],[21.4,2.0],[21.5,2.0],[21.6,2.0],[21.7,2.0],[21.8,2.0],[21.9,2.0],[22.0,2.0],[22.1,2.0],[22.2,2.0],[22.3,2.0],[22.4,2.0],[22.5,2.0],[22.6,2.0],[22.7,2.0],[22.8,2.0],[22.9,2.0],[23.0,2.0],[23.1,2.0],[23.2,2.0],[23.3,2.0],[23.4,2.0],[23.5,2.0],[23.6,2.0],[23.7,2.0],[23.8,2.0],[23.9,2.0],[24.0,2.0],[24.1,2.0],[24.2,2.0],[24.3,2.0],[24.4,2.0],[24.5,2.0],[24.6,2.0],[24.7,2.0],[24.8,2.0],[24.9,2.0],[25.0,2.0],[25.1,2.0],[25.2,2.0],[25.3,2.0],[25.4,2.0],[25.5,2.0],[25.6,2.0],[25.7,2.0],[25.8,2.0],[25.9,2.0],[26.0,2.0],[26.1,2.0],[26.2,2.0],[26.3,2.0],[26.4,2.0],[26.5,2.0],[26.6,2.0],[26.7,2.0],[26.8,2.0],[26.9,2.0],[27.0,2.0],[27.1,2.0],[27.2,2.0],[27.3,2.0],[27.4,2.0],[27.5,2.0],[27.6,2.0],[27.7,2.0],[27.8,2.0],[27.9,2.0],[28.0,2.0],[28.1,2.0],[28.2,2.0],[28.3,2.0],[28.4,2.0],[28.5,2.0],[28.6,2.0],[28.7,2.0],[28.8,2.0],[28.9,2.0],[29.0,2.0],[29.1,2.0],[29.2,2.0],[29.3,2.0],[29.4,2.0],[29.5,2.0],[29.6,2.0],[29.7,2.0],[29.8,2.0],[29.9,2.0],[30.0,2.0]],"pi":[[0.0,0.0],[0.1,0.213],[0.2,0.402],[0.3,0.569],[0.4,0.714],[0.5,0.839],[0.6,0.946],[0.7,1.036],[0.8,1.11],[0.9,1.169],[1.0,1.215],[1.1,1.248],[1.2,1.27],[1.3,1.283],[1.4,1.286],[1.5,1.281],[1.6,1.268],[1.7,1.249],[1.8,1.225],[1.9,1.196],[2.0,1.162],[2.1,1.125],[2.2,1.085],[2.3,1.043],[2.4,0.999],[2.5,0.953],[2.6,0.907],[2.7,0.86],[2.8,0.813],[2.9,0.765],[3.0,0.719],[3.1,0.672],[3.2,0.627],[3.3,0.583],[3.4,0.54],[3.5,0.498],[3.6,0.457],[3.7,0.418],[3.8,0.381],[3.9,0.345],[4.0,0.311],[4.1,0.279],[4.2,0.249],[4.3,0.22],[4.4,0.193],[4.5,0.168],[4.6,0.144],[4.7,0.122],[4.8,0.102],[4.9,0.083],[5.0,0.065],[5.1,0.049],[5.2,0.035],[5.3,0.022],[5.4,0.01],[5.5,-0.001],[5.6,-0.01],[5.7,-0.019],[5.8,-0.026],[5.9,-0.033],[6.0,-0.038],[6.1,-0.043],[6.2,-0.047],[6.3,-0.05],[6.4,-0.053],[6.5,-0.055],[6.6,-0.056],[6.7,-0.057],[6.8,-0.058],[6.9,-0.058],[7.0,-0.058],[7.1,-0.057],[7.2,-0.056],[7.3,-0.055],[7.4,-0.054],[7.5,-0.052],[7.6,-0.051],[7.7,-0.049],[7.8,-0.047],[7.9,-0.045],[8.0,-0.043],[8.1,-0.041],[8.2,-0.039],[8.3,-0.037],[8.4,-0.034],[8.5,-0.032],[8.6,-0.03],[8.7,-0.028],[8.8,-0.026],[8.9,-0.024],[9.0,-0.022],[9.1,-0.021],[9.2,-0.019],[9.3,-0.017],[9.4,-0.015],[9.5,-0.014],[9.6,-0.012],[9.7,-0.011],[9.8,-0.01],[9.9,-0.009],[10.0,-0.007],[10.1,-0.006],[10.2,-0.005],[10.3,-0.005],[10.4,-0.004],[10.5,-0.003],[10.6,-0.002],[10.7,-0.002],[10.8,-0.001],[10.9,-0.0],[11.0,0.0],[11.1,0.0],[11.2,0.001],[11.3,0.001],[11.4,0.001],[11.5,0.002],[11.6,0.002],[11.7,0.002],[11.8,0.002],[11.9,0.002],[12.0,0.002],[12.1,0.003],[12.2,0.003],[12.3,0.003],[12.4,0.003],[12.5,0.003],[12.6,0.003],[12.7,0.003],[12.8,0.002],[12.9,0.002],[13.0,0.002],[13.1,0.002],[13.2,0.002],[13.3,0.002],[13.4,0.002],[13.5,0.002],[13.6,0.002],[13.7,0.002],[13.8,0.002],[13.9,0.002],[14.0,0.001],[14.1,0.001],[14.2,0.001],[14.3,0.001],[14.4,0.001],[14.5,0.001],[14.6,0.001],[14.7,0.001],[14.8,0.001],[14.9,0.001],[15.0,0.001],[15.1,0.001],[15.2,0.0],[15.3,0.0],[15.4,0.0],[15.5,0.0],[15.6,0.0],[15.7,0.0],[15.8,0.0],[15.9,0.0],[16.0,0.0],[16.1,0.0],[16.2,0.0],[16.3,0.0],[16.4,0.0],[16.5,-0.0],[16.6,-0.0],[16.7,-0.0],[16.8,-0.0],[16.9,-0.0],[17.0,-0.0],[17.1,-0.0],[17.2,-0.0],[17.3,-0.0],[17.4,-0.0],[17.5,-0.0],[17.6,-0.0],[17.7,-0.0],[17.8,-0.0],[17.9,-0.0],[18.0,-0.0],[18.1,-0.0],[18.2,-0.0],[18.3,-0.0],[18.4,-0.0],[18.5,-0.0],[18.6,-0.0],[18.7,-0.0],[18.8,-0.0],[18.9,-0.0],[19.0,-0.0],[19.1,-0.0],[19.2,-0.0],[19.3,-0.0],[19.4,-0.0],[19.5,-0.0],[19.6,-0.0],[19.7,-0.0],[19.8,-0.0],[19.9,-0.0],[20.0,-0.0],[20.1,-0.0],[20.2,-0.0],[20.3,-0.0],[20.4,-0.0],[20.5,-0.0],[20.6,-0.0],[20.7,-0.0],[20.8,-0.0],[20.9,-0.0],[21.0,-0.0],[21.1,-0.0],[21.2,-0.0],[21.3,-0.0],[21.4,-0.0],[21.5,-0.0],[21.6,-0.0],[21.7,-0.0],[21.8,-0.0],[21.9,-0.0],[22.0,0.0],[22.1,0.0],[22.2,0.0],[22.3,0.0],[22.4,0.0],[22.5,0.0],[22.6,0.0],[22.7,0.0],[22.8,0.0],[22.9,0.0],[23.0,0.0],[23.1,0.0],[23.2,0.0],[23.3,0.0],[23.4,0.0],[23.5,0.0],[23.6,0.0],[23.7,0.0],[23.8,0.0],[23.9,0.0],[24.0,0.0],[24.1,0.0],[24.2,0.0],[24.3,0.0],[24.4,0.0],[24.5,0.0],[24.6,0.0],[24.7,0.0],[24.8,0.0],[24.9,0.0],[25.0,0.0],[25.1,0.0],[25.2,0.0],[25.3,0.0],[25.4,0.0],[25.5,0.0],[25.6,0.0],[25.7,0.0],[25.8,0.0],[25.9,0.0],[26.0,0.0],[26.1,0.0],[26.2,0.0],[26.3,0.0],[26.4,0.0],[26.5,0.0],[26.6,0.0],[26.7,0.0],[26.8,0.0],[26.9,0.0],[27.0,0.0],[27.1,0.0],[27.2,0.0],[27.3,0.0],[27.4,0.0],[27.5,-0.0],[27.6,-0.0],[27.7,-0.0],[27.8,-0.0],[27.9,-0.0],[28.0,-0.0],[28.1,-0.0],[28.2,-0.0],[28.3,-0.0],[28.4,-0.0],[28.5,-0.0],[28.6,-0.0],[28.7,-0.0],[28.8,-0.0],[28.9,-0.0],[29.0,-0.0],[29.1,-0.0],[29.2,-0.0],[29.3,-0.0],[29.4,-0.0],[29.5,-0.0],[29.6,-0.0],[29.7,-0.0],[29.8,-0.0],[29.9,-0.0],[30.0,-0.0]]}};
+
+
+/* ------------------------------ tabs ------------------------------ */
+const tabs = [...document.querySelectorAll('.tab')];
+const panels = [...document.querySelectorAll('.panel')];
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.setAttribute('aria-selected', String(x === t)));
+  panels.forEach(p => p.classList.toggle('active', p.id === t.dataset.panel));
+  window.scrollTo({top: 0, behavior: 'instant'});
+  requestAnimationFrame(drawAll);
+}));
+
+/* ------------------------------ theme ------------------------------ */
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+  requestAnimationFrame(drawAll);
+}
+themeBtn.addEventListener('click', () =>
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+
+const cv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS = 'http://www.w3.org/2000/svg';
+const el = (n, a = {}) => { const e = document.createElementNS(NS, n);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+function tipFor(host){
+  let t = host.querySelector('.tip');
+  if (!t){ t = document.createElement('div'); t.className = 'tip'; host.appendChild(t); }
+  return t;
+}
+function placeTip(host, tip, x, y){
+  const w = host.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
+  let left = x + 14; if (left + tw > w - 4) left = x - tw - 14; if (left < 4) left = 4;
+  let top = y - th - 12; if (top < 4) top = y + 16;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+}
+
+/* ------------------------- horizontal bar chart ------------------------- */
+function barsH(hostId, legendId, rows, opts){
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.querySelectorAll('svg').forEach(s => s.remove());
+  const W = host.clientWidth || 760;
+  const rowH = 44, padT = 26, padB = 52, padL = Math.min(300, Math.max(180, W * 0.30)), padR = 78;
+  const H = padT + rows.length * rowH + padB;
+  const svg = el('svg', {viewBox:`0 0 ${W} ${H}`, role:'img'});
+  const plotW = W - padL - padR;
+
+  // round the axis up to a clean number and tick at clean intervals
+  const raw = Math.max(...rows.map(r => r.v));
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)) - 1);
+  const step = [1,2,2.5,5,10,20,25].map(m => m*pow).find(s => Math.ceil(raw / s) <= 5) || 25*pow;
+  const max = Math.ceil(raw / step) * step;
+  const x = v => padL + (v / max) * plotW;
+
+  const grid = cv('--grid'), axis = cv('--axis'), muted = cv('--text-muted'),
+        sec = cv('--text-secondary'), pri = cv('--text-primary'), surf = cv('--card');
+  const colors = {sw: cv('--series-1'), hw: cv('--series-2')};
+
+  // gridlines
+  const ticks = []; for (let t = 0; t <= max + 1e-9; t += step) ticks.push(t);
+  ticks.forEach(t => {
+    svg.appendChild(el('line',{x1:x(t),x2:x(t),y1:padT-8,y2:H-padB+4,stroke:grid,'stroke-width':1}));
+    const lb = el('text',{x:x(t),y:H-padB+22,'text-anchor':'middle','font-size':11,fill:muted,
+      'font-variant-numeric':'tabular-nums'});
+    lb.textContent = Math.round(t).toLocaleString();
+    svg.appendChild(lb);
+  });
+  svg.appendChild(el('line',{x1:padL,x2:padL,y1:padT-8,y2:H-padB+4,stroke:axis,'stroke-width':1}));
+
+  // target reference line
+  if (opts && opts.target){
+    const tx = x(opts.target.v);
+    svg.appendChild(el('line',{x1:tx,x2:tx,y1:padT-14,y2:H-padB+4,stroke:cv('--good'),'stroke-width':2}));
+    const tl = el('text',{x:tx+6,y:padT-6,'font-size':11.5,fill:cv('--good'),'font-weight':600});
+    tl.textContent = opts.target.label;
+    svg.appendChild(tl);
+  }
+
+  const tip = tipFor(host);
+  rows.forEach((r,i) => {
+    const cy = padT + i*rowH + rowH/2;
+    const bh = 22, ry = cy - bh/2, w = Math.max(2, x(r.v) - padL), rr = 4;
+    const c = colors[r.type];
+    // bar: square at baseline, 4px rounded data-end
+    const d = `M${padL},${ry} H${padL+w-rr} a${rr},${rr} 0 0 1 ${rr},${rr} V${ry+bh-rr} a${rr},${rr} 0 0 1 -${rr},${rr} H${padL} Z`;
+    const p = el('path',{d, fill:c});
+    svg.appendChild(p);
+
+    const lab = el('text',{x:padL-12,y:cy+4,'text-anchor':'end','font-size':12.5,fill:sec});
+    lab.textContent = r.label;
+    svg.appendChild(lab);
+
+    const val = el('text',{x:padL+w+9,y:cy+4,'font-size':12.5,fill:pri,'font-weight':620,
+      'font-variant-numeric':'tabular-nums'});
+    val.textContent = r.v.toLocaleString() + ' mm';
+    svg.appendChild(val);
+
+    // hover target spans the full row
+    const hit = el('rect',{x:padL,y:cy-rowH/2,width:Math.max(24,plotW),height:rowH,fill:'transparent'});
+    hit.addEventListener('mousemove', e => {
+      const b = host.getBoundingClientRect();
+      tip.innerHTML = `<div class="tt">${r.label}</div>
+        <div class="r"><span class="k"><span class="sw" style="background:${c}"></span>${r.typeLabel}</span></div>
+        <div class="r"><span class="k">Heading error</span><b>${r.deg}</b></div>
+        <div class="r"><span class="k">Drift over 10 m</span><b>${r.v.toLocaleString()} mm</b></div>`;
+      tip.style.opacity = 1;
+      placeTip(host, tip, e.clientX - b.left, e.clientY - b.top);
+    });
+    hit.addEventListener('mouseleave', () => tip.style.opacity = 0);
+    svg.appendChild(hit);
+  });
+
+  const ax = el('text',{x:padL+plotW/2,y:H-8,'text-anchor':'middle','font-size':11,fill:muted});
+  ax.textContent = 'sideways drift over a 10 m pass (mm)';
+  svg.appendChild(ax);
+
+  host.appendChild(svg);
+
+  const lg = document.getElementById(legendId);
+  if (lg) lg.innerHTML =
+    `<span class="k"><span class="sw dot" style="background:${colors.sw}"></span>Software defect &mdash; we can fix this</span>
+     <span class="k"><span class="sw dot" style="background:${colors.hw}"></span>Sensor physics</span>`;
+}
+
+/* ------------------------------ line chart ------------------------------ */
+function lineChart(hostId, legendId, series, opts){
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.querySelectorAll('svg').forEach(s => s.remove());
+  const W = host.clientWidth || 760, H = opts.height || 300;
+  const padL = 54, padR = 20, padT = 16, padB = 40;
+  const svg = el('svg',{viewBox:`0 0 ${W} ${H}`, role:'img'});
+  const pw = W - padL - padR, ph = H - padT - padB;
+  const xs = opts.xDomain, ys = opts.yDomain;
+  const X = v => padL + (v - xs[0]) / (xs[1] - xs[0]) * pw;
+  const Y = v => padT + (1 - (v - ys[0]) / (ys[1] - ys[0])) * ph;
+
+  const grid = cv('--grid'), axis = cv('--axis'), muted = cv('--text-muted'),
+        pri = cv('--text-primary'), surf = cv('--card');
+
+  (opts.yTicks || []).forEach(t => {
+    svg.appendChild(el('line',{x1:padL,x2:W-padR,y1:Y(t),y2:Y(t),stroke:grid,'stroke-width':1}));
+    const lb = el('text',{x:padL-9,y:Y(t)+4,'text-anchor':'end','font-size':11,fill:muted,
+      'font-variant-numeric':'tabular-nums'});
+    lb.textContent = t;
+    svg.appendChild(lb);
+  });
+  (opts.xTicks || []).forEach(t => {
+    const lb = el('text',{x:X(t),y:H-padB+19,'text-anchor':'middle','font-size':11,fill:muted,
+      'font-variant-numeric':'tabular-nums'});
+    lb.textContent = t;
+    svg.appendChild(lb);
+  });
+  svg.appendChild(el('line',{x1:padL,x2:W-padR,y1:Y(0),y2:Y(0),stroke:axis,'stroke-width':1}));
+
+  series.forEach(s => {
+    const d = s.data.map((p,i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1)).join(' ');
+    svg.appendChild(el('path',{d, fill:'none', stroke:s.color, 'stroke-width':2,
+      'stroke-linejoin':'round','stroke-linecap':'round'}));
+  });
+
+  // selective direct labels at the series endpoint
+  series.forEach(s => {
+    if (!s.endLabel) return;
+    const p = s.data[s.data.length-1];
+    const cx = X(p[0]), cy = Math.max(padT+8, Math.min(H-padB-4, Y(p[1])));
+    svg.appendChild(el('circle',{cx, cy, r:4.5, fill:s.color, stroke:surf, 'stroke-width':2}));
+    const t = el('text',{x:cx-8,y:cy-10,'text-anchor':'end','font-size':11.5,fill:pri,'font-weight':620});
+    t.textContent = s.endLabel;
+    svg.appendChild(t);
+  });
+
+  const axl = el('text',{x:padL+pw/2,y:H-6,'text-anchor':'middle','font-size':11,fill:muted});
+  axl.textContent = opts.xLabel; svg.appendChild(axl);
+  const ayl = el('text',{x:14,y:padT+ph/2,'text-anchor':'middle','font-size':11,fill:muted,
+    transform:`rotate(-90 14 ${padT+ph/2})`});
+  ayl.textContent = opts.yLabel; svg.appendChild(ayl);
+
+  // crosshair + tooltip
+  const cross = el('line',{x1:0,x2:0,y1:padT,y2:padT+ph,stroke:axis,'stroke-width':1,opacity:0});
+  svg.appendChild(cross);
+  const dots = series.map(s => { const c = el('circle',{r:4.5,fill:s.color,stroke:surf,'stroke-width':2,opacity:0});
+    svg.appendChild(c); return c; });
+  const tip = tipFor(host);
+  const hit = el('rect',{x:padL,y:padT,width:pw,height:ph,fill:'transparent'});
+  hit.addEventListener('mousemove', e => {
+    const b = host.getBoundingClientRect();
+    const px = (e.clientX - b.left) / host.clientWidth * W;
+    const tv = xs[0] + (px - padL) / pw * (xs[1] - xs[0]);
+    let idx = 0, best = 1e9;
+    series[0].data.forEach((p,i) => { const dd = Math.abs(p[0]-tv); if (dd < best){best = dd; idx = i;} });
+    const tx = X(series[0].data[idx][0]);
+    cross.setAttribute('x1',tx); cross.setAttribute('x2',tx); cross.setAttribute('opacity',1);
+    let rows = '';
+    series.forEach((s,i) => {
+      const p = s.data[idx];
+      dots[i].setAttribute('cx',tx); dots[i].setAttribute('cy',Y(p[1])); dots[i].setAttribute('opacity',1);
+      rows += `<div class="r"><span class="k"><span class="sw" style="background:${s.color}"></span>${s.name}</span><b>${p[1].toFixed(2)}&deg;</b></div>`;
+    });
+    tip.innerHTML = `<div class="tt">t = ${series[0].data[idx][0].toFixed(1)} s</div>${rows}`;
+    tip.style.opacity = 1;
+    placeTip(host, tip, e.clientX - b.left, e.clientY - b.top);
+  });
+  hit.addEventListener('mouseleave', () => {
+    cross.setAttribute('opacity',0); dots.forEach(d => d.setAttribute('opacity',0)); tip.style.opacity = 0;
+  });
+  svg.appendChild(hit);
+  host.appendChild(svg);
+
+  const lg = document.getElementById(legendId);
+  if (lg) lg.innerHTML = series.map(s =>
+    `<span class="k"><span class="sw" style="background:${s.color}"></span>${s.name}</span>`).join('');
+}
+
+/* ------------------------------ draw ------------------------------ */
+const CAUSES = [
+  {label:'Lane-change accepts a 15°-wide window', v:1305, deg:'7.50°', type:'sw', typeLabel:'Software defect'},
+  {label:'P-only controller: standing error',          v:349,  deg:'2.00°', type:'sw', typeLabel:'Software defect'},
+  {label:'Sensor offset never calibrated out',         v:100,  deg:'0.573°',type:'hw', typeLabel:'Sensor physics (fixable by calibration)'},
+  {label:'Sensor electrical noise floor',              v:1.2,  deg:'0.0068°',type:'hw',typeLabel:'Sensor physics (irreducible)'},
+];
+
+function drawAll(){
+  barsH('ch-causes','lg-causes',CAUSES,{target:{v:35,label:'35 mm = the target'}});
+  lineChart('ch-sign','lg-sign',[
+    {name:'Signed heading (corrected firmware)', color:cv('--series-1'), data:SIM.signVsUnsigned.signed,   endLabel:'0.00°'},
+    {name:'Unsigned ANG_X (what we ship today)', color:cv('--series-2'), data:SIM.signVsUnsigned.unsigned, endLabel:'runs away'},
+  ],{height:300,xDomain:[0,30],yDomain:[-45,6],xTicks:[0,5,10,15,20,25,30],yTicks:[-45,-30,-15,0],
+     xLabel:'time (s)',yLabel:'heading error (°)'});
+  lineChart('ch-pi','lg-pi',[
+    {name:'P-only (KP = 25, what we ship today)', color:cv('--series-2'), data:SIM.pVsPI.p_only, endLabel:'+2.00°'},
+    {name:'PI (KP = 25, KI = 14.3)',              color:cv('--series-1'), data:SIM.pVsPI.pi,     endLabel:'0.00°'},
+  ],{height:270,xDomain:[0,30],yDomain:[-0.4,2.6],xTicks:[0,5,10,15,20,25,30],yTicks:[0,1,2],
+     xLabel:'time (s)',yLabel:'heading error (°)'});
+}
+window.addEventListener('resize', () => requestAnimationFrame(drawAll));
+window.addEventListener('beforeprint', () => { panels.forEach(p => p.classList.add('active')); drawAll(); });
+drawAll();
+</script>
+</body>
+</html>
