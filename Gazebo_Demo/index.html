@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPS Gazebo Simulation — Demo Board</title>
+<style>
+  :root{
+    --ink:#1a1d21; --muted:#5c6470; --line:#e3e6ea; --bg:#f7f8fa; --card:#ffffff;
+    --accent:#c2410c; --accent-soft:#fff1e8; --ok:#1a7f37; --warn-bg:#fef3c7; --warn-line:#d97706;
+    --danger-bg:#fee2e2; --danger-line:#dc2626; --code-bg:#14171c; --code-ink:#e6edf3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif; background:var(--bg); color:var(--ink); line-height:1.55;}
+  header{background:var(--ink); color:#fff; padding:18px 28px;}
+  header h1{font-size:19px; font-weight:600;}
+  header p{color:#9aa4b2; font-size:13px; margin-top:2px;}
+  nav{display:flex; gap:4px; background:var(--card); border-bottom:2px solid var(--line); padding:0 20px; position:sticky; top:0; z-index:5; overflow-x:auto;}
+  nav button{border:none; background:none; font:inherit; font-size:14px; font-weight:600; color:var(--muted); padding:13px 16px 11px; cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap;}
+  nav button:hover{color:var(--ink);}
+  nav button.active{color:var(--accent); border-bottom-color:var(--accent);}
+  main{max-width:880px; margin:0 auto; padding:26px 20px 80px;}
+  section.tab{display:none;} section.tab.active{display:block;}
+  h2{font-size:21px; margin-bottom:6px;}
+  h3{font-size:15px; margin:26px 0 8px; text-transform:uppercase; letter-spacing:.04em; color:var(--accent);}
+  p{margin:8px 0; font-size:14.5px;}
+  .sub{color:var(--muted); font-size:13.5px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:12px 0;}
+  pre{background:var(--code-bg); color:var(--code-ink); border-radius:8px; padding:13px 15px; font-size:13px; line-height:1.6; overflow-x:auto; position:relative; margin:10px 0; font-family:"SF Mono",Consolas,"Ubuntu Mono",monospace;}
+  pre .cp{position:absolute; top:8px; right:8px; background:#2d333b; color:#adbac7; border:none; border-radius:6px; font-size:11px; padding:4px 9px; cursor:pointer;}
+  pre .cp:hover{background:#444c56;}
+  code.inline{background:#eceff3; border-radius:4px; padding:1px 6px; font-size:13px; font-family:"SF Mono",Consolas,monospace;}
+  table{border-collapse:collapse; width:100%; margin:10px 0; font-size:13.5px; background:var(--card);}
+  th,td{border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top;}
+  th{background:#f0f2f5; font-size:12.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted);}
+  .warn{background:var(--warn-bg); border-left:4px solid var(--warn-line); border-radius:6px; padding:10px 14px; margin:10px 0; font-size:13.5px;}
+  .danger{background:var(--danger-bg); border-left:4px solid var(--danger-line); border-radius:6px; padding:10px 14px; margin:10px 0; font-size:13.5px;}
+  .okline{color:var(--ok); font-weight:600;}
+  .step{display:flex; gap:12px; margin:14px 0;}
+  .step .n{flex:0 0 30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:14px; margin-top:2px;}
+  .step .body{flex:1; min-width:0;}
+  .kv{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin:12px 0;}
+  .kv .cell{background:var(--accent-soft); border:1px solid #f3d5c0; border-radius:8px; padding:10px 12px;}
+  .kv .cell b{display:block; font-size:17px;} .kv .cell span{font-size:12px; color:var(--muted);}
+  ul{margin:8px 0 8px 20px; font-size:14px;} li{margin:4px 0;}
+  .tag{display:inline-block; font-size:11px; font-weight:700; border-radius:20px; padding:2px 10px; margin-left:6px; vertical-align:middle;}
+  .tag.ok{background:#dcfce7; color:#166534;} .tag.info{background:#e0e7ff; color:#3730a3;} .tag.est{background:#fef3c7; color:#92400e;}
+</style>
+</head>
+<body>
+<header>
+  <h1>SPS Gazebo Simulation — Demo Board</h1>
+  <p>Gen5 UT-inspection drone &amp; magnetic crawler rovers · every command on this board was verified by running it on this machine</p>
+</header>
+<nav id="tabs">
+  <button data-t="summary">Summary</button>
+  <button data-t="models">Models</button>
+  <button data-t="demo1" class="active">Demo 1 — RC Flight</button>
+  <button data-t="demo2">Demo 2 — FPV + Wind</button>
+  <button data-t="wind">Wind Control</button>
+  <button data-t="fix">If It Goes Wrong</button>
+</nav>
+<main>
+
+<!-- ============ SUMMARY ============ -->
+<section class="tab" id="summary">
+  <h2>What this simulation is</h2>
+  <p>A physics-accurate simulation of SPS's inspection machines in Gazebo (Harmonic), flown on the <b>real ArduPilot autopilot software</b>: the <b>Gen5 drone</b> that presses its ultrasonic probe against a 45&nbsp;m chimney, and the <b>magnetic crawler rovers</b> that stick to steel pipes — including fully upside down. Every calibration traces to a measurement made on the real hardware (luggage scale, kitchen scale, tape measure, KDE thrust bench).</p>
+  <h3>Three numbers that prove the model</h3>
+  <div class="kv">
+    <div class="cell"><b>4&thinsp;399 rpm</b><span>hover speed — predicted from bench data, measured 460.60 vs 460.6 rad/s, to the digit</span></div>
+    <div class="cell"><b>4.31°</b><span>lean in a 10 m/s wind — predicted 4.2° before the flight, from the CAD silhouette</span></div>
+    <div class="cell"><b>100 %</b><span>probe contact held for the full 10 s chimney measurement — in calm air AND 5 m/s wind</span></div>
+  </div>
+  <h3>Demo schedule</h3>
+  <table>
+    <tr><th>Demo</th><th>What</th><th>World</th></tr>
+    <tr><td><b>Demo 1</b></td><td>RC flight — real transmitter in hand</td><td>proven plant world (v1)</td></tr>
+    <tr><td><b>Demo 2</b></td><td>FPV flight in gusting wind + chimney; then the NEW plant world showcase</td><td>v1 official · v2 showcase</td></tr>
+  </table>
+  <h3>Honest lines, if the room asks</h3>
+  <ul>
+    <li><b>Nothing can break.</b> The engine models rigid bodies — impacts stop the aircraft, they cannot damage it. An intact drone after a strike is not a survivability claim.</li>
+    <li>The oil-film result: 1&nbsp;mm of oil costs the OMNI rover 31&nbsp;% of grip — leaving 13&times; its weight. No realistic film detaches it.</li>
+    <li>The old single-magnet plan (20&nbsp;kgf) cannot hang inverted at all — physics predicted the failure, the sim reproduced it. That is why the two-magnet design exists.</li>
+  </ul>
+</section>
+
+<!-- ============ MODELS ============ -->
+<section class="tab" id="models">
+  <h2>The machines</h2>
+  <div class="card"><b>Gen5 drone</b> <span class="tag ok">FULLY PROVEN</span>
+    <p class="sub">12.000 kg from CAD with battery + 550 g Tritex UT kit · real 18.5&Prime; tri-blade props · 819 mm motor spacing (tape-measured) · thrust from the KDE bench table. Flies ArduPilot SITL: hover, wind, RC, and the full chimney-touch mission all validated. Gel-fed probe disc leads by design; static plastic stabilizer below it.</p></div>
+  <div class="card"><b>OMNI rover</b> <span class="tag ok">FULLY PROVEN</span>
+    <p class="sub">7.0 kg · 120 kgf magnetic front wheel + 50–60 kgf rear arc (5 magnets), both luggage-scale measured. Holds and crawls on flat and Ø500 pipe, hangs fully inverted (level within 3.75°). The oil-film decrement study is built on it.</p></div>
+  <div class="card"><b>Dyna Flux rover</b> <span class="tag info">MECHANISM DEMO</span> <span class="tag ok">MAGNETS MEASURED</span>
+    <p class="sub">14.0 kg · 20–22 kgf per wheel (measured) · <b>suspended-magnet wheels</b>: a servo-held magnet inside an aluminum shell, swung up to release. Crawls around a pipe, holds inverted, skid-steers (tank turn). Attached 360° pipe turns: real machine does it, sim work in progress.</p></div>
+  <div class="card"><b>Orbit 1.1 rover</b> <span class="tag info">MECHANISM DEMO</span>
+    <p class="sub">18.0 kg (wheels 1.5 kg each, kitchen-scale measured) · 40 kgf magnet ring per wheel · wheels pivot 0↔90° (2 motors each) to <i>orbit</i> the pipe: along, then around, raster-scanning. Pivot mechanism validated; shown as a model + mechanism at the review.</p></div>
+  <h3>Worlds</h3>
+  <table>
+    <tr><th>World</th><th>Use</th></tr>
+    <tr><td><code class="inline">gen5_plant.sdf</code></td><td>THE demo world — chimney, buildings, gas holder, wind. Every mission validated here.</td></tr>
+    <tr><td><code class="inline">gen5_plant_v2.sdf</code></td><td>The showcase — built from our own plant photos: China Shed with ore, conveyor galleries, clarifiers, stockpiles. No wind control (known, deliberate for now).</td></tr>
+    <tr><td><code class="inline">rover_showcase.sdf</code></td><td>A pipe with one OMNI on top and one hanging fully inverted beneath.</td></tr>
+  </table>
+</section>
+
+<!-- ============ DEMO 1 ============ -->
+<section class="tab active" id="demo1">
+  <h2>Demo 1 — RC flight, step by step</h2>
+  <p class="sub">Setup from cold: ~3 minutes. Three terminals. Written from the rehearsal; the warnings are things that actually happened.</p>
+
+  <div class="danger"><b>Before anyone is watching:</b> transmitter dongle in USB · transmitter switched <b>ON</b> · <b>throttle stick fully DOWN</b> (in rehearsal it sat near full and would have blocked arming — check every time).</div>
+
+  <div class="step"><div class="n">1</div><div class="body">
+    <b>Terminal 1 — start the simulator</b>
+<pre><button class="cp">copy</button>cd ~/gz_ws/src/GazebooAssets
+export GZ_SIM_RESOURCE_PATH="$PWD/Models/converted:$PWD/Gen5Flight/models:$PWD/InspectionYard/exports:$GZ_SIM_RESOURCE_PATH"
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/gz_ws/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"
+gz sim -r Gen5Flight/worlds/gen5_plant.sdf</pre>
+    <p class="sub">Wait until the drone is visible on the ground.</p>
+  </div></div>
+
+  <div class="step"><div class="n">2</div><div class="body">
+    <b>Terminal 2 — start the autopilot</b>
+    <div class="warn"><b>Use the launcher script — never <code class="inline">sim_vehicle.py</code> directly.</b> The script sets the flag without which the transmitter is silently invisible (sticks do nothing, no error).</div>
+<pre><button class="cp">copy</button>~/gz_ws/src/GazebooAssets/Gen5Flight/scripts/start_sitl.sh</pre>
+    <p class="sub">Wait for <code class="inline">Received ... parameters</code> and a <code class="inline">STABILIZE&gt;</code> prompt.</p>
+  </div></div>
+
+  <div class="step"><div class="n">3</div><div class="body">
+    <b>Terminal 3 — connect the transmitter</b>
+<pre><button class="cp">copy</button>cd ~/gz_ws/src/GazebooAssets
+SDL_LINUX_JOYSTICK_CLASSIC=1 python3 Gen5Flight/scripts/rc_bridge.py --check</pre>
+    <p>Two columns of matching numbers appear. <b>Move every stick once and watch all four respond</b> — a stick that has never moved reports itself centred no matter where it is. <b>Leave this window running for the whole flight</b>; closing it releases the controls.</p>
+    <table>
+      <tr><th>Move</th><th>Expect</th></tr>
+      <tr><td>throttle up / down</td><td>3rd number rises toward 1900 / falls toward 1100</td></tr>
+      <tr><td>roll right</td><td>1st number rises</td></tr>
+      <tr><td>pitch forward</td><td>2nd number <b>falls</b> (correct — deliberate)</td></tr>
+      <tr><td>yaw right</td><td>4th number rises</td></tr>
+    </table>
+  </div></div>
+
+  <div class="step"><div class="n">4</div><div class="body">
+    <b>Fly — typed in the MAVProxy window (terminal 2)</b>
+<pre><button class="cp">copy</button>mode stabilize
+arm throttle</pre>
+    <p>Throttle up gently to lift off, small stick inputs, land by easing throttle down. Then:</p>
+<pre><button class="cp">copy</button>disarm</pre>
+    <p class="sub">The transmitter has <b>no switches</b> — arming and modes are always typed. Keep the MAVProxy window in reach.</p>
+  </div></div>
+
+  <div class="danger"><b>Emergency stop, any time:</b> Ctrl-C in the bridge window (terminal 3) — controls release instantly — then type <code class="inline">disarm</code> in MAVProxy.</div>
+</section>
+
+<!-- ============ DEMO 2 ============ -->
+<section class="tab" id="demo2">
+  <h2>Demo 2 — FPV flight in wind, then the showcase</h2>
+  <p class="sub">Official flight in the proven world; the new world is the finale. Setup ~4 minutes. Terminals 1–3 exactly as Demo 1, then:</p>
+
+  <div class="step"><div class="n">4</div><div class="body">
+    <b>FPV camera on screen</b>
+    <p>In the Gazebo window: <b>⋮ menu (top-right) → search “Image Display” → add it → choose topic <code class="inline">/gen5/fpv</code></b>. The orange-tipped UT probe sits low-centre in frame — deliberate, so a touch stays visible.</p>
+  </div></div>
+
+  <div class="step"><div class="n">5</div><div class="body">
+    <b>Wind — terminal 4</b>
+<pre><button class="cp">copy</button>cd ~/gz_ws/src/GazebooAssets
+python3 Gen5Flight/scripts/wind_panel.py</pre>
+    <p>Tick <b>Enable wind</b> → direction → speed → <b>Apply</b>. Suggested for the demo: <b>5 m/s, gusting ±3, period 8 s</b> — the conditions the chimney mission was validated in. Full detail in the Wind tab.</p>
+  </div></div>
+
+  <div class="step"><div class="n">6</div><div class="body">
+    <b>Suggested flight</b>
+    <ul>
+      <li>Lift off, low hover — let the room watch the FPV panel</li>
+      <li>Wind ON — the drone visibly leans into it (~2.5° at 5 m/s)</li>
+      <li>Fly to the chimney watching FPV, circle at mid height</li>
+      <li>Return, land, <code class="inline">disarm</code></li>
+    </ul>
+  </div></div>
+
+  <div class="step"><div class="n">7</div><div class="body">
+    <b>SHOWCASE — the new plant world</b> <span class="sub">(only after the official flight)</span>
+    <p>Ctrl-C terminals 1, 2, 3. Then terminal 1:</p>
+<pre><button class="cp">copy</button>cd ~/gz_ws/src/GazebooAssets
+export GZ_SIM_RESOURCE_PATH="$PWD/Models/converted:$PWD/Gen5Flight/models:$PWD/InspectionYard/exports:$PWD/DemoAssets/models:$GZ_SIM_RESOURCE_PATH"
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/gz_ws/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"
+gz sim -r Gen5Flight/worlds/gen5_plant_v2.sdf</pre>
+    <p>Terminals 2 and 3 as before; FPV as step 4. Suggested lap: climb to gallery height, over the <b>China Shed</b> (big curved roof, south-east), back <b>under and between the conveyor galleries</b>, land.</p>
+    <div class="warn"><b>Wind does NOT work in the showcase world</b> — the panel is wired to the old world's channel and its buttons silently do nothing here. Known, verified, fixed after the demos. Fly the showcase calm.</div>
+  </div></div>
+</section>
+
+<!-- ============ WIND ============ -->
+<section class="tab" id="wind">
+  <h2>Wind control</h2>
+  <p>Works in the main demo world (<code class="inline">gen5_plant.sdf</code>). Wind ramps in over ~3 s — it arrives like weather, not a switch. It is a world property: it does not follow the drone's nose.</p>
+  <h3>Point and click</h3>
+<pre><button class="cp">copy</button>cd ~/gz_ws/src/GazebooAssets
+python3 Gen5Flight/scripts/wind_panel.py</pre>
+  <p>Tick <b>Enable wind</b> → pick where it comes FROM → speed slider → <b>Apply</b>. Tick <b>Gusting</b> (e.g. ±3 m/s every 8 s). The red <b>STOP WIND</b> button is the only correct off switch. Closing the window does <i>not</i> stop a steady wind.</p>
+  <h3>Command line (same mechanism)</h3>
+<pre><button class="cp">copy</button>python3 Gen5Flight/scripts/set_wind.py --from-heading 0 --speed 5
+python3 Gen5Flight/scripts/set_wind.py --from-heading 0 --speed 5 --gust 3 --period 8
+python3 Gen5Flight/scripts/set_wind.py --off</pre>
+  <table>
+    <tr><th>Wind from the drone's… (at spawn heading)</th><th>--from-heading</th></tr>
+    <tr><td>front (nose / probe side)</td><td>0</td></tr>
+    <tr><td>left</td><td>90</td></tr>
+    <tr><td>back</td><td>180</td></tr>
+    <tr><td>right</td><td>270</td></tr>
+  </table>
+  <h3>What to expect (all flight-verified)</h3>
+  <table>
+    <tr><th>Wind</th><th>Lean</th><th>Position hold</th></tr>
+    <tr><td>5 m/s steady</td><td>~2.5°</td><td>centimetres</td></tr>
+    <tr><td>10 m/s steady</td><td>~4.5°</td><td>centimetres</td></tr>
+    <tr><td>5 ±3 m/s gusting</td><td>breathing ~3°</td><td>&lt; 10 cm</td></tr>
+  </table>
+</section>
+
+<!-- ============ FIX ============ -->
+<section class="tab" id="fix">
+  <h2>If it goes wrong</h2>
+  <div class="danger"><b>Emergency stop, any time:</b> Ctrl-C in the bridge window (terminal 3), then <code class="inline">disarm</code> in MAVProxy. Anything alarming in the air: <code class="inline">mode land</code> then <code class="inline">disarm</code>.</div>
+  <table>
+    <tr><th>Symptom</th><th>Do this</th></tr>
+    <tr><td>Sticks do nothing, everything else looks fine</td><td>Terminal 2 was not started with <code class="inline">start_sitl.sh</code> — restart it with the script</td></tr>
+    <tr><td>Bridge says <code class="inline">no joystick</code></td><td>Dongle unplugged or transmitter off — re-plug, re-run</td></tr>
+    <tr><td>Refuses to arm</td><td>Throttle not fully down, or EKF/GPS still settling — wait ~30 s</td></tr>
+    <tr><td>Drone drifts or fights you</td><td>Ctrl-C the bridge — controls release immediately</td></tr>
+    <tr><td>FPV panel black</td><td>Wrong topic — it must be <code class="inline">/gen5/fpv</code></td></tr>
+    <tr><td>Wind buttons do nothing in the NEW world</td><td>Expected — showcase world has no wind wiring yet. Fly it calm.</td></tr>
+    <tr><td>Models missing / white boxes</td><td>The <code class="inline">export</code> lines were skipped in that terminal — redo them, relaunch</td></tr>
+    <tr><td>World validates as INVALID but runs fine</td><td>Known quirk — ignore during demos</td></tr>
+  </table>
+  <h3>Worth knowing before the room asks</h3>
+  <ul>
+    <li><b>The drone will not visibly crash or break</b> — impacts stop it dead; nothing fractures in any physics engine. Heavier aircraft look more survivable than reality; the report states this.</li>
+    <li>Arming and modes are typed, never flicked — the transmitter has no switches.</li>
+    <li>If the machine was ever rebuilt: the file <code class="inline">/etc/udev/rules.d/99-rc-joystick.rules</code> must exist or the transmitter is invisible.</li>
+  </ul>
+</section>
+
+</main>
+<script>
+  const tabs=document.querySelectorAll('#tabs button'), secs=document.querySelectorAll('section.tab');
+  tabs.forEach(b=>b.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active')); secs.forEach(s=>s.classList.remove('active'));
+    b.classList.add('active'); document.getElementById(b.dataset.t).classList.add('active');
+    window.scrollTo({top:0});
+  }));
+  document.querySelectorAll('pre .cp').forEach(btn=>btn.addEventListener('click',()=>{
+    const t=btn.parentElement.innerText.replace(/^copy\n?/,'');
+    navigator.clipboard.writeText(t).then(()=>{btn.textContent='copied!'; setTimeout(()=>btn.textContent='copy',1200);});
+  }));
+</script>
+</body>
+</html>
