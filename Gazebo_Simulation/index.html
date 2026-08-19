@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gen5 Inspection Drone — Simulation Overview</title>
+<style>
+  :root{
+    --ink:#1c2128; --ink2:#57606a; --ink3:#8b949e;
+    --surface:#ffffff; --section:#f6f8fa; --line:#d8dee4;
+    --accent:#1f4e79; --accent-soft:#e8f0f7;
+    --amber:#b45309; --amber-soft:#fdf3e7;
+    --good:#1a7f37; --good-soft:#e9f5ec;
+    --code-bg:#0d1117; --code-ink:#e6edf3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth; scroll-padding-top:70px;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); background:var(--section); line-height:1.55; font-size:15.5px;
+  }
+  /* ---- header ---- */
+  header{
+    background:var(--accent); color:#fff; padding:38px 24px 30px;
+  }
+  .wrap{max-width:960px; margin:0 auto;}
+  header h1{font-size:26px; font-weight:650; letter-spacing:-0.01em;}
+  header .sub{margin-top:6px; font-size:15px; color:#c9d9ea;}
+  header .meta{margin-top:14px; font-size:12.5px; color:#9db8d4; text-transform:uppercase; letter-spacing:0.08em;}
+  /* ---- nav ---- */
+  nav{
+    position:sticky; top:0; z-index:50; background:var(--surface);
+    border-bottom:1px solid var(--line); box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  }
+  nav .wrap{display:flex; gap:2px; overflow-x:auto; padding:0 12px;}
+  nav a{
+    display:block; padding:12px 13px; font-size:13.5px; font-weight:550;
+    color:var(--ink2); text-decoration:none; white-space:nowrap;
+    border-bottom:2px solid transparent;
+  }
+  nav a:hover{color:var(--accent);}
+  nav a.active{color:var(--accent); border-bottom-color:var(--accent);}
+  /* ---- sections ---- */
+  section{padding:36px 24px 8px;}
+  section h2{
+    font-size:20px; font-weight:650; margin-bottom:4px; letter-spacing:-0.01em;
+  }
+  section .lede{color:var(--ink2); font-size:15px; margin-bottom:20px; max-width:760px;}
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin-bottom:16px;
+  }
+  /* ---- what we built grid ---- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:12px; margin-bottom:16px;}
+  .grid .card{margin-bottom:0;}
+  .card h3{font-size:15px; font-weight:650; margin-bottom:5px; color:var(--accent);}
+  .card p{font-size:14px; color:var(--ink2);}
+  /* ---- stat tiles ---- */
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px;}
+  .stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:16px 16px 13px;
+  }
+  .stat .v{font-size:23px; font-weight:650; letter-spacing:-0.02em;}
+  .stat .l{font-size:12.5px; color:var(--ink2); margin-top:3px;}
+  .stat .s{font-size:11.5px; color:var(--ink3); margin-top:5px;}
+  /* ---- tables ---- */
+  table{width:100%; border-collapse:collapse; font-size:14px; background:var(--surface);}
+  .card table{margin:2px 0;}
+  th{
+    text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--ink2); font-weight:600; padding:8px 12px; border-bottom:2px solid var(--line);
+  }
+  td{padding:9px 12px; border-bottom:1px solid #eef1f4; vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td.num{font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .match{color:var(--good); font-weight:600;}
+  /* ---- code blocks ---- */
+  .term{
+    position:relative; background:var(--code-bg); color:var(--code-ink);
+    border-radius:10px; padding:14px 16px; margin:10px 0 16px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px; line-height:1.6; overflow-x:auto; white-space:pre;
+  }
+  .term .cmt{color:#8b949e;}
+  .copy{
+    position:absolute; top:8px; right:8px; background:#21262d; color:#c9d1d9;
+    border:1px solid #30363d; border-radius:6px; font-size:11.5px; padding:4px 10px;
+    cursor:pointer; font-family:inherit;
+  }
+  .copy:hover{background:#30363d;}
+  .stepno{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
+    font-size:13px; font-weight:650; margin-right:9px; flex-shrink:0;
+  }
+  .step-h{display:flex; align-items:center; font-size:15.5px; font-weight:650; margin:20px 0 4px;}
+  .step-note{color:var(--ink2); font-size:13.5px; margin-left:33px; max-width:720px;}
+  /* ---- callouts ---- */
+  .note{
+    border-left:4px solid var(--accent); background:var(--accent-soft);
+    border-radius:0 8px 8px 0; padding:12px 16px; font-size:14px; margin:14px 0;
+  }
+  .warn{
+    border-left:4px solid var(--amber); background:var(--amber-soft);
+    border-radius:0 8px 8px 0; padding:12px 16px; font-size:14px; margin:14px 0;
+  }
+  .warn b, .note b{font-weight:650;}
+  /* ---- checklist ---- */
+  ul.check{list-style:none; margin:6px 0;}
+  ul.check li{
+    padding:7px 0 7px 30px; position:relative; font-size:14.5px;
+    border-bottom:1px solid #eef1f4;
+  }
+  ul.check li:last-child{border-bottom:none;}
+  ul.check li::before{
+    content:""; position:absolute; left:2px; top:10px; width:15px; height:15px;
+    border:2px solid var(--accent); border-radius:4px;
+  }
+  /* ---- evidence ---- */
+  .figs{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-bottom:16px;}
+  figure.shot{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; margin:0;
+  }
+  figure.shot img{display:block; width:100%; height:auto;}
+  figure.shot .ph{
+    display:none; padding:34px 18px; text-align:center; color:var(--ink3);
+    font-size:13px; background:repeating-linear-gradient(45deg,#fafbfc,#fafbfc 12px,#f2f4f7 12px,#f2f4f7 24px);
+  }
+  figure.shot.missing .ph{display:block;}
+  figure.shot figcaption{
+    padding:10px 14px; font-size:13px; color:var(--ink2); border-top:1px solid var(--line);
+  }
+  figure.shot figcaption b{color:var(--ink); font-weight:650;}
+  .video-card video{display:block; width:100%; border-radius:8px; background:#0d1117;}
+  /* ---- Q&A ---- */
+  .qa dt{font-weight:650; font-size:14.5px; margin-top:14px;}
+  .qa dt:first-child{margin-top:2px;}
+  .qa dd{color:var(--ink2); font-size:14px; margin:3px 0 0;}
+  footer{padding:30px 24px 44px; color:var(--ink3); font-size:12.5px; text-align:center;}
+  @media print{
+    nav{display:none;} .copy{display:none;}
+    body{background:#fff;} section{padding:20px 0 0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Gen5 Inspection Drone — Simulation System</h1>
+    <div class="sub">A physics simulation of the SPS Gen5 UT-inspection drone in Gazebo, flown by hand on the real RC transmitter through the ArduPilot autopilot.</div>
+    <div class="meta">SPS &nbsp;·&nbsp; Department Review &nbsp;·&nbsp; August 2026 &nbsp;·&nbsp; Drone flight system only</div>
+  </div>
+</header>
+
+<nav id="nav">
+  <div class="wrap">
+    <a href="#built">What We Built</a>
+    <a href="#drone">The Drone</a>
+    <a href="#consistency">Consistency</a>
+    <a href="#crash">Crash Behaviour</a>
+    <a href="#wind">Wind &amp; Gusts</a>
+    <a href="#run">Run It</a>
+    <a href="#evidence">Flight Evidence</a>
+  </div>
+</nav>
+
+<!-- ================= WHAT WE BUILT ================= -->
+<section id="built">
+  <div class="wrap">
+    <h2>What We Built</h2>
+    <p class="lede">Six pieces, working together as one system. Everything below exists and has flown — nothing on this page is planned work.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Digital twin of the Gen5</h3>
+        <p>Built from the real CAD files (STEP) of the actual machine. Its weight was put on a scale, its dimensions taken from the CAD — not guessed.</p>
+      </div>
+      <div class="card">
+        <h3>Real autopilot firmware</h3>
+        <p>The simulated drone is flown by ArduPilot — the same autopilot software family that flies real aircraft. It runs unmodified (SITL: software-in-the-loop).</p>
+      </div>
+      <div class="card">
+        <h3>The real transmitter in your hands</h3>
+        <p>The physical RC transmitter plugs into the PC and flies the simulation. Stick movements go through the same radio channels a real flight would use.</p>
+      </div>
+      <div class="card">
+        <h3>Industrial plant world</h3>
+        <p>A simulated site with the striped inspection chimney as the mission target. A second, richer world was built from photographs of our own plant.</p>
+      </div>
+      <div class="card">
+        <h3>FPV camera + UT probe</h3>
+        <p>A nose camera (1280×720) streams the pilot's view live. The orange-tipped ultrasonic probe sits visibly in frame, so probe contact can be seen as it happens.</p>
+      </div>
+      <div class="card">
+        <h3>Calibrated wind with gusts</h3>
+        <p>Wind is a property of the world, controlled from a point-and-click panel: direction, speed, and breathing gusts. The drone leans into it, measurably.</p>
+      </div>
+    </div>
+    <div class="note"><b>The mission this enables:</b> take off, fly to the chimney on the FPV view, touch the ultrasonic probe to the wall, hold contact, and return — in calm air or in gusting wind. This full mission has been flown successfully, repeatedly.</div>
+  </div>
+</section>
+
+<!-- ================= THE DRONE ================= -->
+<section id="drone">
+  <div class="wrap">
+    <h2>The Drone in Simulation</h2>
+    <p class="lede">Every figure below is a measurement of the real machine, carried into the simulation.</p>
+    <div class="stats">
+      <div class="stat"><div class="v">12.0 kg</div><div class="l">Take-off mass</div><div class="s">weighed on the real drone</div></div>
+      <div class="stat"><div class="v">819 mm</div><div class="l">Motor-to-motor span</div><div class="s">from the CAD model</div></div>
+      <div class="stat"><div class="v">4 rotors</div><div class="l">Quad-X layout</div><div class="s">matching the real airframe</div></div>
+      <div class="stat"><div class="v">~4,400 RPM</div><div class="l">Hover motor speed</div><div class="s">predicted from bench data</div></div>
+      <div class="stat"><div class="v">1280×720</div><div class="l">FPV nose camera</div><div class="s">live stream in Gazebo</div></div>
+    </div>
+    <div class="card">
+      <p style="color:var(--ink); font-size:14.5px;">
+        The propellers generate lift from the manufacturer's <b>bench test data</b> (thrust and torque measured on a real test stand), not from generic defaults.
+        The UT probe is modelled at its true position on the nose, with its contact disc at the correct face — so a probe touch in simulation happens where it happens on the real drone.
+        The drone also feels wind on its body, and its propellers can physically strike obstacles (see Crash Behaviour).
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONSISTENCY ================= -->
+<section id="consistency">
+  <div class="wrap">
+    <h2>How Consistent Is It? — The Discipline</h2>
+    <p class="lede">Two rules were enforced for the whole build, and they are what make the numbers below trustworthy.</p>
+    <div class="card">
+      <p style="font-size:14.5px; color:var(--ink);">
+        <b>Rule 1 — measure first, model second.</b> No number was invented or hand-tuned to "look right." Mass came from a scale, geometry from CAD, propulsion from bench charts.<br><br>
+        <b>Rule 2 — predict blind, then check.</b> Before each behaviour was first run, its expected value was calculated on paper from the measurements and written down. Only then was the simulation run, and the two compared. That is the honest test: the simulation was never tuned toward the answer.
+      </p>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Behaviour</th><th>Predicted on paper (before running)</th><th>Simulation showed</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Hover motor speed</td><td class="num">460.60 rad/s</td><td class="num">460.6 rad/s</td><td class="match">Match</td></tr>
+          <tr><td>Lean angle in 10 m/s wind</td><td class="num">4.31&deg;</td><td class="num">4.2&deg;</td><td class="match">Match</td></tr>
+          <tr><td>Resting attitude on the ground</td><td>Slight nose-down (centre of gravity)</td><td>Slight nose-down</td><td class="match">Match</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><b>The documentation follows the same rule:</b> every command in the "Run It" section below was executed on the demo machine before it was written into this document. Nothing here is copied from a manual or assumed to work.</div>
+  </div>
+</section>
+
+<!-- ================= CRASH ================= -->
+<section id="crash">
+  <div class="wrap">
+    <h2>How a Crash Behaves</h2>
+    <p class="lede">Crashes are physical events with an honest boundary, stated plainly.</p>
+    <div class="card">
+      <p style="font-size:14.5px; color:var(--ink);">
+        <b>What happens:</b> the propellers carry real collision geometry (the full disc each blade sweeps), so flying into the chimney or a structure is a genuine physical impact — the drone is stopped or thrown by the contact, falls, and tumbles under gravity. The autopilot then detects the upset exactly as it would on a real aircraft and disarms itself, printing
+        <code style="background:#f2f4f7; padding:1px 6px; border-radius:4px; font-size:13px;">Crash: Disarming</code> in the console for everyone to see.
+      </p>
+      <p style="font-size:14.5px; color:var(--ink); margin-top:10px;">
+        <b>Mass matters, correctly:</b> a light 1.5&nbsp;kg drone in the same simulation gets flipped by an impact that the 12&nbsp;kg Gen5 pushes through. That difference is real physics — momentum — not a scripted effect.
+      </p>
+    </div>
+    <div class="warn"><b>The honest limit:</b> nothing breaks. The physics engine models rigid bodies — it has no structural failure, so propellers never shatter and arms never snap. A real Gen5 hitting a wall at speed would lose propellers; the simulated one keeps its shape. An intact aircraft after an impact is therefore <b>not</b> a survivability claim, and we do not present it as one.</div>
+  </div>
+</section>
+
+<!-- ================= WIND ================= -->
+<section id="wind">
+  <div class="wrap">
+    <h2>How the Gust Wind Works</h2>
+    <p class="lede">Wind belongs to the world, as in reality — it does not follow the aircraft's nose.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>The physics</h3>
+        <p>The force on the drone comes from the <b>relative</b> air speed — wind minus the drone's own motion. Fly downwind and the push weakens; hold position and the drone must lean into it. The strength was calibrated once, at a 10&nbsp;m/s reference, against the drone's real drag estimate — then verified in flight (the 4.31&deg; vs 4.2&deg; row above).</p>
+      </div>
+      <div class="card">
+        <h3>The control panel</h3>
+        <p>A point-and-click window: tick <b>Enable wind</b>, choose the direction it comes <b>from</b>, set the speed, press <b>Apply</b>. Tick <b>Gusting</b> for a breathing wind that swells and eases on a set period. <b>STOP WIND</b> always works. Wind ramps in over ~3 seconds — it arrives like weather, not a light switch.</p>
+      </div>
+    </div>
+    <div class="note"><b>Validated under wind:</b> the full chimney-touch mission — approach, probe contact, hold, return — was flown in <b>5&nbsp;m/s wind gusting ±3&nbsp;m/s</b> with 100% probe contact maintained. That is the recommended demo setting.</div>
+  </div>
+</section>
+
+<!-- ================= RUN IT ================= -->
+<section id="run">
+  <div class="wrap">
+    <h2>Run the Simulation</h2>
+    <p class="lede">Four terminals, about 3 minutes from cold. Every command verified on the demo machine.</p>
+
+    <div class="card">
+      <h3 style="color:var(--ink); font-size:15px; font-weight:650; margin-bottom:6px;">Pre-flight checklist — before anyone is watching</h3>
+      <ul class="check">
+        <li>Transmitter dongle plugged into USB, transmitter <b>switched on</b></li>
+        <li><b>Throttle stick fully DOWN</b> — the aircraft refuses to arm otherwise</li>
+        <li>No leftover Gazebo or MAVProxy windows from earlier sessions</li>
+        <li>After starting the bridge (step 3): <b>move every stick once</b> — an untouched stick reports itself as centred no matter where it really is</li>
+      </ul>
+    </div>
+
+    <div class="step-h"><span class="stepno">1</span> Start the world &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 1)</span></div>
+    <div class="term"><button class="copy">Copy</button>cd ~/gz_ws/src/GazebooAssets
+export GZ_SIM_RESOURCE_PATH="$PWD/Models/converted:$PWD/Gen5Flight/models:$PWD/InspectionYard/exports:$GZ_SIM_RESOURCE_PATH"
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/gz_ws/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"
+gz sim -r Gen5Flight/worlds/gen5_plant.sdf</div>
+    <p class="step-note">Wait until the drone and the striped chimney are visible.</p>
+
+    <div class="step-h"><span class="stepno">2</span> Start the autopilot &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 2)</span></div>
+    <div class="term"><button class="copy">Copy</button>~/gz_ws/src/GazebooAssets/Gen5Flight/scripts/start_sitl.sh</div>
+    <p class="step-note"><b>Always use this launcher script</b> — never <code>sim_vehicle.py</code> directly, or the transmitter is silently invisible. Wait for the <code>STABILIZE&gt;</code> prompt.</p>
+
+    <div class="step-h"><span class="stepno">3</span> Connect the transmitter &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 3)</span></div>
+    <div class="term"><button class="copy">Copy</button>cd ~/gz_ws/src/GazebooAssets
+SDL_LINUX_JOYSTICK_CLASSIC=1 python3 Gen5Flight/scripts/rc_bridge.py --check</div>
+    <p class="step-note">Two columns of matching numbers appear. Move each stick and confirm all four channels respond. Leave this running for the whole flight — closing it releases the controls.</p>
+
+    <div class="step-h"><span class="stepno">4</span> Wind panel &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 4 — optional until needed)</span></div>
+    <div class="term"><button class="copy">Copy</button>cd ~/gz_ws/src/GazebooAssets
+python3 Gen5Flight/scripts/wind_panel.py</div>
+    <p class="step-note">For the FPV view: in the Gazebo window, ⋮ menu → search "Image Display" → add it → choose topic <code>/gen5/fpv</code>.</p>
+
+    <div class="step-h"><span class="stepno">5</span> Fly &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(type in the MAVProxy window, terminal 2)</span></div>
+    <div class="term"><button class="copy">Copy</button>mode stabilize
+arm throttle
+<span class="cmt"># ...fly on the sticks; when finished:</span>
+disarm</div>
+
+    <div class="card">
+      <table>
+        <thead><tr><th>If it goes wrong</th><th>Do this</th></tr></thead>
+        <tbody>
+          <tr><td>Sticks do nothing, everything else fine</td><td>Terminal 2 was not started with <code>start_sitl.sh</code> — restart it that way</td></tr>
+          <tr><td>Bridge says "no joystick"</td><td>Dongle unplugged or transmitter off — re-plug, re-run</td></tr>
+          <tr><td>Refuses to arm</td><td>Throttle not fully down, or wait longer for the autopilot to settle</td></tr>
+          <tr><td>Anything alarming</td><td><b>Ctrl-C in the bridge window</b> (releases controls), then <code>mode land</code> and <code>disarm</code> in MAVProxy</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EVIDENCE ================= -->
+<section id="evidence">
+  <div class="wrap">
+    <h2>Flight Evidence</h2>
+    <p class="lede">Screenshots and the flight recording. Save images into <code>Docs/evidence/</code> with the file names below and they appear here automatically.</p>
+
+    <div class="card video-card">
+      <video controls preload="metadata">
+        <source src="evidence/flight_demo.webm" type="video/webm">
+        <source src="evidence/flight_demo.mp4" type="video/mp4">
+      </video>
+      <p style="font-size:13px; color:var(--ink2); margin-top:10px;"><b>Full flight recording</b> — save as <code>Docs/evidence/flight_demo.webm</code> (or <code>.mp4</code>): arm → lift-off → hover → wind on → lean → FPV approach → probe touch on the chimney → return → land → disarm.</p>
+    </div>
+
+    <div class="figs">
+      <figure class="shot missing">
+        <img src="evidence/01_world.png" alt="Gen5 parked in the plant world" onload="this.parentElement.classList.remove('missing')">
+        <div class="ph">Add screenshot → Docs/evidence/01_world.png</div>
+        <figcaption><b>1 — The stage.</b> Gen5 parked in the plant world, striped inspection chimney in view.</figcaption>
+      </figure>
+      <figure class="shot missing">
+        <img src="evidence/02_terminals.png" alt="SITL and bridge running" onload="this.parentElement.classList.remove('missing')">
+        <div class="ph">Add screenshot → Docs/evidence/02_terminals.png</div>
+        <figcaption><b>2 — The stack alive.</b> STABILIZE&gt; prompt in SITL and the bridge's matching channel columns.</figcaption>
+      </figure>
+      <figure class="shot missing">
+        <img src="evidence/03_hover_fpv.png" alt="Hover with FPV panel" onload="this.parentElement.classList.remove('missing')">
+        <div class="ph">Add screenshot → Docs/evidence/03_hover_fpv.png</div>
+        <figcaption><b>3 — Hands-on hover.</b> Drone in a low hover with the FPV panel open, probe tip visible in frame.</figcaption>
+      </figure>
+      <figure class="shot missing">
+        <img src="evidence/04_wind_lean.png" alt="Leaning into wind with panel open" onload="this.parentElement.classList.remove('missing')">
+        <div class="ph">Add screenshot → Docs/evidence/04_wind_lean.png</div>
+        <figcaption><b>4 — Wind on.</b> Wind panel set to 5 m/s gusting; the drone visibly leaning into it while holding position.</figcaption>
+      </figure>
+      <figure class="shot missing">
+        <img src="evidence/05_probe_touch.png" alt="Probe contact with chimney" onload="this.parentElement.classList.remove('missing')">
+        <div class="ph">Add screenshot → Docs/evidence/05_probe_touch.png</div>
+        <figcaption><b>5 — The mission moment.</b> FPV view at the instant the orange probe tip contacts the chimney wall.</figcaption>
+      </figure>
+      <figure class="shot missing">
+        <img src="evidence/06_showcase.png" alt="Showcase plant world" onload="this.parentElement.classList.remove('missing')">
+        <div class="ph">Add screenshot → Docs/evidence/06_showcase.png</div>
+        <figcaption><b>6 — Built from our photos.</b> Aerial view of the new plant world modelled from site photographs.</figcaption>
+      </figure>
+    </div>
+
+    <div class="card qa">
+      <h3 style="color:var(--ink); font-size:15px; font-weight:650; margin-bottom:8px;">Straight answers, if the room asks</h3>
+      <dl class="qa">
+        <dt>Does it crash like a real drone?</dt>
+        <dd>The impact, fall, and autopilot crash-detection are real. Structural breakage is not modelled — nothing fractures, and we say so rather than claim it.</dd>
+        <dt>Why does the simulation run slower than real time?</dt>
+        <dd>The autopilot and physics run in lockstep so control is exact; that caps speed at roughly half real time. It is a fidelity choice, not a graphics limit.</dd>
+        <dt>What is the note about the transmitter?</dt>
+        <dd>The transmitter dongle has a known hardware fault (spurious full-throttle bursts). A software guard blocks them — validated against captured data. The dongle is scheduled for replacement after the review.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<footer>
+  SPS · Gen5 simulation system · Gazebo Harmonic + ArduPilot SITL · Every command on this page was executed on the demo machine before being documented.
+</footer>
+
+<script>
+  // copy buttons
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var block = btn.parentElement.cloneNode(true);
+      block.querySelector('.copy').remove();
+      var text = block.textContent.replace(/^\n+|\n+$/g,'')
+        .split('\n').filter(function(l){return !l.trim().startsWith('#');}).join('\n');
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = 'Copied ✓';
+        setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      });
+    });
+  });
+  // nav highlight on scroll
+  var links = document.querySelectorAll('nav a');
+  var sections = Array.prototype.map.call(links, function(a){
+    return document.querySelector(a.getAttribute('href'));
+  });
+  function onScroll(){
+    var y = window.scrollY + 90, idx = 0;
+    sections.forEach(function(s,i){ if (s && s.offsetTop <= y) idx = i; });
+    links.forEach(function(a,i){ a.classList.toggle('active', i===idx); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+</script>
+</body>
+</html>
