@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gen5 Inspection Drone — Simulation Overview</title>
+<title>Gen5 Inspection Drone , Simulation Overview</title>
 <style>
   :root{
     --ink:#1c2128; --ink2:#57606a; --ink3:#8b949e;
@@ -149,7 +149,7 @@
 
 <header>
   <div class="wrap">
-    <h1>Gen5 Inspection Drone — Simulation System</h1>
+    <h1>Gen5 Inspection Drone , Simulation System</h1>
     <div class="sub">A physics simulation of the SPS Gen5 UT-inspection drone in Gazebo, flown by hand on the real RC transmitter through the ArduPilot autopilot.</div>
     <div class="meta">SPS &nbsp;·&nbsp; Department Review &nbsp;·&nbsp; August 2026 &nbsp;·&nbsp; Drone flight system only</div>
   </div>
@@ -171,15 +171,15 @@
 <section id="built">
   <div class="wrap">
     <h2>What We Built</h2>
-    <p class="lede">Six pieces, working together as one system. Everything below exists and has flown — nothing on this page is planned work.</p>
+    <p class="lede">Six pieces, working together as one system. Everything below exists and has flown , nothing on this page is planned work.</p>
     <div class="grid">
       <div class="card">
         <h3>Digital twin of the Gen5</h3>
-        <p>Built from the real CAD files (STEP) of the actual machine. Its weight was put on a scale, its dimensions taken from the CAD — not guessed.</p>
+        <p>Built from the real CAD files (STEP) of the actual machine. Its weight was put on a scale, its dimensions taken from the CAD , not guessed.</p>
       </div>
       <div class="card">
         <h3>Real autopilot firmware</h3>
-        <p>The simulated drone is flown by ArduPilot — the same autopilot software family that flies real aircraft. It runs unmodified (SITL: software-in-the-loop).</p>
+        <p>The simulated drone is flown by ArduPilot , the same autopilot software family that flies real aircraft. It runs unmodified (SITL: software-in-the-loop).</p>
       </div>
       <div class="card">
         <h3>The real transmitter in your hands</h3>
@@ -198,7 +198,7 @@
         <p>Wind is a property of the world, controlled from a point-and-click panel: direction, speed, and breathing gusts. The drone leans into it, measurably.</p>
       </div>
     </div>
-    <div class="note"><b>The mission this enables:</b> take off, fly to the chimney on the FPV view, touch the ultrasonic probe to the wall, hold contact, and return — in calm air or in gusting wind. This full mission has been flown successfully, repeatedly.</div>
+    <div class="note"><b>The mission this enables:</b> take off, fly to the chimney on the FPV view, touch the ultrasonic probe to the wall, hold contact, and return , in calm air or in gusting wind. This full mission has been flown successfully, repeatedly.</div>
   </div>
 </section>
 
@@ -217,7 +217,7 @@
     <div class="card">
       <p style="color:var(--ink); font-size:14.5px;">
         The propellers generate lift from the manufacturer's <b>bench test data</b> (thrust and torque measured on a real test stand), not from generic defaults.
-        The UT probe is modelled at its true position on the nose, with its contact disc at the correct face — so a probe touch in simulation happens where it happens on the real drone.
+        The UT probe is modelled at its true position on the nose, with its contact disc at the correct face , so a probe touch in simulation happens where it happens on the real drone.
         The drone also feels wind on its body, and its propellers can physically strike obstacles (see Crash Behaviour).
       </p>
     </div>
@@ -227,12 +227,12 @@
 <!-- ================= CONSISTENCY ================= -->
 <section id="consistency">
   <div class="wrap">
-    <h2>How Consistent Is It? — The Discipline</h2>
+    <h2>How Consistent Is It? , The Discipline</h2>
     <p class="lede">Two rules were enforced for the whole build, and they are what make the numbers below trustworthy.</p>
     <div class="card">
       <p style="font-size:14.5px; color:var(--ink);">
-        <b>Rule 1 — measure first, model second.</b> No number was invented or hand-tuned to "look right." Mass came from a scale, geometry from CAD, propulsion from bench charts.<br><br>
-        <b>Rule 2 — predict blind, then check.</b> Before each behaviour was first run, its expected value was calculated on paper from the measurements and written down. Only then was the simulation run, and the two compared. That is the honest test: the simulation was never tuned toward the answer.
+        <b>Rule 1 , measure first, model second.</b> No number was invented or hand-tuned to "look right." Mass came from a scale, geometry from CAD, propulsion from bench charts.<br><br>
+        <b>Rule 2 , predict blind, then check.</b> Before each behaviour was first run, its expected value was calculated on paper from the measurements and written down. Only then was the simulation run, and the two compared. That is the honest test: the simulation was never tuned toward the answer.
       </p>
     </div>
     <div class="card">
@@ -256,14 +256,14 @@
     <p class="lede">Crashes are physical events with an honest boundary, stated plainly.</p>
     <div class="card">
       <p style="font-size:14.5px; color:var(--ink);">
-        <b>What happens:</b> the propellers carry real collision geometry (the full disc each blade sweeps), so flying into the chimney or a structure is a genuine physical impact — the drone is stopped or thrown by the contact, falls, and tumbles under gravity. The autopilot then detects the upset exactly as it would on a real aircraft and disarms itself, printing
+        <b>What happens:</b> the propellers carry real collision geometry (the full disc each blade sweeps), so flying into the chimney or a structure is a genuine physical impact , the drone is stopped or thrown by the contact, falls, and tumbles under gravity. The autopilot then detects the upset exactly as it would on a real aircraft and disarms itself, printing
         <code style="background:#f2f4f7; padding:1px 6px; border-radius:4px; font-size:13px;">Crash: Disarming</code> in the console for everyone to see.
       </p>
       <p style="font-size:14.5px; color:var(--ink); margin-top:10px;">
-        <b>Mass matters, correctly:</b> a light 1.5&nbsp;kg drone in the same simulation gets flipped by an impact that the 12&nbsp;kg Gen5 pushes through. That difference is real physics — momentum — not a scripted effect.
+        <b>Mass matters, correctly:</b> a light 1.5&nbsp;kg drone in the same simulation gets flipped by an impact that the 12&nbsp;kg Gen5 pushes through. That difference is real physics , momentum , not a scripted effect.
       </p>
     </div>
-    <div class="warn"><b>The honest limit:</b> nothing breaks. The physics engine models rigid bodies — it has no structural failure, so propellers never shatter and arms never snap. A real Gen5 hitting a wall at speed would lose propellers; the simulated one keeps its shape. An intact aircraft after an impact is therefore <b>not</b> a survivability claim, and we do not present it as one.</div>
+    <div class="warn"><b>The honest limit:</b> nothing breaks. The physics engine models rigid bodies , it has no structural failure, so propellers never shatter and arms never snap. A real Gen5 hitting a wall at speed would lose propellers; the simulated one keeps its shape. An intact aircraft after an impact is therefore <b>not</b> a survivability claim, and we do not present it as one.</div>
   </div>
 </section>
 
@@ -271,18 +271,18 @@
 <section id="wind">
   <div class="wrap">
     <h2>How the Gust Wind Works</h2>
-    <p class="lede">Wind belongs to the world, as in reality — it does not follow the aircraft's nose.</p>
+    <p class="lede">Wind belongs to the world, as in reality , it does not follow the aircraft's nose.</p>
     <div class="grid">
       <div class="card">
         <h3>The physics</h3>
-        <p>The force on the drone comes from the <b>relative</b> air speed — wind minus the drone's own motion. Fly downwind and the push weakens; hold position and the drone must lean into it. The strength was calibrated once, at a 10&nbsp;m/s reference, against the drone's real drag estimate — then verified in flight (the 4.31&deg; vs 4.2&deg; row above).</p>
+        <p>The force on the drone comes from the <b>relative</b> air speed , wind minus the drone's own motion. Fly downwind and the push weakens; hold position and the drone must lean into it. The strength was calibrated once, at a 10&nbsp;m/s reference, against the drone's real drag estimate , then verified in flight (the 4.31&deg; vs 4.2&deg; row above).</p>
       </div>
       <div class="card">
         <h3>The control panel</h3>
-        <p>A point-and-click window: tick <b>Enable wind</b>, choose the direction it comes <b>from</b>, set the speed, press <b>Apply</b>. Tick <b>Gusting</b> for a breathing wind that swells and eases on a set period. <b>STOP WIND</b> always works. Wind ramps in over ~3 seconds — it arrives like weather, not a light switch.</p>
+        <p>A point-and-click window: tick <b>Enable wind</b>, choose the direction it comes <b>from</b>, set the speed, press <b>Apply</b>. Tick <b>Gusting</b> for a breathing wind that swells and eases on a set period. <b>STOP WIND</b> always works. Wind ramps in over ~3 seconds , it arrives like weather, not a light switch.</p>
       </div>
     </div>
-    <div class="note"><b>Validated under wind:</b> the full chimney-touch mission — approach, probe contact, hold, return — was flown in <b>5&nbsp;m/s wind gusting ±3&nbsp;m/s</b> with 100% probe contact maintained. That is the recommended demo setting.</div>
+    <div class="note"><b>Validated under wind:</b> the full chimney-touch mission , approach, probe contact, hold, return , was flown in <b>5&nbsp;m/s wind gusting ±3&nbsp;m/s</b> with 100% probe contact maintained. That is the recommended demo setting.</div>
   </div>
 </section>
 
@@ -293,12 +293,12 @@
     <p class="lede">Four terminals, about 3 minutes from cold. Every command verified on the demo machine.</p>
 
     <div class="card">
-      <h3 style="color:var(--ink); font-size:15px; font-weight:650; margin-bottom:6px;">Pre-flight checklist — before anyone is watching</h3>
+      <h3 style="color:var(--ink); font-size:15px; font-weight:650; margin-bottom:6px;">Pre-flight checklist , before anyone is watching</h3>
       <ul class="check">
         <li>Transmitter dongle plugged into USB, transmitter <b>switched on</b></li>
-        <li><b>Throttle stick fully DOWN</b> — the aircraft refuses to arm otherwise</li>
+        <li><b>Throttle stick fully DOWN</b> , the aircraft refuses to arm otherwise</li>
         <li>No leftover Gazebo or MAVProxy windows from earlier sessions</li>
-        <li>After starting the bridge (step 3): <b>move every stick once</b> — an untouched stick reports itself as centred no matter where it really is</li>
+        <li>After starting the bridge (step 3): <b>move every stick once</b> , an untouched stick reports itself as centred no matter where it really is</li>
       </ul>
     </div>
 
@@ -311,14 +311,14 @@ gz sim -r Gen5Flight/worlds/gen5_plant.sdf</div>
 
     <div class="step-h"><span class="stepno">2</span> Start the autopilot &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 2)</span></div>
     <div class="term"><button class="copy">Copy</button>~/gz_ws/src/GazebooAssets/Gen5Flight/scripts/start_sitl.sh</div>
-    <p class="step-note"><b>Always use this launcher script</b> — never <code>sim_vehicle.py</code> directly, or the transmitter is silently invisible. Wait for the <code>STABILIZE&gt;</code> prompt.</p>
+    <p class="step-note"><b>Always use this launcher script</b> , never <code>sim_vehicle.py</code> directly, or the transmitter is silently invisible. Wait for the <code>STABILIZE&gt;</code> prompt.</p>
 
     <div class="step-h"><span class="stepno">3</span> Connect the transmitter &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 3)</span></div>
     <div class="term"><button class="copy">Copy</button>cd ~/gz_ws/src/GazebooAssets
 SDL_LINUX_JOYSTICK_CLASSIC=1 python3 Gen5Flight/scripts/rc_bridge.py --check</div>
-    <p class="step-note">Two columns of matching numbers appear. Move each stick and confirm all four channels respond. Leave this running for the whole flight — closing it releases the controls.</p>
+    <p class="step-note">Two columns of matching numbers appear. Move each stick and confirm all four channels respond. Leave this running for the whole flight , closing it releases the controls.</p>
 
-    <div class="step-h"><span class="stepno">4</span> Wind panel &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 4 — optional until needed)</span></div>
+    <div class="step-h"><span class="stepno">4</span> Wind panel &nbsp;<span style="font-weight:500; color:var(--ink3); font-size:13px;">(terminal 4 , optional until needed)</span></div>
     <div class="term"><button class="copy">Copy</button>cd ~/gz_ws/src/GazebooAssets
 python3 Gen5Flight/scripts/wind_panel.py</div>
     <p class="step-note">For the FPV view: in the Gazebo window, ⋮ menu → search "Image Display" → add it → choose topic <code>/gen5/fpv</code>.</p>
@@ -333,8 +333,8 @@ disarm</div>
       <table>
         <thead><tr><th>If it goes wrong</th><th>Do this</th></tr></thead>
         <tbody>
-          <tr><td>Sticks do nothing, everything else fine</td><td>Terminal 2 was not started with <code>start_sitl.sh</code> — restart it that way</td></tr>
-          <tr><td>Bridge says "no joystick"</td><td>Dongle unplugged or transmitter off — re-plug, re-run</td></tr>
+          <tr><td>Sticks do nothing, everything else fine</td><td>Terminal 2 was not started with <code>start_sitl.sh</code> , restart it that way</td></tr>
+          <tr><td>Bridge says "no joystick"</td><td>Dongle unplugged or transmitter off , re-plug, re-run</td></tr>
           <tr><td>Refuses to arm</td><td>Throttle not fully down, or wait longer for the autopilot to settle</td></tr>
           <tr><td>Anything alarming</td><td><b>Ctrl-C in the bridge window</b> (releases controls), then <code>mode land</code> and <code>disarm</code> in MAVProxy</td></tr>
         </tbody>
@@ -354,39 +354,39 @@ disarm</div>
         <source src="evidence/flight_demo.webm" type="video/webm">
         <source src="evidence/flight_demo.mp4" type="video/mp4">
       </video>
-      <p style="font-size:13px; color:var(--ink2); margin-top:10px;"><b>Full flight recording</b> — save as <code>Docs/evidence/flight_demo.webm</code> (or <code>.mp4</code>): arm → lift-off → hover → wind on → lean → FPV approach → probe touch on the chimney → return → land → disarm.</p>
+      <p style="font-size:13px; color:var(--ink2); margin-top:10px;"><b>Full flight recording</b> , save as <code>Docs/evidence/flight_demo.webm</code> (or <code>.mp4</code>): arm → lift-off → hover → wind on → lean → FPV approach → probe touch on the chimney → return → land → disarm.</p>
     </div>
 
     <div class="figs">
       <figure class="shot missing">
         <img src="evidence/01_world.png" alt="Gen5 parked in the plant world" onload="this.parentElement.classList.remove('missing')">
         <div class="ph">Add screenshot → Docs/evidence/01_world.png</div>
-        <figcaption><b>1 — The stage.</b> Gen5 parked in the plant world, striped inspection chimney in view.</figcaption>
+        <figcaption><b>1 , The stage.</b> Gen5 parked in the plant world, striped inspection chimney in view.</figcaption>
       </figure>
       <figure class="shot missing">
         <img src="evidence/02_terminals.png" alt="SITL and bridge running" onload="this.parentElement.classList.remove('missing')">
         <div class="ph">Add screenshot → Docs/evidence/02_terminals.png</div>
-        <figcaption><b>2 — The stack alive.</b> STABILIZE&gt; prompt in SITL and the bridge's matching channel columns.</figcaption>
+        <figcaption><b>2 , The stack alive.</b> STABILIZE&gt; prompt in SITL and the bridge's matching channel columns.</figcaption>
       </figure>
       <figure class="shot missing">
         <img src="evidence/03_hover_fpv.png" alt="Hover with FPV panel" onload="this.parentElement.classList.remove('missing')">
         <div class="ph">Add screenshot → Docs/evidence/03_hover_fpv.png</div>
-        <figcaption><b>3 — Hands-on hover.</b> Drone in a low hover with the FPV panel open, probe tip visible in frame.</figcaption>
+        <figcaption><b>3 , Hands-on hover.</b> Drone in a low hover with the FPV panel open, probe tip visible in frame.</figcaption>
       </figure>
       <figure class="shot missing">
         <img src="evidence/04_wind_lean.png" alt="Leaning into wind with panel open" onload="this.parentElement.classList.remove('missing')">
         <div class="ph">Add screenshot → Docs/evidence/04_wind_lean.png</div>
-        <figcaption><b>4 — Wind on.</b> Wind panel set to 5 m/s gusting; the drone visibly leaning into it while holding position.</figcaption>
+        <figcaption><b>4 , Wind on.</b> Wind panel set to 5 m/s gusting; the drone visibly leaning into it while holding position.</figcaption>
       </figure>
       <figure class="shot missing">
         <img src="evidence/05_probe_touch.png" alt="Probe contact with chimney" onload="this.parentElement.classList.remove('missing')">
         <div class="ph">Add screenshot → Docs/evidence/05_probe_touch.png</div>
-        <figcaption><b>5 — The mission moment.</b> FPV view at the instant the orange probe tip contacts the chimney wall.</figcaption>
+        <figcaption><b>5 , The mission moment.</b> FPV view at the instant the orange probe tip contacts the chimney wall.</figcaption>
       </figure>
       <figure class="shot missing">
         <img src="evidence/06_showcase.png" alt="Showcase plant world" onload="this.parentElement.classList.remove('missing')">
         <div class="ph">Add screenshot → Docs/evidence/06_showcase.png</div>
-        <figcaption><b>6 — Built from our photos.</b> Aerial view of the new plant world modelled from site photographs.</figcaption>
+        <figcaption><b>6 , Built from our photos.</b> Aerial view of the new plant world modelled from site photographs.</figcaption>
       </figure>
     </div>
 
@@ -394,11 +394,11 @@ disarm</div>
       <h3 style="color:var(--ink); font-size:15px; font-weight:650; margin-bottom:8px;">Straight answers, if the room asks</h3>
       <dl class="qa">
         <dt>Does it crash like a real drone?</dt>
-        <dd>The impact, fall, and autopilot crash-detection are real. Structural breakage is not modelled — nothing fractures, and we say so rather than claim it.</dd>
+        <dd>The impact, fall, and autopilot crash-detection are real. Structural breakage is not modelled , nothing fractures, and we say so rather than claim it.</dd>
         <dt>Why does the simulation run slower than real time?</dt>
         <dd>The autopilot and physics run in lockstep so control is exact; that caps speed at roughly half real time. It is a fidelity choice, not a graphics limit.</dd>
         <dt>What is the note about the transmitter?</dt>
-        <dd>The transmitter dongle has a known hardware fault (spurious full-throttle bursts). A software guard blocks them — validated against captured data. The dongle is scheduled for replacement after the review.</dd>
+        <dd>The transmitter dongle has a known hardware fault (spurious full-throttle bursts). A software guard blocks them , validated against captured data. The dongle is scheduled for replacement after the review.</dd>
       </dl>
     </div>
   </div>
