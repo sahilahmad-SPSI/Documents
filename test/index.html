@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VisionSync — Team UAT Pack (6 roles, 2 work orders)</title>
+<title>VisionSync — Team UAT Pack v3 (the U2+U3 build)</title>
 <style>
   :root{
     --ink:#1a202c; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#fff;
@@ -13,7 +13,6 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5}
   .wrap{max-width:1060px;margin:0 auto;padding:0 18px 60px}
-
   #topbar{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.06)}
   #topbar .inner{max-width:1060px;margin:0 auto;padding:8px 18px}
   #topbar .row1{display:flex;align-items:center;gap:14px;margin-bottom:7px}
@@ -24,15 +23,12 @@
   .tabs button{border:1px solid var(--line);background:#f1f5f9;border-radius:7px 7px 0 0;padding:6px 11px;font-size:13px;font-weight:600;color:#475569;cursor:pointer}
   .tabs button.active{background:var(--accent);border-color:var(--accent);color:#fff}
   .tabs button .mini{font-weight:400;font-size:11px;opacity:.85}
-
   section.panel{display:none;padding-top:18px}
   section.panel.active{display:block}
-
   h1{font-size:22px;margin:18px 0 4px}
   h2{font-size:18px;margin:6px 0 4px;color:var(--accent)}
   h3{font-size:15.5px;margin:20px 0 6px}
   .sub{color:var(--muted);font-size:13.5px;margin:0 0 12px}
-
   .box{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:12px 0;background:var(--card)}
   .box.note{background:var(--notebg);border-color:var(--notebd)}
   .box.warn{background:var(--warnbg);border-color:var(--warnbd)}
@@ -40,41 +36,31 @@
   .box h4{margin:0 0 7px;font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
   .box ul,.box ol{margin:4px 0 2px;padding-left:20px}
   .box li{margin:4px 0}
-
   table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);margin:8px 0 20px;font-size:13.5px}
   th{background:#f1f5f9;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:7px 9px}
   td{padding:8px 9px;border-top:1px solid var(--line);vertical-align:top}
   td.mark{width:74px;white-space:nowrap}
-  td.num{width:74px;font-weight:700;color:var(--accent);white-space:nowrap;font-size:12.5px}
+  td.num{width:78px;font-weight:700;color:var(--accent);white-space:nowrap;font-size:12.5px}
   tr.pass td{background:var(--okbg)}
   tr.fail td{background:var(--badbg)}
   .pf{display:inline-block;width:30px;height:26px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:14px;cursor:pointer;line-height:24px;text-align:center;user-select:none}
   .pf.p.on{background:var(--ok);border-color:var(--ok);color:#fff}
   .pf.f.on{background:var(--bad);border-color:var(--bad);color:#fff}
-
   .phase{display:inline-block;padding:1px 6px;border-radius:8px;font-size:10.5px;font-weight:700;background:#e2e8f0;color:#475569;margin-left:4px}
   .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700;color:#fff}
   .ADM909{background:#6b46c1}.ADM101{background:#2b6cb0}.ADM201{background:#0d9488}
-  .VAL201{background:#d97706}.SUP301{background:#16a34a}.MGT001{background:#64748b}
+  .VAL201{background:#d97706}.SUP301{background:#16a34a}.SUP302{background:#0e7490}.MGT001{background:#64748b}
   .wait{display:inline-block;background:#fde68a;color:#78350f;font-size:11px;font-weight:700;padding:1px 7px;border-radius:8px}
   .money{white-space:nowrap;font-weight:600}
   code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.5px}
   .small{font-size:12.5px;color:var(--muted)}
   .tabsum{font-size:13px;color:var(--muted);margin:2px 0 10px}
   .tabsum b.p{color:var(--ok)} .tabsum b.f{color:var(--bad)}
-
   .flow{counter-reset:st;margin:14px 0}
   .st{position:relative;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;background:var(--card);padding:10px 14px 10px 52px;margin:10px 0}
   .st::before{counter-increment:st;content:counter(st);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;text-align:center;line-height:26px;font-size:13px}
   .st b.t{display:block;margin-bottom:2px}
   .st .who{float:right;margin-left:8px}
-
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:820px){.grid2{grid-template-columns:1fr}}
-
-  .vgrid td:nth-child(n+4){text-align:center;white-space:nowrap;font-size:12px}
-  .yes{color:var(--ok);font-weight:700}.no{color:#cbd5e1}
-
   @media print{
     #topbar{display:none}
     body{background:#fff;font-size:11px}
@@ -90,7 +76,7 @@
 
 <div id="topbar"><div class="inner">
   <div class="row1">
-    <span class="title">VisionSync Team UAT</span>
+    <span class="title">VisionSync Team UAT · v3</span>
     <span id="totline"><span id="totPass">0 ✓</span> · <span id="totFail">0 ✗</span> · <span id="totAll">0 steps</span></span>
   </div>
   <div class="tabs" id="tabbar"></div>
@@ -100,394 +86,288 @@
 
 <!-- ============================ READ ME ============================ -->
 <section class="panel" data-tab="Read Me First" data-mini="">
-<h1>VisionSync — Team UAT <span class="small">(the SPSI Revenue Tracker, renamed)</span></h1>
-<p class="sub">Six people · one per role · two work orders · one day · fresh slate. Each person works
-only in their own tab and marks every step <b style="color:var(--ok)">✓ done as expected</b> or
-<b style="color:var(--bad)">✗ did not match</b>. A ✗ is not a failure of the tester — it is exactly
-what this session exists to find. Write the step ID (e.g. <code>V-7</code>) next to every ✗ and
-send the list to Mukesh.</p>
+<h1>VisionSync — Team UAT, third walk <span class="small">(the U2+U3 build)</span></h1>
+<p class="sub">Six people, one per role, one day, clean slate. Mark every step
+<b style="color:var(--ok)">✓ as expected</b> or <b style="color:var(--bad)">✗ did not match</b>;
+send ✗ step IDs to Mukesh. Everything the last two walks blocked on is rebuilt — this walk
+proves it.</p>
 
 <div class="box stop">
-<h4>Gate — do not start until all three are true</h4>
+<h4>Gate — all three true before starting</h4>
 <ul>
-<li>The <b>clean-slate reset has been run</b> — database empty except the ADM909 account. (Mukesh confirms.)</li>
-<li>Every tester has the app URL and this file open. <b>Each person on their own device or own browser profile</b> — logging in on the same browser replaces the previous person's session.</li>
-<li>Everyone has read this tab and the <b>Process Flow</b> tab (5 minutes) — you cannot judge "did not match" without knowing what "expected" means.</li>
-</ul>
-</div>
-
-<h3>The people and the accounts</h3>
-<table>
-<thead><tr><th>Account</th><th>Role</th><th>Person</th><th>What they do in one line</th></tr></thead>
-<tbody>
-<tr><td><span class="badge ADM909">ADM909</span></td><td>Super Admin</td><td>__________</td><td>Creates every account, owns the sub-category catalogue, approves/returns packages, records billed, grants permissions</td></tr>
-<tr><td><span class="badge ADM101">ADM101</span></td><td>Admin 1</td><td>__________</td><td>Master data maker — sites, codes, work orders, line items, rates, stage mapping; submits for approval, never approves</td></tr>
-<tr><td><span class="badge ADM201">ADM201</span></td><td>Admin 2</td><td>__________</td><td>People and targets — employees, per-person points, std teams, daily targets, validator/supervisor mappings; no money unless granted</td></tr>
-<tr><td><span class="badge VAL201">VAL201</span></td><td>Validator</td><td>__________</td><td>Issues job references, approves/returns/rejects entries, closes JRs with measured value</td></tr>
-<tr><td><span class="badge SUP301">SUP301</span></td><td>Supervisor</td><td>__________</td><td>Enters the day's work — quantities, crew, permit; sees no rupee, ever</td></tr>
-<tr><td><span class="badge MGT001">MGT001</span></td><td>Management (admin_3)</td><td>__________</td><td>Reads everything at the end — dashboard, five-row report, accuracy; touches nothing</td></tr>
-</tbody>
-</table>
-
-<h3>Run order — seven phases, with handoffs</h3>
-<p class="sub">Work is sequential, not parallel. Each tab marks where you must <span class="wait">WAIT</span> for someone else. When you finish a phase, say so out loud / in the group chat.</p>
-<table>
-<thead><tr><th>Phase</th><th>Who acts</th><th>What happens</th></tr></thead>
-<tbody>
-<tr><td><b>P0</b></td><td>ADM909</td><td>Creates four accounts (SUP301 waits — supervisors are site-scoped at creation and the site doesn't exist yet); shows that role templates auto-grant permissions</td></tr>
-<tr><td><b>P1</b></td><td>ADM101 → ADM909 → ADM101</td><td>Location → Client → Vertical → the Client + Location pack with code TSJ → vertical code RA → the five stages <b>with display order</b> (Super Admin's catalogue) + the SUP301 account with TSJ assigned → both work orders built (no team count — that is Admin 2's now), priced, mapped, and submitted <b>past the completeness gate</b></td></tr>
-<tr><td><b>P2</b></td><td>ADM201 + VAL201, then ADM909, then ADM101</td><td>Invisibility checks on unapproved WOs → WO-1 returned with remark → rate corrected, resubmitted → both WOs approved</td></tr>
-<tr><td><b>P3</b></td><td>ADM201 (+ ADM909 for one checkbox)</td><td>Mappings, employees, points, std teams, targets — then the live ₹-permission demo</td></tr>
-<tr><td><b>P4</b></td><td>VAL201 + SUP301</td><td>JRs issued /01 and /02 → WO-1 entry, return, resubmit, approve → WO-2 bad entry, reject, fresh entry, approve → double-deployment check</td></tr>
-<tr><td><b>P5</b></td><td>VAL201</td><td>Five-row reports verified against the WO tabs → WO-1 closures: partial, correction, final</td></tr>
-<tr><td><b>P6</b></td><td>ADM909</td><td>Billed entry + correction on the closed JR; refusal on the open one; grants Billed visibility to MGT001</td></tr>
-<tr><td><b>P7</b></td><td>MGT001 (everyone watches)</td><td>Management walks the dashboard and reports; every figure must match the WO tabs to the paisa</td></tr>
-</tbody>
-</table>
-
-<div class="box note">
-<h4>Ground rules</h4>
-<ul>
-<li>Everything created today is test data — a second reset wipes it before the pilot.</li>
-<li>All <b>effective-from dates = the 1st of this month</b>. All entries dated <b>today</b>. This is deliberate — a wrong effective date is the single most common way to get confusing zeros.</li>
-<li>Job reference numbers will print <code>MM-YY/TSJ-RA/01</code> and <code>/02</code> — month, site code, vertical code, serial. The serial pool is shared per site+vertical+month, <i>not</i> per work order: that is why WO-2's first JR is /02, not /01.</li>
-<li>"Refused" always means a <b>named message or an absent control</b>. A blank or raw error is always a ✗.</li>
-<li>Checkbox state lives only in this open page — <b>print or screenshot your tab before closing it</b>.</li>
+<li>Reset run 3 executed (database = ADM909 only) — done 2026-08-19, recorded.</li>
+<li>Each tester on their own device/browser profile (logins replace each other in one browser).</li>
+<li>Everyone reads this tab + Process Flow first. Effective dates = <b>1st of this month</b>; entries dated <b>today</b>.</li>
 </ul>
 </div>
 
 <div class="box warn">
-<h4>Known cosmetic items — already logged, mark ✓ if you see them, do not re-report</h4>
+<h4>What changed since the last walk — brief the team, do not re-report</h4>
 <ul>
-<li>The app is now named <b>VisionSync</b> on the login page, browser tab and sidebar. Documents, service names and records still say SPSI — deliberate.</li>
-<li>The Approvals screen's browser URL still says <code>/pack1</code> — historical name, display was renamed.</li>
-<li>Stage ordering is now real: stages render in the <b>display order the Super Admin sets</b> (SA-4), not alphabetically. If you see alphabetical order anywhere, that is a ✗, not a cosmetic.</li>
+<li><b>Supervisors have no site.</b> Accounts are created with no site question; a validator assigns them to job references, and that is their whole scope. "You're not assigned to a site yet" no longer exists.</li>
+<li><b>Units and stages are Super Admin masters.</b> Units (SQM, NOS, Shift) must exist before Admin 1 can add a line item — the unit is a dropdown now.</li>
+<li><b>Teams are split per line item.</b> Admin 2 allocates the WO's teams across line items; each line's target uses its own teams.</li>
+<li><b>The checker sees the package.</b> Approvals shows line items, rates (old → new), and stages — read them aloud before approving.</li>
+<li><b>JRs carry a Site</b> (Pellet Plant / Blast Furnace) — chosen at issue, shown in the register, never part of the number.</li>
 </ul>
 </div>
+
+<h3>The people</h3>
+<table>
+<thead><tr><th>Account</th><th>Role</th><th>Person</th><th>One line</th></tr></thead>
+<tbody>
+<tr><td><span class="badge ADM909">ADM909</span></td><td>Super Admin</td><td>__________</td><td>Accounts, units, stages+order, package approvals, billed, grants</td></tr>
+<tr><td><span class="badge ADM101">ADM101</span></td><td>Admin 1</td><td>__________</td><td>New Job Data: location/client/vertical/pack, plant sites, WOs, line items (SrvLnNo + unit), rates, stage maps</td></tr>
+<tr><td><span class="badge ADM201">ADM201</span></td><td>Admin 2</td><td>__________</td><td>Employees, points, std teams (designation dropdown), team counts, targets, <b>allocations</b>, mappings</td></tr>
+<tr><td><span class="badge VAL201">VAL201</span></td><td>Validator</td><td>__________</td><td>Issues JRs (with Site), <b>assigns supervisors per JR</b>, decides entries, closes</td></tr>
+<tr><td><span class="badge SUP301">SUP301</span> + <span class="badge SUP302">SUP302</span></td><td>Supervisors</td><td>__________</td><td>SUP301 does the day's entries; SUP302 exists for the empty-state and handover demos (same tester, second browser profile)</td></tr>
+<tr><td><span class="badge MGT001">MGT001</span></td><td>Management (admin_3)</td><td>__________</td><td>Reads everything at the end; signs off the money</td></tr>
+</tbody>
+</table>
+
+<h3>Run order — seven phases</h3>
+<table>
+<thead><tr><th>Phase</th><th>Who</th><th>What</th></tr></thead>
+<tbody>
+<tr><td><b>P0</b></td><td>ADM909</td><td>Six accounts (supervisors included — no site question) + the <b>units master</b> (SQM, NOS, Shift)</td></tr>
+<tr><td><b>P1</b></td><td>ADM101 → ADM909 → ADM101</td><td>New Job Data cards → vertical code RA → <b>plant sites</b> under Jamshedpur → five stages with display order (SA) → WO-1 and WO-2 built, priced, mapped, past the completeness gate</td></tr>
+<tr><td><b>P2</b></td><td>ADM201/VAL201, ADM909, ADM101</td><td>Invisibility checks → the checker <b>reads the package contents</b> → return → reprice 110 → approve both</td></tr>
+<tr><td><b>P3</b></td><td>ADM201 (+ADM909 one checkbox)</td><td>Mappings (new screens) → employees → <b>points first</b> → std teams by dropdown → team counts → targets → <b>allocations</b> (incl. the over-allocation refusal) → the ₹-grant demo</td></tr>
+<tr><td><b>P4</b></td><td>VAL201 + SUP301/302</td><td>JRs issued with Sites → SUP301's <b>"no JR assigned" state</b> → assignments (incl. the handover + 409 demos) → WO-1 entry/return/approve → WO-2 reject → fresh entry with <b>crew per line</b> → double-deployment report</td></tr>
+<tr><td><b>P5</b></td><td>VAL201</td><td>Reports checked to the paisa (per-line figures now) → WO-1 closures: partial, correction, final</td></tr>
+<tr><td><b>P6</b></td><td>ADM909</td><td>Billed + correction on the closed JR; refusal on the open one; billed-view grant to MGT001</td></tr>
+<tr><td><b>P7</b></td><td>MGT001</td><td>Dashboard + reports + site grouping; sign-off against the WO tabs</td></tr>
+</tbody>
+</table>
+
+<div class="box note"><h4>Ground rules</h4>
+<ul>
+<li>All of this is test data; reset run 4 wipes it before the pilot.</li>
+<li>JR numbers print <code>MM-YY/TSJ-RA/01</code> and <code>/02</code> — one serial pool per pack+vertical+month; the plant site is data beside the number, never inside it.</li>
+<li>"Refused" means a named message or an absent control; a blank error is always a ✗.</li>
+<li>Tick state lives in the open page — print or screenshot before closing.</li>
+</ul></div>
 </section>
 
 <!-- ============================ PROCESS FLOW ============================ -->
 <section class="panel" data-tab="Process Flow" data-mini="">
-<h2>How the data flows — what happens at each point</h2>
-<p class="sub">Ten stations. At each one: who acts, what gets created, and — the part that matters — what moves money and what does not.</p>
-
+<h2>How the data flows now</h2>
 <div class="flow">
-<div class="st"><span class="who"><span class="badge ADM909">ADM909</span></span><b class="t">Accounts &amp; permissions</b>
-Creating an account <i>with a role</i> auto-grants that role's permission template — nobody hand-assembles 26 checkboxes. Manual ticks are only for deltas (this test has exactly two: ₹ targets for Admin 2, Billed visibility for Management). Nothing about money exists yet.</div>
-
-<div class="st"><span class="who"><span class="badge ADM101">ADM101</span></span><b class="t">Master data → a Draft package</b>
-Location, client, vertical, the <b>Client + Location pack</b> with its code, the work order, its line items, their rates, and the stage weightages are all <b>staged into one draft package</b> per WO. Nothing here is live, nothing is visible downstream, no money exists — and the <b>number of teams is not here at all</b>: that is Admin 2's number now. The short codes (TSJ, RA) will be frozen forever by the first job reference that prints them.</div>
-
-<div class="st"><span class="who"><span class="badge ADM909">ADM909</span></span><b class="t">Approvals (maker-checker)</b>
-A package <b>cannot even be submitted until it can price work</b> — no line items, or a line item with no rate, and the Submit button is disabled with the reason written next to it. Once submitted, the checker can <b>Return with remarks</b> (package goes back, editable, resubmit becomes v2) or <b>Approve</b> (everything staged becomes live at once). The maker cannot approve their own package — the controls do not render for them. Approval is what makes a WO visible to Admin 2 and the validator. Still no revenue: a rate existing prices nothing by itself.</div>
-
-<div class="st"><span class="who"><span class="badge ADM201">ADM201</span></span><b class="t">Wiring people to work</b>
-Validator↔WO and supervisor↔validator mappings decide <i>who may touch what</i> (scope). Employee base + per-person points (L3 0.33 / L2 0.17 / L1 0.11 for Rope Access) + <b>the number of teams (effective-dated — it can change mid-WO, and each work day uses the count in force that day)</b> + std team definition (what one full team looks like) + per-day target (what one full team should produce). This creates the <b>measuring stick</b> — Fixed Target ₹ = target × teams-on-that-date × rate — but records no work. Until the team count is entered, screens say <b>"team count not set"</b>, never a silent zero.</div>
-
-<div class="st"><span class="who"><span class="badge VAL201">VAL201</span></span><b class="t">Job reference issued</b>
-An official numbered permission to work: <code>MM-YY/TSJ-RA/01</code>. Issuing it freezes the codes inside it permanently. JRs are the unit that later gets closed and billed.</div>
-
-<div class="st"><span class="who"><span class="badge SUP301">SUP301</span></span><b class="t">Daily entry — quantities only</b>
-Permit number, per-stage quantities, named crew. The supervisor's screen carries <b>no rupee anywhere</b> — deliberately. Submitting creates a record <b>awaiting validation</b> and moves nothing: no report row, no dashboard tile, no target consumption. An unvalidated entry does not exist, financially.</div>
-
-<div class="st"><span class="who"><span class="badge VAL201">VAL201</span></span><b class="t">Validation — the only gate where money is born</b>
-Three powers: <b>Return</b> (goes back editable, resubmit increments revision — nothing moves), <b>Reject</b> (dead permanently — nothing moves, a fresh entry is needed), <b>Approve</b> — and only approve computes: <b>Work Done Value</b> = Σ(stage qty × rate × weightage), the day's stored result (prorated target from actual crew vs std team, efficiency %, points-per-person), and contract consumption. Rate used = the rate effective on the <i>work date</i>, forever — later rate changes never touch approved history.</div>
-
-<div class="st"><span class="who"><span class="badge VAL201">VAL201</span></span><b class="t">Closure — measured truth</b>
-Site measurement done, the validator closes the JR (partially or finally) with a <b>measured ₹</b>. This creates <b>Actual (Unbilled)</b> on the closure date and a <b>closure accuracy</b> row (measured vs what approvals had valued). Corrections stack with a reason and a flag — the original figure is never overwritten. A fully-closed JR disappears from the supervisor's entry picker.</div>
-
-<div class="st"><span class="who"><span class="badge ADM909">ADM909</span></span><b class="t">Billed — the invoice fact</b>
-Allowed <b>only on a fully-closed JR</b>, refused with a named message on open or partially-closed ones. Append-only with corrections, like closures. Gated by its <i>own</i> key (<code>validation.billed_entry</code>) — held by no role template except Super Admin; anyone else needs a manual grant even to <i>see</i> billed figures.</div>
-
-<div class="st"><span class="who"><span class="badge MGT001">MGT001</span></span><b class="t">Dashboard &amp; the five-row report</b>
-Each row reads its own source and nothing is recomputed: <b>Fixed Target ₹</b> and <b>Calculated Target ₹</b> from the stored daily results · <b>Work Done Value ₹</b> from approvals · <b>Actual (Unbilled) ₹</b> from closure measurements · <b>Billed ₹</b> from billed entries. Earned Revenue is a drill-down. Rows land on their own dates: targets &amp; WDV on the work day, Actual on closure dates, Billed on the billed date.</div>
+<div class="st"><span class="who"><span class="badge ADM909">ADM909</span></span><b class="t">Accounts, units, stages</b>
+Role templates auto-grant permissions. Supervisors are created like anyone else — no site. The units master and the stage catalogue (with display order) are Super Admin's; nobody types a unit or a stage name downstream.</div>
+<div class="st"><span class="who"><span class="badge ADM101">ADM101</span></span><b class="t">New Job Data → a draft package</b>
+Location → Client → Vertical → the pack (client+location+code, live preview) → plant sites under the location. The WO's line items carry <b>SrvLnNo-Service#</b> and a unit from the dropdown; rates and stage maps stage into the draft. Submit stays disabled until the package can price work.</div>
+<div class="st"><span class="who"><span class="badge ADM909">ADM909</span></span><b class="t">Approvals — the checker sees everything</b>
+The review pane shows the header diff (with real names, not ids), the line items added, every staged rate as <b>old → new against the last approved rate</b>, and the stage split. Return sends it back editable; approve makes it all live at once.</div>
+<div class="st"><span class="who"><span class="badge ADM201">ADM201</span></span><b class="t">People, measuring stick, and the split</b>
+Points per designation (the points table IS the designation list), std teams picked from a dropdown, the effective-dated team count — and now the <b>allocation</b>: each line item gets its share of the WO's teams, the form pre-fills the remainder, and the sum can never exceed the count. Each line's Fixed Target = its own teams × per-day × rate.</div>
+<div class="st"><span class="who"><span class="badge VAL201">VAL201</span></span><b class="t">JR issued — with a Site — and a supervisor assigned</b>
+The JR takes a plant site at issue (required once the location has sites). Then the validator assigns a supervisor from their own pool, effective-dated and append-only — a later row hands the JR over from its date, and the month shows both supervisors' slices.</div>
+<div class="st"><span class="who"><span class="badge SUP301">SUP301</span></span><b class="t">Entry — scoped by assignment, crew per line</b>
+A supervisor sees exactly the open JRs assigned to them today. One line item: the day's crew attributes automatically. Two or more: each line gets its crew pickers, everyone must be placed, and one person cannot be on two lines — refused by name.</div>
+<div class="st"><span class="who"><span class="badge VAL201">VAL201</span></span><b class="t">Validation — money is born per line</b>
+Approve computes per line item: WDV (qty × rate × weightage — or qty × rate where no stages are mapped), that line's prorated target from ITS crew and ITS teams, efficiency, points. Return moves nothing; reject is dead.</div>
+<div class="st"><b class="t">Closure → Billed → Dashboard</b>
+Unchanged: measured value at closure = Actual (Unbilled); billed only on fully-closed JRs, corrections stack; the five-row report traces every rupee, and the JR register now groups by Site.</div>
 </div>
-
-<h3>What moves money — the truth table</h3>
-<table>
-<thead><tr><th>Event</th><th>What moves</th><th>What does NOT move</th></tr></thead>
-<tbody>
-<tr><td>Supervisor submits</td><td>Nothing</td><td>All five report rows</td></tr>
-<tr><td>Validator <b>approves</b></td><td>Work Done Value, stored daily result (targets, efficiency, points), consumption</td><td>Actual, Billed</td></tr>
-<tr><td>Validator <b>returns / rejects</b></td><td>Nothing, ever</td><td>Everything</td></tr>
-<tr><td><b>Closure</b> with measured ₹</td><td>Actual (Unbilled) on the closure date; accuracy rows</td><td>WDV (already booked), Billed</td></tr>
-<tr><td>Closure <b>correction</b></td><td>The corrected figure + flag</td><td>The closure's identity and date</td></tr>
-<tr><td><b>Billed entry</b> (fully-closed JR only)</td><td>The Billed row on the billed date</td><td>Everything else</td></tr>
-<tr><td>Rate change by Admin 1</td><td>Nothing until approval; then future pricing only</td><td>Approved history — priced at work-date rates, forever</td></tr>
-</tbody>
-</table>
 </section>
 
 <!-- ============================ PERMISSIONS ============================ -->
-<section class="panel" data-tab="Permissions" data-mini="">
-<h2>Permissions — what each key means and who holds it</h2>
-<p class="sub">The matrix screen shows these exact labels (raw key in grey beside each). Creating an account with a role ticks its template automatically. <b>V</b> = view, <b>E</b> = edit, <b>V+E</b> = both, — = neither.</p>
-
-<table class="vgrid">
-<thead><tr><th>Matrix label (key)</th><th></th><th>Plain English — what it gates</th><th>SA</th><th>A1</th><th>A2</th><th>VAL</th><th>SUP</th><th>MGT</th></tr></thead>
+<section class="panel" data-tab="Permissions" data-mini="43 boxes">
+<h2>Permissions — what changed in the matrix</h2>
+<p class="sub">The catalogue now has <b>43</b> checkboxes. The v2 table still holds for everything unlisted here; these are the deltas the testers will actually meet.</p>
+<table>
+<thead><tr><th>Key / area</th><th>What it gates now</th><th>Who holds it</th></tr></thead>
 <tbody>
-<tr><td>Locations, sites &amp; verticals <span class="small">(master_data.locations)</span></td><td></td><td>View: every site/vertical picker. Edit: create clients, verticals, locations, sites and their short codes</td><td class="yes">V+E</td><td class="yes">V+E</td><td>V</td><td>V</td><td>V</td><td>V</td></tr>
-<tr><td>Work orders &amp; line items <span class="small">(master_data.work_orders)</span></td><td></td><td>View: WO list/detail, JRs, submissions. Edit: create WOs and line items</td><td class="yes">V+E</td><td class="yes">V+E</td><td>V</td><td>V</td><td>V</td><td>V</td></tr>
-<tr><td>Line-item rates <span class="small">(master_data.rates)</span></td><td></td><td>View: <b>every rupee figure in the app</b> — this is the money switch; without it ₹ columns/tiles are stripped server-side. Edit: set new rates</td><td class="yes">V+E</td><td class="yes">V+E</td><td class="no">—</td><td>V</td><td class="no">—</td><td>V</td></tr>
-<tr><td>Sub-line-item mapping <span class="small">(master_data.sub_item_mapping)</span></td><td></td><td>View: see stage weightages. Edit: the weightage editor (which stages, what %)</td><td class="yes">V+E</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Holiday calendar <span class="small">(master_data.holidays)</span></td><td></td><td>View: everyone. Edit: maintain the calendar</td><td class="yes">V+E</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr>
-<tr><td>Submit for approval <span class="small">(pack1.submit)</span></td><td></td><td>Create/edit/submit a WO's draft package — the maker's half of Approvals</td><td class="yes">E</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Approve / return <span class="small">(pack1.approve)</span></td><td></td><td>The checker's decision buttons in Approvals</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Employee base <span class="small">(people.employee_base)</span></td><td></td><td>View/maintain the worker list with levels</td><td class="yes">V+E</td><td class="no">—</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td>V</td></tr>
-<tr><td>Teams &amp; std teams <span class="small">(people.teams)</span></td><td></td><td>View/define what one standard team looks like per WO — and, since U1, the <b>number of teams</b> (effective-dated, append-only)</td><td class="yes">V+E</td><td class="no">—</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td>V</td></tr>
-<tr><td>User directory <span class="small">(people.users)</span></td><td></td><td>View: account list + name pickers in Mappings</td><td class="yes">V+E</td><td class="no">—</td><td>V</td><td>V</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Validator / WO mapping <span class="small">(mappings.validator_wo)</span></td><td></td><td>Which validator answers for which WO</td><td class="yes">V+E</td><td class="no">—</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td>V</td></tr>
-<tr><td>Supervisor / validator mapping <span class="small">(mappings.supervisor_validator)</span></td><td></td><td>Which supervisor reports to which validator</td><td class="yes">V+E</td><td class="no">—</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td>V</td></tr>
-<tr><td>Per-day output targets <span class="small">(targets.set)</span></td><td></td><td>View: targets, per-person points, daily results (opens a read-only Admin → Targets tab for viewers). Edit: set targets and points</td><td class="yes">V+E</td><td class="no">—</td><td class="yes">V+E</td><td>V</td><td class="no">—</td><td>V</td></tr>
-<tr><td>Validation queue &amp; decisions <span class="small">(validation.decide)</span></td><td></td><td>View: the queue + double-deployment report. Edit: approve/reject/return</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Issue job references <span class="small">(validation.jr_issue)</span></td><td></td><td>The Issue button</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Close JRs <span class="small">(validation.jr_close)</span></td><td></td><td>Partial/final closures</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Measured entry at closure <span class="small">(validation.measured_entry)</span></td><td></td><td>The measured ₹ inside a closure + closure corrections</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Billed value <span class="small">(validation.billed_entry)</span></td><td></td><td>View: see billed figures anywhere. Edit: record/correct billed on closed JRs. <b>No template except Super Admin holds either axis — manual grant only</b></td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">— *</td></tr>
-<tr><td>Submit daily entries <span class="small">(entry.submit)</span></td><td></td><td>The supervisor's entry screen and roster</td><td class="yes">E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">E</td><td class="no">—</td></tr>
-<tr><td>Dashboards &amp; KPIs <span class="small">(reports.dashboard)</span></td><td></td><td>The Dashboard nav + tiles (₹ tiles additionally need the money switch)</td><td>V</td><td>V</td><td>V</td><td>V</td><td class="no">—</td><td>V</td></tr>
-<tr><td>Reports <span class="small">(reports.reports)</span></td><td></td><td>The Reports nav: five-row daily report, measures, closure accuracy</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td><td>V</td></tr>
-<tr><td>Accounts <span class="small">(admin.accounts)</span></td><td></td><td>Create users, change roles, reset passwords</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Permission grants <span class="small">(admin.permissions)</span></td><td></td><td>The matrix itself — read and edit per-account grants</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
-<tr><td>Sub-category master <span class="small">(admin.subcategory_master)</span></td><td></td><td>Create/rename/delete the stage catalogue (mapping stays Admin 1's)</td><td class="yes">V+E</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+<tr><td><b>Units</b> <span class="small">(master_data.units — edit-only, no view axis)</span></td><td>Create/deactivate units. Reading the dropdown rides work-orders:view, so Admin 1 needs no extra grant</td><td>Super Admin only</td></tr>
+<tr><td><b>Plant sites</b> <span class="small">(rides master_data.locations)</span></td><td>The Sites card on Locations &amp; Codes; the Site dropdown at JR issue reads them</td><td>Same as Locations — Admin 1 edit, most roles view</td></tr>
+<tr><td><b>Supervisor assignment</b> <span class="small">(rides validation.jr_issue:edit)</span></td><td>Assigning supervisors to JRs, from the validator's own pool</td><td>Validator, Super Admin</td></tr>
+<tr><td><b>Allocations</b> <span class="small">(rides targets.set)</span></td><td>Write under :edit (Admin 2, Super Admin); validators see the column read-only under :view</td><td>Admin 2 edits; validator/management read</td></tr>
+<tr><td><b>Supervisor scope</b></td><td>No key and no site: a supervisor sees exactly the JRs assigned to them (today for entry, ever for their own history)</td><td>—</td></tr>
+<tr><td><b>Billed</b> <span class="small">(validation.billed_entry)</span></td><td>Unchanged: no template but Super Admin holds it — MGT001 gets :view by a live grant in P6</td><td>Manual grant only</td></tr>
 </tbody>
 </table>
-<p class="small">* MGT001 receives <code>validation.billed_entry:view</code> by a live manual grant during Phase 6 (step SA-12) — that is a scripted demo, not a template default. Three further keys exist (exports, audit trail, and a spare users:edit box) whose checkboxes currently gate nothing — they are excluded from this test and queued for cleanup.</p>
-
-<div class="box warn"><h4>For the pilot — two open decisions this table exposes</h4>
-<ul>
-<li><b>Billed visibility:</b> today nobody in the field can even see billed figures without a hand grant. Decide before go-live which accounts (management? a finance account?) get <code>validation.billed_entry</code>, and on which axis.</li>
-<li><b>Dead checkboxes:</b> five boxes tick but gate nothing (exports, audit-view, users:edit, two view-axis spares). Risk: a Super Admin believes they revoked something they didn't. Queued for post-UAT cleanup.</li>
-</ul></div>
+<p class="small">Three checkboxes still gate nothing (known, queued): admin.accounts:view, admin.subcategory_master:view, people.users:edit. Not four — the units view axis was caught and retired before it shipped's first birthday.</p>
 </section>
 
 <!-- ============================ WO-1 ============================ -->
-<section class="panel" data-tab="WO-1" data-mini="the full story">
-<h2>WO-UAT-001 — the full story (every feature, every row populated)</h2>
-<p class="sub">This WO exercises: return-and-resubmit at Approvals, a rate correction, short-crew proration, return-and-resubmit at validation, partial closure + correction + final closure, billed + correction.</p>
-
-<h3>Inputs (what gets typed, exactly)</h3>
+<section class="panel" data-tab="WO-1" data-mini="full story">
+<h2>WO-UAT-001 — the full story (one line item, every feature)</h2>
+<h3>Inputs</h3>
 <table>
-<thead><tr><th>Field</th><th>Value</th><th>Entered by</th></tr></thead>
+<thead><tr><th>Field</th><th>Value</th><th>By</th></tr></thead>
 <tbody>
-<tr><td>Work order</td><td><code>WO-UAT-001</code> · Client + Location <b>Tata Steel — Jamshedpur [TSJ]</b> · vertical Rope Access (<b>RA</b>) · contract <span class="money">₹50,00,000</span> — no team count at creation (U1)</td><td>ADM101</td></tr>
-<tr><td>Team count</td><td><b>2</b>, effective 1st of month — effective-dated, append-only</td><td>ADM201</td></tr>
-<tr><td>Line item</td><td><code>UAT-01 / UAT Coating / SQM</code></td><td>ADM101</td></tr>
-<tr><td>Rate</td><td>first <span class="money">₹100</span>, corrected after return to <span class="money">₹110</span>, effective 1st of month</td><td>ADM101</td></tr>
-<tr><td>Stage mapping</td><td>all five stages, auto <b>20%</b> each, effective 1st</td><td>ADM101</td></tr>
-<tr><td>Std team</td><td>L3 ×1, L2 ×2, L1 ×3 → headcount <b>6</b>, std points <b>1.00</b> (0.33 + 2×0.17 + 3×0.11), effective 1st</td><td>ADM201</td></tr>
-<tr><td>Target</td><td><b>2,000</b> SQM per day per standard team, effective 1st</td><td>ADM201</td></tr>
-<tr><td>Entry (today)</td><td>JR /01 · permit <code>PTW-UAT-1</code> · crew <b>5 of 6</b> (leave out Farid L1) · stages Surface 200 / First 200 / Second 100 / Third 100 / Final 0 → <b>returned</b> → Third corrected to <b>200</b> → total <b>700</b></td><td>SUP301</td></tr>
-<tr><td>Closures (today)</td><td>partial measured <span class="money">₹10,000</span> → corrected to <span class="money">₹11,000</span> → final measured <span class="money">₹2,000</span></td><td>VAL201</td></tr>
-<tr><td>Billed (today)</td><td><span class="money">₹12,000</span> → corrected to <span class="money">₹12,500</span></td><td>ADM909</td></tr>
+<tr><td>Work order</td><td><code>WO-UAT-001</code> · pack <b>Tata Steel — Jamshedpur [TSJ]</b> · vertical Rope Access (RA) · contract <span class="money">₹50,00,000</span></td><td>ADM101</td></tr>
+<tr><td>Line item</td><td>SrvLnNo <b>10</b> · Service # <b>UAT-01</b> · "UAT Coating" · unit <b>SQM</b> (dropdown) → renders <b>10-UAT-01</b></td><td>ADM101</td></tr>
+<tr><td>Rate</td><td>₹100 → returned → <b>₹110</b>, effective 1st</td><td>ADM101</td></tr>
+<tr><td>Stages</td><td>all five via the combobox, auto 20% each, effective 1st</td><td>ADM101</td></tr>
+<tr><td>Team count</td><td><b>2</b>, effective 1st</td><td>ADM201</td></tr>
+<tr><td>Allocation</td><td>10-UAT-01 ← <b>2 teams</b> (the form pre-fills 2 — the full remainder), effective 1st</td><td>ADM201</td></tr>
+<tr><td>Std team</td><td>L3 1 / L2 2 / L1 3 via the <b>designation dropdown</b> → headcount 6, std points 1.0000</td><td>ADM201</td></tr>
+<tr><td>Target</td><td>2,000 SQM/day per std team, effective 1st</td><td>ADM201</td></tr>
+<tr><td>JR</td><td><code>MM-YY/TSJ-RA/01</code> · Site <b>Pellet Plant</b> · assigned to <b>SUP301</b> eff 1st</td><td>VAL201</td></tr>
+<tr><td>Entry (today)</td><td>crew <b>5 of 6</b> (no picker — single line auto-attributes) · 200/200/100/100/0 → returned → Third 200 → total <b>700</b></td><td>SUP301</td></tr>
+<tr><td>Closures / billed</td><td>partial 10,000 → corrected 11,000 → final 2,000 · billed 12,000 → 12,500</td><td>VAL201 / ADM909</td></tr>
 </tbody>
 </table>
-
-<h3>Every expected figure — and exactly how it is built</h3>
+<h3>Expected figures — the arithmetic shown</h3>
 <table>
-<thead><tr><th>Figure</th><th>Value</th><th>The arithmetic</th></tr></thead>
+<thead><tr><th>Figure</th><th>Value</th><th>How</th></tr></thead>
 <tbody>
-<tr><td><b>Fixed Target ₹</b></td><td class="money">₹4,40,000</td><td>2,000 SQM × 2 teams × ₹110 = 4,000 SQM = ₹4,40,000 per day</td></tr>
-<tr><td><b>Calculated Target ₹</b></td><td class="money">₹1,83,333.33</td><td>Crew ratio = (5 came ÷ 6 standard) ÷ 2 planned teams = 0.416667 → ₹4,40,000 × 0.416667. Only headcount prorates the target — point values never do</td></tr>
-<tr><td>Prorated target qty</td><td>1,666.67 SQM</td><td>4,000 × 0.416667</td></tr>
-<tr><td><b>Work Done Value ₹</b></td><td class="money">₹15,400</td><td>Σ(stage qty) × rate × weightage = 700 × ₹110 × 20% = ₹15,400. (Before the return it would have been 600 × 110 × 20% = ₹13,200 — the return moved nothing until re-approval)</td></tr>
-<tr><td>Efficiency</td><td><b>42.00%</b></td><td>700 done ÷ 1,666.67 prorated</td></tr>
-<tr><td>Points per person</td><td><b>17.80</b></td><td>Deployed points 0.33 + 2×0.17 + 2×0.11 = 0.89 ÷ std 1.00 × 20</td></tr>
-<tr><td><b>Actual (Unbilled) ₹</b></td><td class="money">₹13,000</td><td>Corrected partial 11,000 + final 2,000 — measured at closure, independent of WDV</td></tr>
-<tr><td><b>Billed ₹</b></td><td class="money">₹12,500</td><td>The corrected billed entry; original ₹12,000 stays in history with a flag</td></tr>
-<tr><td>Closure accuracy</td><td>rows present</td><td>Measured 13,000 vs work-done 15,400 across the closure windows, corrected figure flagged</td></tr>
+<tr><td>Fixed Target ₹</td><td class="money">₹4,40,000</td><td>2,000 × <b>2 allocated teams</b> × ₹110 (allocation = full count here, so U1's number survives)</td></tr>
+<tr><td>Calculated ₹</td><td class="money">₹1,83,333.33</td><td>(5÷6)÷2 = 0.416667 × 4,40,000 · prorated qty 1,666.67</td></tr>
+<tr><td>Work Done Value ₹</td><td class="money">₹15,400</td><td>700 × 110 × 20%</td></tr>
+<tr><td>Efficiency / points</td><td><b>42.00%</b> · <b>17.80</b></td><td>700÷1,666.67 · (0.89÷1.00)×20</td></tr>
+<tr><td>Actual (Unbilled) ₹</td><td class="money">₹13,000</td><td>11,000 corrected + 2,000 final</td></tr>
+<tr><td>Billed ₹</td><td class="money">₹12,500</td><td>corrected; original 12,000 kept flagged</td></tr>
 </tbody>
 </table>
-<p class="small">Whoever sees ₹ sees these exact numbers. ADM201 sees quantities only until the Phase-3 grant; SUP301 never sees any of the ₹ rows; Billed is visible only to ADM909 and (after SA-12) MGT001.</p>
 </section>
 
 <!-- ============================ WO-2 ============================ -->
-<section class="panel" data-tab="WO-2" data-mini="the contrast">
-<h2>WO-UAT-002 — the contrast (full crew, a rejection, honest dashes)</h2>
-<p class="sub">This WO proves three things WO-1 cannot: a full crew makes Calculated equal Fixed; a <b>reject</b> is dead (unlike a return); and unclosed/unbilled rows show "—", not zero — the report never pretends.</p>
-
+<section class="panel" data-tab="WO-2" data-mini="the split">
+<h2>WO-UAT-002 — two line items, the team split, crew per line</h2>
 <h3>Inputs</h3>
 <table>
-<thead><tr><th>Field</th><th>Value</th><th>Entered by</th></tr></thead>
+<thead><tr><th>Field</th><th>Value</th><th>By</th></tr></thead>
 <tbody>
-<tr><td>Work order</td><td><code>WO-UAT-002</code> · same pack Tata Steel — Jamshedpur [TSJ] · same vertical RA · contract <span class="money">₹20,00,000</span> — no team count at creation (U1)</td><td>ADM101</td></tr>
-<tr><td>Team count</td><td><b>1</b>, effective 1st of month</td><td>ADM201</td></tr>
-<tr><td>Line item + rate</td><td><code>UAT-02 / UAT Coating-B / SQM</code> · rate <span class="money">₹250</span> effective 1st · same five stages, auto 20%, effective 1st</td><td>ADM101</td></tr>
-<tr><td>Std team + target</td><td>same composition (6 heads, std points 1.00) · target <b>400</b> SQM/day, effective 1st</td><td>ADM201</td></tr>
-<tr><td>Entry 1 (today)</td><td>JR /02 · permit <code>PTW-UAT-2</code> · full crew <b>6 of 6</b> · Surface Cleaning <b>10,000</b> (deliberately absurd) → VAL201 <b>rejects</b></td><td>SUP301</td></tr>
-<tr><td>Entry 2 (today)</td><td>fresh entry: Surface 100 / First 100 / Second 100 / Third 0 / Final 0 = <b>300</b> · full crew → approved</td><td>SUP301</td></tr>
-<tr><td>Closures / billed</td><td><b>None — deliberately.</b> JR /02 stays open</td><td>—</td></tr>
+<tr><td>Work order</td><td><code>WO-UAT-002</code> · same pack · same vertical · contract <span class="money">₹20,00,000</span></td><td>ADM101</td></tr>
+<tr><td>Line item A</td><td><b>10-UAT-02</b> "UAT Coating-B" · SQM · rate <b>₹250</b> eff 1st · five stages 20%</td><td>ADM101</td></tr>
+<tr><td>Line item B</td><td><b>20-UAT-03</b> "UAT Sheet Fixing" · NOS · rate <b>₹500</b> eff 1st · <b>deliberately NO stages</b> — plain-quantity line (the advisory, not the gate)</td><td>ADM101</td></tr>
+<tr><td>Team count</td><td><b>2</b>, effective 1st</td><td>ADM201</td></tr>
+<tr><td>Allocations</td><td>10-UAT-02 ← <b>1</b> · then try <b>2</b> for 20-UAT-03 → <b>refused: "at most 1 more"</b> → 20-UAT-03 ← <b>1</b> (pre-filled)</td><td>ADM201</td></tr>
+<tr><td>Targets</td><td>UAT-02: 400 SQM/day · UAT-03: 20 NOS/day (per std team)</td><td>ADM201</td></tr>
+<tr><td>JR</td><td><code>MM-YY/TSJ-RA/02</code> — same pool continues · Site <b>Blast Furnace</b> · assigned SUP301 eff 1st</td><td>VAL201</td></tr>
+<tr><td>Entry 1 (today)</td><td>absurd 10,000 on UAT-02, full crew → <b>rejected</b> (dead, nothing moves)</td><td>SUP301 / VAL201</td></tr>
+<tr><td>Entry 2 (today)</td><td>full crew <b>6 of 6</b>, <b>split by line</b>: 4 on UAT-02 (L3+both L2+one L1), 2 on UAT-03 (two L1) · UAT-02 stages 100/100/50/0/0 = <b>250</b> · UAT-03 plain qty <b>5</b> → approved</td><td>SUP301 / VAL201</td></tr>
+<tr><td>Closures / billed</td><td><b>none</b> — the honest-dashes contrast stays</td><td>—</td></tr>
 </tbody>
 </table>
-
-<h3>Every expected figure</h3>
+<h3>Expected figures — per line, then the WO</h3>
 <table>
-<thead><tr><th>Figure</th><th>Value</th><th>The arithmetic</th></tr></thead>
+<thead><tr><th>Figure</th><th>10-UAT-02</th><th>20-UAT-03</th><th>WO total</th></tr></thead>
 <tbody>
-<tr><td><b>Fixed Target ₹</b></td><td class="money">₹1,00,000</td><td>400 × 1 team × ₹250</td></tr>
-<tr><td><b>Calculated Target ₹</b></td><td class="money">₹1,00,000</td><td>(6÷6)÷1 = 1.0 — full crew means <b>Calculated = Fixed</b>, the whole point of this WO</td></tr>
-<tr><td><b>Work Done Value ₹</b></td><td class="money">₹15,000</td><td>300 × ₹250 × 20%. The rejected 10,000-SQM entry contributed <b>zero</b> — check the report between reject and re-entry if you want proof</td></tr>
-<tr><td>Efficiency</td><td><b>75.00%</b></td><td>300 ÷ 400</td></tr>
-<tr><td>Points per person</td><td><b>20.00</b></td><td>Deployed 1.00 ÷ std 1.00 × 20 — a full standard team scores exactly 20</td></tr>
-<tr><td><b>Actual (Unbilled) ₹</b></td><td><b>—</b></td><td>No closure happened. A dash, not a zero</td></tr>
-<tr><td><b>Billed ₹</b></td><td><b>—</b></td><td>Nothing billed — and billing would be <i>refused</i> on this open JR (ADM909 proves it in SA-11)</td></tr>
+<tr><td>Fixed Target ₹</td><td class="money">₹1,00,000 <span class="small">(400×1×250)</span></td><td class="money">₹10,000 <span class="small">(20×1×500)</span></td><td class="money">₹1,10,000</td></tr>
+<tr><td>Calculated ₹</td><td class="money">₹66,666.67 <span class="small">((4÷6)÷1 × 1,00,000)</span></td><td class="money">₹3,333.33 <span class="small">((2÷6)÷1 × 10,000)</span></td><td class="money">₹70,000</td></tr>
+<tr><td>WDV ₹</td><td class="money">₹12,500 <span class="small">(250×250×20%)</span></td><td class="money">₹2,500 <span class="small">(5×500 — no stages, 100%)</span></td><td class="money">₹15,000</td></tr>
+<tr><td>Efficiency</td><td><b>93.75%</b> <span class="small">(250÷266.67)</span></td><td><b>75.00%</b> <span class="small">(5÷6.67)</span></td><td>—</td></tr>
+<tr><td>Points/person</td><td>≈15.60 <span class="small">(0.78÷1.00×20, derived)</span></td><td>≈4.40 <span class="small">(0.22÷1.00×20, derived)</span></td><td><b>20.00</b> <span class="small">(full crew — hard number)</span></td></tr>
+<tr><td>Actual / Billed</td><td colspan="2" style="text-align:center">— / — (nothing closed, nothing billed)</td><td>— / —</td></tr>
 </tbody>
 </table>
-
-<div class="box note"><h4>The bonus check this WO enables</h4>
-The same six workers appear on WO-1 and WO-2 on the same day. The <b>double-deployment report</b> (VAL201, step V-9) must list them — as a <i>warning</i>, while both approvals stand. Warn-not-block, proven live for the first time.</div>
+<p class="small">The ≈ marks are derived, not yet observed on production — if a per-line points figure differs slightly, note the actual and flag to Mukesh; the WO-day 20.00 must be exact. Dashboard at the end: WDV MTD = 15,400 + 12,500 + 2,500 = <b>₹30,400</b> · Actual = <b>₹13,000</b>.</p>
 </section>
 
 <!-- ============================ ADM909 ============================ -->
 <section class="panel" data-tab="ADM909" data-mini="Super Admin">
-<h2><span class="badge ADM909">ADM909</span> Super Admin — builder of accounts, checker of packages, keeper of billed</h2>
+<h2><span class="badge ADM909">ADM909</span> Super Admin</h2>
 <div class="tabsum">Marked: <b class="p">0 ✓</b> · <b class="f">0 ✗</b> of <span class="n">0</span></div>
-
-<div class="box note"><h4>When you log in you will see</h4>
-Every nav item: Dashboard · Work Orders · Validation · Supervisor Entry · Reports · Approvals · Admin (all tabs). The Super Admin template holds all 26 keys on both axes — there is no separate bypass; the grants themselves are total.</div>
-
 <table>
 <thead><tr><th>Mark</th><th>#</th><th>Do</th><th>Expect</th></tr></thead>
 <tbody>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-1 <span class="phase">P0</span></td><td>Log in as ADM909</td><td>All nav items above render; Dashboard loads (empty tiles — fresh slate)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-2 <span class="phase">P0</span></td><td>Admin → Accounts → create <b>four</b> accounts: <code>ADM101</code> role <b>admin_1</b>, <code>ADM201</code> role <b>admin_2</b>, <code>VAL201</code> role <b>validator</b>, <code>MGT001</code> role <b>admin_3</b>. <b>Deliberately NOT SUP301 yet</b> — supervisors are site-scoped at account creation, no screen can add a site later, and the site doesn't exist yet (see SA-4b)</td><td>Each created (with zero sites — fine for these roles; only supervisors are site-scoped). The role picker offers exactly: supervisor, validator, admin_1, admin_2, admin_3, super_admin</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-3 <span class="phase">P0</span></td><td>Open ADM201's permission matrix (Accounts → ADM201 → permissions)</td><td>The template pre-ticked ~18 boxes (people, mappings, targets, reports) and <b>Line-item rates : view is UNticked</b>. You assembled nothing by hand — the role did it</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-4 <span class="phase">P1</span> <span class="wait">WAIT for A1-2</span></td><td>After ADM101 creates the vertical: Admin → Sub-categories → <b>master</b> → create five, scoped to Rope Access: <code>Surface Cleaning</code>, <code>First Coat</code>, <code>Second Coat</code>, <code>Third Coat</code>, <code>Final Coat</code> — then set each chip's <b>order</b>: 10, 20, 30, 40, 50 in process order</td><td>Chips re-render in <b>process order</b> (Surface Cleaning first, Final Coat last) — and every screen that lists stages from now on shows this order, not alphabetical. Only this account has these controls; ADM101 proves their absence in A1-6</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-4b <span class="phase">P1</span> <span class="wait">WAIT for A1-2</span></td><td>Admin → Accounts → create <code>SUP301</code> role <b>supervisor</b>, <b>ticking the site "Tata Steel — Jamshedpur [TSJ]"</b> at creation</td><td>The pack appears in the site picker under its derived label and can be ticked. This ordering is a real constraint, not ceremony: a supervisor's site access is written once, at creation — a supervisor created before their site exists would be stranded with no way to fix it short of a new account</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-5 <span class="phase">P2</span> <span class="wait">WAIT for A1-7</span></td><td>Approvals → WO-UAT-001 v1 → review the staged rate (₹100) → remark "Rate should be 110" → <b>Return with remarks</b></td><td>"Package returned to Admin 1." — the checker can send work back</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-6 <span class="phase">P2</span> <span class="wait">WAIT for A1-9</span></td><td>Approvals → WO-UAT-001 v2 → <b>Approve</b></td><td>"Package approved." — WO, rate ₹110, and stage weightages all go live at once</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-7 <span class="phase">P2</span></td><td>Approvals → WO-UAT-002 → <b>Approve</b> (no return — the happy path)</td><td>Approved first time</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-8 <span class="phase">P3</span> <span class="wait">WAIT for A2-7</span></td><td>When ADM201 says targets are in: their matrix → tick <b>Line-item rates : view</b> → Save</td><td>Saves. ADM201 re-opens Targets and the ₹ columns appear (their step A2-8). One checkbox = the money switch</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-9 <span class="phase">P6</span> <span class="wait">WAIT for V-13</span></td><td>WO-1 → the fully-closed JR → <b>Billed entries</b> → record <span class="money">₹12,000</span>, today</td><td>Saved and listed</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-10 <span class="phase">P6</span></td><td>Correct it to <span class="money">₹12,500</span> with a reason</td><td>Corrected figure shows with a flag; the original ₹12,000 stays in history</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-11 <span class="phase">P6</span></td><td>Try to record billed on JR <b>/02</b> (WO-2 — still open)</td><td><b>Refused with a message naming the JR's state.</b> Billed answers only to fully-closed JRs</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-12 <span class="phase">P6</span></td><td>MGT001's matrix → tick <b>Billed value : view</b> → Save</td><td>Saves. This is the only way management sees the Billed row — no role template grants it. Announce to MGT001 they can start Phase 7</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-13 <span class="phase">P7</span></td><td>While MGT001 walks their tab: your own Dashboard + WO-1/WO-2 reports</td><td>Same figures as the WO tabs: WDV total <span class="money">₹30,400</span>, Actual <span class="money">₹13,000</span>, Billed <span class="money">₹12,500</span></td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-1 <span class="phase">P0</span></td><td>Log in (hard refresh first)</td><td>Login page and sidebar say <b>VisionSync</b>; full nav renders</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-2 <span class="phase">P0</span></td><td>Admin → Accounts → create <b>all six</b>: ADM101 (admin_1), ADM201 (admin_2), VAL201 (validator), <b>SUP301 and SUP302 (supervisor)</b>, MGT001 (admin_3)</td><td>Supervisor rows show <b>no site picker</b> — a sentence names where scope moved. Nobody is stranded by creation order any more</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-3 <span class="phase">P0</span></td><td>Admin → <b>Units</b> → create <code>SQM</code>, <code>NOS</code>, <code>Shift</code></td><td>Three active units. This tab is yours alone — and without these rows Admin 1 cannot add a single line item (the dropdown would be empty, with a named reason)</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-4 <span class="phase">P1</span> <span class="wait">WAIT for A1-2</span></td><td>Sub-categories → create the five stages scoped to Rope Access, set order 10/20/30/40/50 — then press <b>Edit</b> on one chip, change nothing, Cancel</td><td>Chips render in process order and are <b>read-only until Edit</b> — no always-live inputs. Cancel restores</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-5 <span class="phase">P2</span> <span class="wait">WAIT for A1-7</span></td><td>Approvals → WO-UAT-001 v1 → <b>read the contents aloud</b>: the line item, the rate, the stages — then remark "Rate should be 110" → Return</td><td>The pane shows <b>10-UAT-01 · UAT Coating · SQM</b>, <b>first rate → ₹100.00</b> with its date, and the five stages at 20% in process order. The header diff shows names, not ids. Returned</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-6 <span class="phase">P2</span> <span class="wait">WAIT for A1-9</span></td><td>WO-UAT-001 v2 → confirm the rate card now reads <b>first rate → ₹110.00</b> → Approve. Then approve WO-UAT-002</td><td>Both live. (Once a rate is approved, any future staged change will show <b>old → new</b> against it — that is what the card exists for)</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-7 <span class="phase">P3</span> <span class="wait">WAIT for A2-8</span></td><td>Tick <code>master_data.rates : view</code> on ADM201 → Save</td><td>One checkbox; ADM201's Targets grow ₹ columns (their step)</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-8 <span class="phase">P6</span> <span class="wait">WAIT for V-13</span></td><td>Billed on the fully-closed JR /01: <b>12,000</b> → correct to <b>12,500</b> with reason → try billed on open JR /02</td><td>Entry + corrected flag, original kept; /02 refused naming its state</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">SA-9 <span class="phase">P6</span></td><td>Tick <code>Billed value : view</code> on MGT001 → Save → announce Phase 7</td><td>The only way management sees the Billed row — still no template holds it</td></tr>
 </tbody>
 </table>
 </section>
 
 <!-- ============================ ADM101 ============================ -->
 <section class="panel" data-tab="ADM101" data-mini="Admin 1">
-<h2><span class="badge ADM101">ADM101</span> Admin 1 — master data maker; submits, never approves</h2>
+<h2><span class="badge ADM101">ADM101</span> Admin 1</h2>
 <div class="tabsum">Marked: <b class="p">0 ✓</b> · <b class="f">0 ✗</b> of <span class="n">0</span></div>
-
-<div class="box note"><h4>When you log in you will see</h4>
-Dashboard (with ₹ tiles — this role holds the money switch) · Work Orders · Reports · Approvals · Admin with tabs: Work Orders, Locations &amp; Codes, Sub-categories. <b>No</b> Validation, <b>no</b> Supervisor Entry, <b>no</b> Employee/Std Teams/Targets/Mappings tabs.</div>
-
 <table>
 <thead><tr><th>Mark</th><th>#</th><th>Do</th><th>Expect</th></tr></thead>
 <tbody>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-1 <span class="phase">P1</span> <span class="wait">WAIT for SA-2</span></td><td>Log in as ADM101</td><td>Exactly the nav described above — nothing more, nothing less</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-2 <span class="phase">P1</span></td><td>Admin → Work Orders → the four reference-data cards, <b>in their on-screen order</b>: <b>New location</b> <code>Jamshedpur</code> → <b>New client</b> <code>Tata Steel</code> → <b>New vertical</b> <code>Rope Access</code> → <b>New client + location</b>: pick Tata Steel, pick Jamshedpur, short code <code>TSJ</code> — watch the live preview show <b>Tata Steel — Jamshedpur [TSJ]</b> before you press Add. Then Locations &amp; Codes → Verticals → set short code <b>RA</b> on Rope Access. Tell ADM909 the vertical exists (they create the stages)</td><td>Four cards render in that order; there is <b>no free-text site name and no free-text location anywhere</b>. The pack appears under "Client + Location codes" on Locations &amp; Codes with TSJ editable. TSJ and RA will print inside every job number and freeze at first JR issue</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-3 <span class="phase">P1</span> <span class="wait">WAIT for SA-4</span></td><td>Create <code>WO-UAT-001</code>: <b>Client + Location</b> dropdown → <code>Tata Steel — Jamshedpur [TSJ]</code>, vertical Rope Access, contract <code>5000000</code>, planned dates this month</td><td>Draft pill; Approvals shows a v1 Draft package. <b>Check deliberately: there is NO Team count field on this form</b> — that number is Admin 2's now (A2-6)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-3b <span class="phase">P1</span></td><td><i>(the completeness gate, part 1)</i> Before adding anything else: find the <b>Submit for approval</b> button</td><td><b>Disabled</b>, with "This package has no line items. Add at least one line item and give it a rate…" written beneath it. An empty package cannot reach the Super Admin's queue</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-4 <span class="phase">P1</span></td><td><i>(completeness gate, part 2)</i> Add line item <code>UAT-01 / UAT Coating / SQM</code> — glance at Submit: still disabled, now naming <b>UAT-01</b> as unpriced. Then <b>Set new rate</b> <code>100</code>, effective <b>1st of this month</b></td><td>After the rate: Submit becomes <b>enabled</b>. The gate asks exactly one question — can this package price work — and the reasons update live. The rate stages into the draft; nothing is live yet</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-5 <span class="phase">P1</span></td><td>Admin → Sub-categories → Line-item sub-mapping → WO-UAT-001 → UAT Coating → tick all <b>five</b> stages → auto <b>20%</b> each → effective <b>1st</b> → Save</td><td>The stages list in <b>process order</b> (Surface Cleaning first — SA-4's ordering, live). Total 100.00% in green; "Mapping saved."</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-6 <span class="phase">P1</span></td><td>Still in Sub-categories: look for create/rename/delete on the stage <b>master</b> list</td><td><b>Absent.</b> The catalogue is Super Admin's; you only map. (Refusal-by-absent-control — mark ✓ if the controls are missing)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-7 <span class="phase">P1</span></td><td>Work Orders → <b>Submit for approval</b>. Then open Approvals and look at your own package</td><td>Pill → Awaiting approval. In Approvals you can SEE your package but <b>Approve/Return buttons do not render</b> — the maker cannot check</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-8 <span class="phase">P1</span></td><td>Create <code>WO-UAT-002</code>: same Client + Location pack, same vertical, contract <code>2000000</code> (no team count — Admin 2 sets 1 later); line item <code>UAT-02 / UAT Coating-B / SQM</code> rate <code>250</code> eff 1st; map the same five stages 20% eff 1st; Submit</td><td>Second package Awaiting approval</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-9 <span class="phase">P2</span> <span class="wait">WAIT for SA-5</span></td><td>See WO-1's Returned pill + the remark → change the rate to <code>110</code> eff 1st → <b>Submit</b> again</td><td>Accepted as v2 — a returned package is editable; the remark is visible on the package history</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-10 <span class="phase">P7</span></td><td>Reports → WO-UAT-001, today</td><td>Fixed <span class="money">₹4,40,000</span> · Calculated <span class="money">₹1,83,333.33</span> · WDV <span class="money">₹15,400</span> · Actual <span class="money">₹13,000</span> · <b>Billed "—"</b> — you hold the money switch but not the billed key; billed answers to its own permission</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-1 <span class="phase">P1</span> <span class="wait">WAIT for SA-2</span></td><td>Log in → Admin → Work Orders</td><td>The first section is titled <b>"1. New Job Data"</b> with the four cards</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-2 <span class="phase">P1</span></td><td>Cards in order: Location <code>Jamshedpur</code> (code JSR optional) → Client <code>Tata Steel</code> → Vertical <code>Rope Access</code> → <b>Client + location</b>: pick both, code <code>TSJ</code>, watch the preview → Add. Then Locations &amp; Codes: set <b>RA</b> on the vertical, and on the <b>Sites card</b> add <code>Pellet Plant</code> and <code>Blast Furnace</code> under Jamshedpur. Tell ADM909 the vertical exists</td><td>Preview shows <b>Tata Steel — Jamshedpur [TSJ]</b> before saving; two plant sites listed with the note that they never appear in JR numbers</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-3 <span class="phase">P1</span> <span class="wait">WAIT for SA-4</span></td><td>Create <code>WO-UAT-001</code>: pack dropdown, vertical, contract <code>5000000</code>, dates this month. Find Submit</td><td>No Team count field; Submit <b>disabled</b>: "This package has no line items…"</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-4 <span class="phase">P1</span></td><td>Add line item: SrvLnNo <code>10</code>, Service # <code>UAT-01</code>, "UAT Coating", unit <b>SQM from the dropdown</b> (try typing — you cannot) → glance at Submit → Set rate <code>100</code> eff 1st</td><td>Renders <b>10-UAT-01</b> everywhere; Submit stayed disabled naming 10-UAT-01 as unpriced, then enabled after the rate</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-5 <span class="phase">P1</span></td><td>Sub-mapping → WO-UAT-001 → 10-UAT-01 → add all five stages <b>via the combobox + "+ Add"</b> (type a few letters, pick, repeat) → auto 20% → eff 1st → Save</td><td>Type-ahead finds stages; an already-added stage is not offered again; total 100.00%; stages in process order</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-6 <span class="phase">P1</span></td><td><b>Submit</b> WO-UAT-001</td><td>Awaiting approval; your own view of the package shows no Approve/Return</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-7 <span class="phase">P1</span></td><td>Create <code>WO-UAT-002</code> (same pack, contract <code>2000000</code>): line items <b>10-UAT-02</b> "UAT Coating-B" SQM rate 250 eff 1st + <b>20-UAT-03</b> "UAT Sheet Fixing" NOS rate 500 eff 1st. Map five stages on UAT-02 only — <b>leave UAT-03 unmapped on purpose</b> → Submit</td><td>Submit enabled (both priced) with the grey advisory <b>"1 of 2 line items have sub-category mapping."</b> — informative, not blocking. Awaiting approval</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A1-9 <span class="phase">P2</span> <span class="wait">WAIT for SA-5</span></td><td>See the Returned pill + remark on WO-1 → change the rate to <code>110</code> eff 1st → resubmit</td><td>Accepted as v2</td></tr>
 </tbody>
 </table>
 </section>
 
 <!-- ============================ ADM201 ============================ -->
 <section class="panel" data-tab="ADM201" data-mini="Admin 2">
-<h2><span class="badge ADM201">ADM201</span> Admin 2 — people and targets; money only by grant</h2>
+<h2><span class="badge ADM201">ADM201</span> Admin 2</h2>
 <div class="tabsum">Marked: <b class="p">0 ✓</b> · <b class="f">0 ✗</b> of <span class="n">0</span></div>
-
-<div class="box note"><h4>When you log in you will see</h4>
-Dashboard (<b>without</b> ₹ tiles — until the Phase-3 grant) · Work Orders · Reports · Admin with tabs: Employee Base, Std Teams, Targets, Mappings. <b>No</b> Approvals, <b>no</b> Validation, <b>no</b> Supervisor Entry, no rate controls anywhere.</div>
-
 <table>
 <thead><tr><th>Mark</th><th>#</th><th>Do</th><th>Expect</th></tr></thead>
 <tbody>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-1 <span class="phase">P2</span> <span class="wait">WAIT for SA-2</span></td><td>Log in as ADM201</td><td>Exactly the nav above; Dashboard tiles show counts/efficiency but no rupee</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-2 <span class="phase">P2</span> <span class="wait">while WO-1 is Awaiting</span></td><td>Admin → Mappings → open the work-order picker</td><td><code>WO-UAT-001</code> is <b>not offered</b> — an unapproved WO is invisible downstream. (Do this before ADM909 approves; coordinate timing)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-3 <span class="phase">P3</span> <span class="wait">WAIT for SA-6/7</span></td><td>Mappings → map <b>VAL201 → WO-UAT-001</b> and <b>VAL201 → WO-UAT-002</b>; map <b>SUP301 → VAL201</b></td><td>Both WOs now offered (approval made them mappable); mappings save</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-4 <span class="phase">P3</span></td><td>Employee Base → create six workers: <code>EMP001 Arun — L3</code>, <code>EMP002 Bala — L2</code>, <code>EMP003 Chetan — L2</code>, <code>EMP004 Dinesh — L1</code>, <code>EMP005 Esak — L1</code>, <code>EMP006 Farid — L1</code></td><td>Six rows with levels; only you (and Super Admin) can edit them</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-5 <span class="phase">P3</span></td><td>Per-person points for vertical Rope Access: <b>L3 = 0.33 · L2 = 0.17 · L1 = 0.11</b>, effective 1st</td><td>Saved. These score performance only — they never change targets (the O-3 rule management confirmed)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-6 <span class="phase">P3</span></td><td>Std Teams → WO-UAT-001. <b>First, read the screen before entering anything:</b> it must say <b>"team count not set"</b> and <b>"std team not set"</b> — named absences, not zeros. Then the new <b>Team count</b> block: enter <b>2</b>, effective <b>1st</b> → Save. Then same-for-all ✓ → <b>L3 1 / L2 2 / L1 3</b> → effective <b>1st</b> → Save. Repeat for WO-UAT-002 with team count <b>1</b>, same composition</td><td>"Not set" wording before entry (never a bare 0); after: WO-1 shows team count <b>2</b>, WO-2 shows <b>1</b>, each with std headcount <b>6</b> and std points <b>1.0000</b> (0.33 + 0.34 + 0.33). This number left Admin 1's form in U1 — it is yours, effective-dated, and it can change mid-WO</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-6b <span class="phase">P3</span></td><td><i>(append-only demo)</i> Try saving a <b>different</b> team count for WO-1 at the <b>same</b> effective date</td><td>Refused: "A team count already exists for that date. Use a later date — these rows are append-only." Same rule as points and closures — history is never overwritten</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-7 <span class="phase">P3</span></td><td>Targets → WO-1 UAT Coating: per-day <b>2000</b> eff 1st · WO-2 UAT Coating-B: per-day <b>400</b> eff 1st. Then tell ADM909 you're ready for the grant demo</td><td>Labels read "per-day output of one standard team"; derived line shows ×2 teams on WO-1, ×1 on WO-2; <b>no ₹ column anywhere</b></td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-8 <span class="phase">P3</span> <span class="wait">WAIT for SA-8</span></td><td>Re-open Targets after ADM909 ticks the one checkbox</td><td><b>₹ columns render:</b> WO-1 Fixed <span class="money">₹4,40,000</span>, WO-2 Fixed <span class="money">₹1,00,000</span>. This is what "permission per account" means — one tick, no code</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-9 <span class="phase">P7</span></td><td>Dashboard, at the end</td><td>₹ tiles now render for you too (same grant), matching the WO tabs' totals</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-1 <span class="phase">P3</span> <span class="wait">WAIT for SA-6</span></td><td>Mappings → <b>Validator ↔ WO panel: pick WO-UAT-001</b> → "+ Add validator" → VAL201. Repeat for WO-UAT-002. Then the <b>supervisor panel: pick VAL201</b> → "+ Add supervisor" → SUP301, then SUP302</td><td>The screens are WO-centric and validator-centric now; both supervisors sit under VAL201 (the pool the assignments will draw from)</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-2 <span class="phase">P3</span></td><td>Employee Base → six workers: 1× L3 (Arun), 2× L2 (Bala, Chetan), 3× L1 (Dinesh, Esak, Farid)</td><td>Six rows with levels</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-3 <span class="phase">P3</span></td><td><b>Points first:</b> Rope Access → L3 0.33 · L2 0.17 · L1 0.11, effective 1st</td><td>Saved. This table now doubles as the designation list for the next step</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-4 <span class="phase">P3</span></td><td>Std Teams → WO-1: read <b>"team count not set" / "std team not set"</b> first → team count <b>2</b> eff 1st → composition via the <b>designation dropdown</b> (only L3/L2/L1 are offered — the free-text box is gone): L3 1 / L2 2 / L1 3 → Save. Repeat WO-2 with count <b>2</b>, same composition</td><td>Named absences before entry; then headcount 6, std points <b>1.0000</b> on both. A designation that has no points row cannot be picked at all</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-5 <span class="phase">P3</span></td><td>Targets → WO-1: 10-UAT-01 per-day <code>2000</code> eff 1st · WO-2: UAT-02 <code>400</code>, UAT-03 <code>20</code> eff 1st</td><td>Saved; no ₹ anywhere yet</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-6 <span class="phase">P3</span></td><td><b>Allocations</b> (same Targets screen): WO-1 → 10-UAT-01: the form <b>pre-fills 2</b> (the whole remainder) → Save. WO-2 → UAT-02: enter <b>1</b> → Save → on 20-UAT-03 <b>try 2</b></td><td>Pre-fill shows the remaining-teams arithmetic inline; the over-ask is <b>refused</b>: "…2 team(s) … 1 already allocated. 20-UAT-03 can take at most 1 more."</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-7 <span class="phase">P3</span></td><td>20-UAT-03: accept the pre-filled <b>1</b> → Save</td><td>2 + nothing left; both lines allocated; unallocated would have read as a named absence, never a zero</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">A2-8 <span class="phase">P3</span></td><td>Signal ADM909 → after SA-7, re-open Targets</td><td>₹ columns render: WO-1 Fixed <span class="money">₹4,40,000</span>; WO-2 <span class="money">₹1,00,000</span> + <span class="money">₹10,000</span> — each line priced by <b>its own</b> teams</td></tr>
 </tbody>
 </table>
 </section>
 
 <!-- ============================ VAL201 ============================ -->
 <section class="panel" data-tab="VAL201" data-mini="Validator">
-<h2><span class="badge VAL201">VAL201</span> Validator — issues, decides, closes; prices but never sets prices</h2>
+<h2><span class="badge VAL201">VAL201</span> Validator</h2>
 <div class="tabsum">Marked: <b class="p">0 ✓</b> · <b class="f">0 ✗</b> of <span class="n">0</span></div>
-
-<div class="box note"><h4>When you log in you will see</h4>
-Dashboard (with ₹ tiles — the validator template holds the money switch) · Work Orders · Validation · Reports · Admin with a <b>read-only Targets tab</b> (you can read targets and daily results; the save controls are absent). No Approvals, no Supervisor Entry, no Employee/Mappings tabs.</div>
-
 <table>
 <thead><tr><th>Mark</th><th>#</th><th>Do</th><th>Expect</th></tr></thead>
 <tbody>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-1 <span class="phase">P2</span> <span class="wait">WAIT for SA-2</span></td><td>Log in as VAL201</td><td>Exactly the nav above, including the read-only Admin → Targets</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-2 <span class="phase">P2</span> <span class="wait">while WO-1 is Awaiting</span></td><td>Work Orders list</td><td><code>WO-UAT-001</code> / <code>-002</code> <b>absent</b> — unapproved WOs are invisible to you</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-3 <span class="phase">P4</span> <span class="wait">WAIT for A2-3</span></td><td>Work Orders → WO-UAT-001 → Job references → set a target window → <b>Issue</b></td><td>Number = <code>MM-YY/TSJ-RA/<b>01</b></code> — first serial of the fresh pool, your codes inside it, frozen from this moment</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-4 <span class="phase">P4</span></td><td>WO-UAT-002 → Issue</td><td><code>/<b>02</b></code> — the pool is per site+vertical+month, shared across WOs, not restarting per WO</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-5 <span class="phase">P4</span> <span class="wait">WAIT for S-2</span></td><td>Validation → Queue → WO-1's card. Review, then <b>Return</b> with remark "Third coat qty — recheck"</td><td>Card shows permit PTW-UAT-1, five stage quantities <b>in process order</b> with their 20% weightages, five named crew with levels, <b>deployed 5 vs std 6</b>. Return succeeds — nothing moves anywhere</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-6 <span class="phase">P4</span> <span class="wait">WAIT for S-3</span></td><td>The resubmitted card → <b>Approve</b></td><td>Revision 2, Third Coat now 200, total 700. Approval computes the stored result — WDV, efficiency, points are born at this click</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-7 <span class="phase">P4</span> <span class="wait">WAIT for S-4</span></td><td>WO-2's card (Surface Cleaning 10,000 — absurd) → <b>Reject</b> with remark</td><td>Rejected: dead, not editable, no resubmit path on it. Reports for WO-2 move <b>nothing</b></td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-8 <span class="phase">P4</span> <span class="wait">WAIT for S-5</span></td><td>WO-2's fresh entry (300 total, 6 crew) → <b>Approve</b></td><td>Approved; WO-2's stored result computes (efficiency 75%, points 20.00)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-9 <span class="phase">P4</span></td><td>Open the <b>double-deployment report</b></td><td>Today lists the six workers deployed on two WOs — a <b>warning</b>, while both approvals stand. Warn-not-block, live</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-10 <span class="phase">P5</span></td><td>Reports → WO-1 and WO-2, today — check against the WO tabs</td><td>WO-1: 4,40,000 / 1,83,333.33 / 15,400 / — / — · 42.00% · 17.80. WO-2: 1,00,000 / 1,00,000 / 15,000 / — / — · 75.00% · 20.00. To the paisa</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-11 <span class="phase">P5</span></td><td>Closure panel → WO-1 JR /01 → <b>partial</b> closure, measured <code>10000</code>, not final</td><td>Record shows Closed under /01; the JR gains its suffix in the table without a manual refresh; <b>Actual ₹10,000</b> appears on today; closure accuracy gains its first row</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-12 <span class="phase">P5</span></td><td>Correct that closure to <code>11000</code> with a reason</td><td>Corrected figure + flag; the original stays in history; accuracy follows</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-13 <span class="phase">P5</span></td><td>Final closure, measured <code>2000</code>, Final ✓. Tell ADM909 billing can start</td><td>JR <b>Fully closed</b>; closure form disappears for it; Actual total now <span class="money">₹13,000</span></td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-14 <span class="phase">P6</span> <span class="wait">WAIT for SA-10</span></td><td>Reports → WO-1 again, after ADM909 records billed</td><td>Your Billed row <b>still shows "—"</b> — billed visibility is its own key and your template doesn't hold it. Every other row unchanged</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-15 <span class="phase">any</span></td><td>Try to set a rate anywhere (WO detail → rates)</td><td>Rates are <b>visible</b> to you, but Set-new-rate is absent or refused <b>naming Admin 1</b> — you price with rates, you never author them</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-1 <span class="phase">P4</span> <span class="wait">WAIT for A2-6</span></td><td>WO-UAT-001 → Job references → target window → <b>Issue</b> — the form demands a <b>Site</b>: pick <code>Pellet Plant</code></td><td>Number <b><code>MM-YY/TSJ-RA/01</code></b> — the site sits beside the number, never inside it. Site is required because Jamshedpur has sites</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-2 <span class="phase">P4</span></td><td>WO-UAT-002 → Issue → Site <code>Blast Furnace</code></td><td><code>/02</code> — one pool per pack+vertical+month, across WOs</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-3 <span class="phase">P4</span> <span class="wait">after S-1</span></td><td><b>Assign supervisors</b>: JR /01 → SUP301 effective <b>1st</b> · JR /02 → SUP301 effective <b>1st</b></td><td>Both saved; the pickers offer only YOUR pool (SUP301/SUP302 — mapped in A2-1)</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-4 <span class="phase">P4</span></td><td><i>(handover demo)</i> On /01: try SUP302 effective <b>1st</b> (same date) → then assign SUP302 effective <b>tomorrow</b></td><td>Same date → <b>409</b> "…already… Use a later date — append-only." Tomorrow → saved: the series shows SUP301 from the 1st and SUP302 from tomorrow — the month will report both slices, and today the JR is still SUP301's</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-5 <span class="phase">P4</span> <span class="wait">WAIT for S-2</span></td><td>Queue → WO-1's card → <b>Return</b> "Third coat qty — recheck" → after resubmit → <b>Approve</b></td><td>Card shows the five stages in process order, 5-of-6 crew; round trip works; approval computes the stored result</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-6 <span class="phase">P4</span> <span class="wait">WAIT for S-4</span></td><td>WO-2's absurd entry (10,000) → <b>Reject</b> with remark</td><td>Dead — no edit path; nothing moves anywhere</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-7 <span class="phase">P4</span> <span class="wait">WAIT for S-5</span></td><td>WO-2's fresh entry → the card</td><td><b>Crew grouped per line item</b>: 4 names under 10-UAT-02, 2 under 20-UAT-03 → Approve</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-8 <span class="phase">P4</span></td><td>Double-deployment report</td><td>Today's six workers flagged on two WOs — a warning; both approvals stand</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-9 <span class="phase">P5</span></td><td>Reports → both WOs against the WO tabs</td><td>WO-1: 4,40,000 / 1,83,333.33 / 15,400 · 42.00% · 17.80. WO-2 per line: 1,00,000 &amp; 10,000 / 66,666.67 &amp; 3,333.33 / 12,500 &amp; 2,500 · 93.75% &amp; 75.00%. To the paisa</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-10 <span class="phase">P5</span></td><td>JR register</td><td>Grouped by <b>Site</b>: Pellet Plant → /01, Blast Furnace → /02</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">V-11..13 <span class="phase">P5</span></td><td>JR /01: partial closure <code>10000</code> → correct to <code>11000</code> with reason → final <code>2000</code> ✓. Tell ADM909</td><td>Suffix renames live; corrected pill; Fully closed; Actual totals <span class="money">₹13,000</span>; accuracy rows present</td></tr>
 </tbody>
 </table>
 </section>
 
 <!-- ============================ SUP301 ============================ -->
-<section class="panel" data-tab="SUP301" data-mini="Supervisor">
-<h2><span class="badge SUP301">SUP301</span> Supervisor — enters the work; lives in a ₹-free world</h2>
+<section class="panel" data-tab="SUP301" data-mini="+SUP302">
+<h2><span class="badge SUP301">SUP301</span> Supervisor <span class="small">(SUP302 in a second browser profile for two checks)</span></h2>
 <div class="tabsum">Marked: <b class="p">0 ✓</b> · <b class="f">0 ✗</b> of <span class="n">0</span></div>
-
-<div class="box note"><h4>When you log in you will see</h4>
-You land directly on <b>Supervisor Entry</b>. Nav shows only: Supervisor Entry · Work Orders · Reports. No dashboard, and <b>no rupee symbol anywhere you can reach</b> — if you ever see one, that is a ✗ worth a photo. Note: your account is created mid-flow (step SA-4b), after the site exists — supervisors are site-scoped at creation; you start working in Phase 4.</div>
-
 <table>
 <thead><tr><th>Mark</th><th>#</th><th>Do</th><th>Expect</th></tr></thead>
 <tbody>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-1 <span class="phase">P4</span> <span class="wait">WAIT for A2-3</span></td><td>Log in as SUP301</td><td>Lands on Supervisor Entry (no "Not authorized" flash); nav is exactly the three items above</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-2 <span class="phase">P4</span> <span class="wait">WAIT for V-3</span></td><td>Entry → today → WO-UAT-001 → JR /01 → Permit <code>PTW-UAT-1</code> → UAT Coating → the five stage rows auto-open → enter <b>Surface 200 / First 200 / Second 100 / Third 100 / Final 0</b> → pick <b>5 of 6</b> crew (leave out Farid) → Submit</td><td>The five stage rows open <b>in process order</b> — Surface Cleaning first, Final Coat last. "Submitted — awaiting validation." No rate, no value, no rupee on this screen at any point</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-3 <span class="phase">P4</span> <span class="wait">WAIT for V-5</span></td><td>Open your returned entry → read the remark → change Third Coat <b>100 → 200</b> → Resubmit</td><td>The same entry reopens editable; resubmit works (this is a <i>return</i> — compare with what happens on WO-2)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-4 <span class="phase">P4</span> <span class="wait">WAIT for V-4</span></td><td>Entry → WO-UAT-002 → JR /02 → Permit <code>PTW-UAT-2</code> → Surface Cleaning <b>10000</b> (yes, deliberately absurd) → full <b>6 of 6</b> crew → Submit</td><td>Submits (the app does not second-guess quantities at entry — validation exists for that)</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-5 <span class="phase">P4</span> <span class="wait">WAIT for V-7</span></td><td>After the rejection: find the rejected entry, then create a <b>fresh</b> entry: <b>Surface 100 / First 100 / Second 100 / Third 0 / Final 0</b>, full crew → Submit</td><td>The rejected one is dead — no edit/resubmit path on it. A new entry is the only way forward. That is reject vs return</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-6 <span class="phase">P7</span></td><td>Reports → WO-UAT-001, today</td><td>The report renders as <b>rows of dashes</b> plus points-per-person <b>17.80</b> — never "Nothing recorded", never a rupee. Your own approved submissions likewise show no rate, no value</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-7 <span class="phase">P7</span> <span class="wait">after V-13</span></td><td>Two absences to confirm: any "issue job reference" control anywhere; JR /01 in your entry picker</td><td>No issue control exists for you; the fully-closed /01 no longer appears in the picker (an open /02 still does)</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-1 <span class="phase">P4</span> <span class="wait">after V-2, BEFORE V-3</span></td><td>Log in as SUP301 <b>before any assignment exists</b></td><td>Entry screen says <b>"No job reference assigned yet — ask your validator."</b> — a named state, not an error. (The old "not assigned to a site" dead end is gone.) Tell VAL201 to proceed with V-3</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-2 <span class="phase">P4</span> <span class="wait">WAIT for V-3</span></td><td>Entry → WO-1 JR /01 (now offered) → permit <code>PTW-UAT-1</code> → quantities 200/200/100/100/0 → pick <b>5 of 6</b> crew → Submit</td><td>Single line item: <b>no crew-per-line picker renders</b> — the day's crew attributes to 10-UAT-01 automatically. No rupee anywhere. Stages in process order</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-3 <span class="phase">P4</span> <span class="wait">WAIT for V-5 return</span></td><td>Open the returned entry → Third Coat 100 → 200 → resubmit</td><td>Editable, resubmits — a return, not a reject</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-4 <span class="phase">P4</span></td><td>WO-2 JR /02 → permit <code>PTW-UAT-2</code> → 10,000 on UAT-02, full crew → Submit (deliberately absurd)</td><td>Submits — judgement lives at validation</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-5 <span class="phase">P4</span> <span class="wait">after V-6 reject</span></td><td>Fresh entry on /02: UAT-02 quantities 100/100/50/0/0 and UAT-03 plain qty <b>5</b> → <b>crew pickers per line</b>: Arun+Bala+Chetan+Dinesh on UAT-02, Esak+Farid on UAT-03 → before submitting, leave Farid unplaced once</td><td>Two line items ⇒ pickers render per line; a picked worker is not offered on the other line; the unplaced-Farid attempt is <b>refused naming him</b>. Placed → submits</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-6 <span class="phase">P4</span></td><td><i>(second profile)</i> Log in as <b>SUP302</b> today</td><td>Entry picker <b>empty</b> — the /01 handover row is effective tomorrow, so today SUP302 has nothing. Assignment timing is real</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">S-7 <span class="phase">P7</span></td><td>As SUP301: Reports → WO-1</td><td>Rows of dashes + points <b>17.80</b> — never a rupee, never "Nothing recorded". Own history stays visible even after tomorrow's handover (ever-assigned)</td></tr>
 </tbody>
 </table>
 </section>
 
 <!-- ============================ MGT001 ============================ -->
 <section class="panel" data-tab="MGT001" data-mini="Management">
-<h2><span class="badge MGT001">MGT001</span> Management — reads everything, touches nothing, signs off the money</h2>
+<h2><span class="badge MGT001">MGT001</span> Management</h2>
 <div class="tabsum">Marked: <b class="p">0 ✓</b> · <b class="f">0 ✗</b> of <span class="n">0</span></div>
-
-<div class="box note"><h4>When you log in you will see</h4>
-Dashboard (full ₹ tiles) · Work Orders · Reports · Admin with <b>read-only</b> tabs (Employee Base, Std Teams, Mappings, Targets — you can read all of it, no save/create button renders anywhere). No Validation, no Supervisor Entry, no Approvals, no Accounts. Log in only when ADM909 announces Phase 7 — the Billed row needs their SA-12 grant first.</div>
-
 <table>
 <thead><tr><th>Mark</th><th>#</th><th>Do</th><th>Expect</th></tr></thead>
 <tbody>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-1 <span class="phase">P7</span> <span class="wait">WAIT for SA-12</span></td><td>Log in as MGT001</td><td>Exactly the nav above</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-2 <span class="phase">P7</span></td><td>Walk every Admin tab you can see</td><td>Employees, std teams, mappings, targets all readable — and <b>not one edit control renders</b>. Read everything, touch nothing, by construction</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-3 <span class="phase">P7</span></td><td>Dashboard</td><td>Work Done Value MTD <span class="money">₹30,400</span> (15,400 + 15,000) · Actual Revenue <span class="money">₹13,000</span> · efficiency/points tiles populated. Every rupee here was born at a validator's Approve click — nothing else on today's timeline created value</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-4 <span class="phase">P7</span></td><td>Reports → WO-UAT-001, month to date — the five rows, against the WO-1 tab</td><td>Fixed <span class="money">₹4,40,000</span> · Calculated <span class="money">₹1,83,333.33</span> · WDV <span class="money">₹15,400</span> · Actual <span class="money">₹13,000</span> · Billed <span class="money">₹12,500</span> — Billed visible to you <i>only because</i> of the live grant in SA-12</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-5 <span class="phase">P7</span></td><td>Reports → WO-UAT-002</td><td>Fixed <span class="money">₹1,00,000</span> · Calculated <span class="money">₹1,00,000</span> (full crew ⇒ equal) · WDV <span class="money">₹15,000</span> · Actual <b>—</b> · Billed <b>—</b>. Dashes are honest: nothing closed, nothing billed, and the rejected 10,000-SQM entry left no trace</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-6 <span class="phase">P7</span></td><td>Closure accuracy report, WO-1</td><td>Measured <span class="money">₹13,000</span> against work-done across the closure windows, the corrected partial (11,000) carrying its corrected flag</td></tr>
-<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-7 <span class="phase">P7</span></td><td><b>Sign-off:</b> read the two WO tabs' expected-figure tables aloud against the screen</td><td>Every figure matches to the paisa. Any mismatch = a finding with the step ID where the number was created. If all match: the system's arithmetic, permissions, and audit trail just survived six people trying to follow the rules — and two deliberate attempts to break them</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-1 <span class="phase">P7</span> <span class="wait">WAIT for SA-9</span></td><td>Log in; walk the read-only Admin tabs</td><td>Everything readable, no edit control renders anywhere</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-2 <span class="phase">P7</span></td><td>Dashboard</td><td>WDV MTD <span class="money">₹30,400</span> · Actual <span class="money">₹13,000</span></td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-3 <span class="phase">P7</span></td><td>Reports → WO-1, month to date</td><td><span class="money">4,40,000 / 1,83,333.33 / 15,400 / 13,000 / 12,500</span> — Billed visible only because of SA-9's grant</td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-4 <span class="phase">P7</span></td><td>Reports → WO-2</td><td>Per-line figures per the WO-2 tab; Actual and Billed honest dashes; the JR register groups by <b>Site</b></td></tr>
+<tr><td class="mark"><span class="pf p">✓</span> <span class="pf f">✗</span></td><td class="num">M-5 <span class="phase">P7</span></td><td>Closure accuracy → WO-1; then the sign-off: read both WO tabs aloud against the screens</td><td>Measured 13,000 vs WDV 15,400, corrected flag shown; every figure matches to the paisa, or it is a finding with a step ID</td></tr>
 </tbody>
 </table>
 </section>
@@ -511,13 +391,11 @@ Dashboard (full ₹ tiles) · Work Orders · Reports · Admin with <b>read-only<
     tabbar.appendChild(b);
     if(i === 0){ p.classList.add('active'); b.classList.add('active'); }
   });
-
   function refresh(){
     var tp = 0, tf = 0, ta = 0;
     panels.forEach(function(p){
       var rows = p.querySelectorAll('td.mark');
       var pass = 0, fail = 0;
-      rows.forEach ? null : null;
       Array.prototype.forEach.call(rows, function(m){
         var tr = m.parentNode;
         if(tr.classList.contains('pass')) pass++;
@@ -535,7 +413,6 @@ Dashboard (full ₹ tiles) · Work Orders · Reports · Admin with <b>read-only<
     document.getElementById('totFail').textContent = tf + ' ✗';
     document.getElementById('totAll').textContent = ta + ' steps';
   }
-
   Array.prototype.forEach.call(document.querySelectorAll('td.mark'), function(cell){
     var pb = cell.querySelector('.pf.p'), fb = cell.querySelector('.pf.f');
     var tr = cell.parentNode;
