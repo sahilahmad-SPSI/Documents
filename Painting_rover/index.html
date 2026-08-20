@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Painting Rover — Fix Work Order (Existing Hardware Only)</title>
+<title>Painting Rover , Fix Work Order (Existing Hardware Only)</title>
 <style>
 :root{
   color-scheme: light;
@@ -116,7 +116,7 @@ footer.foot a{color:var(--text-secondary)}
   <div class="top-inner">
     <div>
       <p class="eyebrow">Fix work order &middot; existing hardware only &middot; no Pixhawk, no Cube, no new sensors</p>
-      <h1>Painting Rover — the seven changes that fix the straight line, and the tests that prove each one</h1>
+      <h1>Painting Rover , the seven changes that fix the straight line, and the tests that prove each one</h1>
       <p class="sub">Everything below uses only what is already on the rover: SCL3300 &rarr; Teensy 4.1 &rarr;
         Raspberry Pi 5 &rarr; 2&times; RoboClaw with wheel encoders. Both patch files are already written, delivered,
         and sitting in the project folder. This document is the execution order.</p>
@@ -196,13 +196,13 @@ float phi = atan2f(a_l, a_f) * 57.2958f - heading_bias_deg;</code></pre></div>
 
 <!-- FIX 2 -->
 <div class="fix">
-  <div class="hd"><span class="n">Fix 2</span><span class="t">Put the SCL3300 in Mode 1 — it is currently outside its own datasheet</span><span class="gain">validity + 4&times; less lag</span></div>
+  <div class="hd"><span class="n">Fix 2</span><span class="t">Put the SCL3300 in Mode 1 , it is currently outside its own datasheet</span><span class="gain">validity + 4&times; less lag</span></div>
   <div class="loc">Included in teensy_wall_heading_v2.ino &rarr; setup()</div>
   <div class="bd">
     <p>The Arduino library defaults to <strong>Mode 4</strong> when <code>setMode()</code> is never called &mdash; and
       the v1 sketch never calls it. Murata limits Modes 3/4 to <strong>&plusmn;10&deg; inclination</strong>; the rover
       sits at 90&deg;. Mode 1 = &plusmn;1.2 g, 40 Hz filter (vs 10 Hz &asymp; 16 ms of group delay).</p>
-<pre><code>inclinometer.setMode(1);      <span class="c">// BEFORE begin() — ±1.2 g, 6000 LSB/g, 40 Hz LPF</span>
+<pre><code>inclinometer.setMode(1);      <span class="c">// BEFORE begin() , ±1.2 g, 6000 LSB/g, 40 Hz LPF</span>
 inclinometer.begin();
 inclinometer.setFastReadMode();</code></pre>
   </div>
@@ -210,11 +210,11 @@ inclinometer.setFastReadMode();</code></pre>
 
 <!-- FIX 3 -->
 <div class="fix">
-  <div class="hd"><span class="n">Fix 3</span><span class="t">Hold true vertical, calibrated once — never “wherever the stick was pushed”</span><span class="gain">&le; 1,305 mm + 100 mm</span></div>
+  <div class="hd"><span class="n">Fix 3</span><span class="t">Hold true vertical, calibrated once , never “wherever the stick was pushed”</span><span class="gain">&le; 1,305 mm + 100 mm</span></div>
   <div class="loc">Straight mode_testing2.py lines 792, 809, 816, 838, 845, 1033 &rarr; or adopt HeadingController in heading_control_v2.py</div>
   <div class="bd">
     <div class="split">
-      <div><p class="codelabel">Today — 5 places + an eyeballed zero</p>
+      <div><p class="codelabel">Today , 5 places + an eyeballed zero</p>
 <pre><code><span class="bad">target_heading = x_angle</span>
 <span class="bad">heading_offset = raw_angle</span>   <span class="c"># operator eyeball</span></code></pre></div>
       <div><p class="codelabel">Fixed</p>
@@ -235,11 +235,11 @@ inclinometer.setFastReadMode();</code></pre>
   <div class="loc">Straight mode_testing2.py lines 522&ndash;529 + laneChange functions &rarr; LaneChanger._turn_to() in heading_control_v2.py</div>
   <div class="bd">
     <div class="split">
-      <div><p class="codelabel">Today — 15&deg; wide, centred on &minus;2.5&deg;, bang-bang</p>
+      <div><p class="codelabel">Today , 15&deg; wide, centred on &minus;2.5&deg;, bang-bang</p>
 <pre><code>def angle_in_zero_zone(a):
     return (<span class="bad">a &gt;= 350 or a &lt;= 5</span>)
 <span class="c"># motors cut the instant it's true → coasts past</span></code></pre></div>
-      <div><p class="codelabel">Fixed — proportional close, 50&times; tighter</p>
+      <div><p class="codelabel">Fixed , proportional close, 50&times; tighter</p>
 <pre><code>err = target - phi
 if abs(err) &lt;= 0.30:            <span class="c"># 0.6° band, centred 0</span>
     stop()
@@ -255,7 +255,7 @@ else:
 
 <!-- FIX 5 -->
 <div class="fix">
-  <div class="hd"><span class="n">Fix 5</span><span class="t">Index by encoder counts — the encoders are wired and unused</span><span class="gain">overlap &plusmn;10% &rarr; ~&plusmn;1%</span></div>
+  <div class="hd"><span class="n">Fix 5</span><span class="t">Index by encoder counts , the encoders are wired and unused</span><span class="gain">overlap &plusmn;10% &rarr; ~&plusmn;1%</span></div>
   <div class="loc">Straight mode_testing2.py lines 605&ndash;608, 669&ndash;672 &rarr; LaneChanger.step() in heading_control_v2.py</div>
   <div class="bd">
     <div class="split">
@@ -263,7 +263,7 @@ else:
 <pre><code>left_speed  = BACKWARD_SPEED
 right_speed = BACKWARD_SPEED
 <span class="bad">time.sleep(1.0)</span></code></pre></div>
-      <div><p class="codelabel">Fixed — distance commanded, then verified</p>
+      <div><p class="codelabel">Fixed , distance commanded, then verified</p>
 <pre><code>travel = LANE_STEP_M / abs(sin(radians(phi_actual)))
 counts = round(travel * COUNTS_PER_METRE)
 md.SpeedAccelDistanceM1M2(addr, ACCEL,
@@ -282,7 +282,7 @@ md.SpeedAccelDistanceM1M2(addr, ACCEL,
 
 <!-- FIX 6 -->
 <div class="fix">
-  <div class="hd"><span class="n">Fix 6</span><span class="t">Add the integral term — P-only cannot cancel a constant pull</span><span class="gain">349 mm &rarr; ~0</span></div>
+  <div class="hd"><span class="n">Fix 6</span><span class="t">Add the integral term , P-only cannot cancel a constant pull</span><span class="gain">349 mm &rarr; ~0</span></div>
   <div class="loc">Straight mode_testing2.py lines 118&ndash;119, 462 &rarr; HeadingController.update() in heading_control_v2.py</div>
   <div class="bd">
     <div class="split">
@@ -305,7 +305,7 @@ if saturated: i_term = corr - p       <span class="c"># back-calc</span></code><
 
 <!-- FIX 7 -->
 <div class="fix">
-  <div class="hd"><span class="n">Fix 7</span><span class="t">Latency housekeeping — about 10 lines and one Motion Studio setting</span><span class="gain">90&ndash;320 &rarr; ~30&ndash;60 ms</span></div>
+  <div class="hd"><span class="n">Fix 7</span><span class="t">Latency housekeeping , about 10 lines and one Motion Studio setting</span><span class="gain">90&ndash;320 &rarr; ~30&ndash;60 ms</span></div>
   <div class="loc">Straight mode_testing2.py line 241 + tilt_reader() &rarr; AsyncLogger + HeadingSource in heading_control_v2.py</div>
   <div class="bd">
     <ul>
@@ -322,7 +322,7 @@ if saturated: i_term = corr - p       <span class="c"># back-calc</span></code><
   </div>
 </div>
 
-<h2>Test ladder — each rung proves one fix before the next is trusted</h2>
+<h2>Test ladder , each rung proves one fix before the next is trusted</h2>
 <p class="small">Pass criteria stated before the tests, not after. T1&ndash;T3 are bench work; only T5 needs the wall.
   Total bench time: about half a day.</p>
 
@@ -353,7 +353,7 @@ if saturated: i_term = corr - p       <span class="c"># back-calc</span></code><
       <td>Rover held against a plumb line or laser-verified vertical. Send <code>Z</code> (500-sample average). Then
         leave untouched 30 min from cold, logging telemetry.</td>
       <td>After <code>Z</code>: heading reads 0.00 &plusmn; 0.05&deg;. Over 30 min: noise &le; 0.05&deg; RMS, warm-up
-        drift &le; 0.10&deg;. <span class="muted">(Sensor spec says ~0.007&deg; noise — large excess means a mounting
+        drift &le; 0.10&deg;. <span class="muted">(Sensor spec says ~0.007&deg; noise , large excess means a mounting
         or vibration problem, not a sensor problem.)</span></td>
       <td class="num">Fix 3</td>
     </tr>
