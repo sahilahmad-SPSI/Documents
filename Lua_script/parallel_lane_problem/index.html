@@ -1,0 +1,517 @@
+<title>The Parallel Lane Problem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#F4F6F9; --surface:#FFFFFF; --surface-2:#EDF1F5; --sunk:#E7ECF2;
+  --ink:#101820; --ink-2:#33404E; --muted:#5D6B7A; --faint:#8593A2;
+  --rule:#D8DFE7; --rule-2:#C3CCD7;
+  --air:#125E96; --air-soft:#E4EFF7;
+  --clay:#9A4E1C; --clay-soft:#F8EDE4;
+  --ok:#136B45; --ok-soft:#E2F1EA;
+  --no:#9C2119; --no-soft:#FAE7E5;
+  --caution:#7F5900; --caution-soft:#FAF0D9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C1117; --surface:#141B23; --surface-2:#1A222C; --sunk:#0F161D;
+    --ink:#E4EAF1; --ink-2:#C2CCD8; --muted:#8B99A8; --faint:#6B7887;
+    --rule:#232D38; --rule-2:#313D4A;
+    --air:#68B4E8; --air-soft:#12283A;
+    --clay:#E39A5F; --clay-soft:#33220F;
+    --ok:#57C495; --ok-soft:#0F2A20;
+    --no:#F0847C; --no-soft:#2E1512;
+    --caution:#DCAA45; --caution-soft:#2C2210;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1117; --surface:#141B23; --surface-2:#1A222C; --sunk:#0F161D;
+  --ink:#E4EAF1; --ink-2:#C2CCD8; --muted:#8B99A8; --faint:#6B7887;
+  --rule:#232D38; --rule-2:#313D4A;
+  --air:#68B4E8; --air-soft:#12283A;
+  --clay:#E39A5F; --clay-soft:#33220F;
+  --ok:#57C495; --ok-soft:#0F2A20;
+  --no:#F0847C; --no-soft:#2E1512;
+  --caution:#DCAA45; --caution-soft:#2C2210;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  font-weight:700;text-wrap:balance;margin:0;letter-spacing:-.005em}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+a{color:var(--air)}
+:focus-visible{outline:2px solid var(--air);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.page{max-width:860px;margin:0 auto;padding:0 28px 90px}
+@media (max-width:640px){.page{padding:0 16px 60px}}
+
+header.mast{border-bottom:1px solid var(--rule);background:var(--surface);margin-bottom:34px}
+.mast-in{max-width:860px;margin:0 auto;padding:26px 28px 22px;
+  display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
+@media (max-width:700px){.mast-in{grid-template-columns:1fr;padding:22px 16px 18px}}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+h1{font-size:28px;line-height:1.15;margin:6px 0 8px}
+.sub{color:var(--muted);font-size:14px;max-width:60ch}
+.tblock{display:grid;grid-template-columns:auto auto;border:1px solid var(--rule-2);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;background:var(--sunk)}
+.tblock div{padding:5px 10px;border-bottom:1px solid var(--rule)}
+.tblock div:nth-child(odd){color:var(--faint);text-transform:uppercase;letter-spacing:.09em;
+  border-right:1px solid var(--rule)}
+.tblock div:nth-child(even){color:var(--ink-2);font-weight:500}
+.tblock div:nth-last-child(-n+2){border-bottom:0}
+@media (max-width:700px){.tblock{display:none}}
+
+section{margin-bottom:38px}
+h2{font-size:22px;line-height:1.25;margin:0 0 4px}
+h2 .n{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;
+  color:var(--faint);margin-right:9px;letter-spacing:.06em}
+h3{font-size:16px;margin:26px 0 8px}
+p{margin:0 0 14px;max-width:70ch}
+ul,ol{margin:0 0 16px;padding-left:20px;max-width:70ch}
+li{margin:0 0 8px}
+li::marker{color:var(--faint)}
+p code,li code,td code,dd code{background:var(--sunk);border:1px solid var(--rule);
+  padding:.5px 4px;border-radius:3px;font-size:.885em;color:var(--ink-2);white-space:nowrap}
+strong{font-weight:600}
+.lede{font-size:17px;color:var(--ink-2);max-width:66ch;margin-bottom:20px}
+
+.tw{overflow-x:auto;margin:0 0 20px;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);text-align:left;padding:9px 12px;
+  border-bottom:1px solid var(--rule-2);background:var(--surface-2);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+td.mono{font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+
+.note{border-left:3px solid var(--rule-2);background:var(--surface);padding:13px 17px;
+  margin:0 0 18px;font-size:14.5px;max-width:70ch}
+.note>:last-child{margin-bottom:0}
+.note .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;
+  letter-spacing:.11em;text-transform:uppercase;display:block;margin-bottom:5px}
+.n-key{border-left-color:var(--air);background:var(--air-soft)}    .n-key .lbl{color:var(--air)}
+.n-no{border-left-color:var(--no);background:var(--no-soft)}       .n-no .lbl{color:var(--no)}
+.n-ok{border-left-color:var(--ok);background:var(--ok-soft)}       .n-ok .lbl{color:var(--ok)}
+.n-cau{border-left-color:var(--caution);background:var(--caution-soft)} .n-cau .lbl{color:var(--caution)}
+
+figure{margin:0 0 24px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:4px;padding:20px 20px 14px;overflow-x:auto}
+figure svg{max-width:100%;height:auto;display:block;margin:0 auto;color:var(--ink)}
+.fN{fill:var(--no)}    .sN{stroke:var(--no)}
+.fO{fill:var(--ok)}    .sO{stroke:var(--ok)}
+.fC{fill:var(--clay)}  .sC{stroke:var(--clay)}
+figcaption{font-size:13px;color:var(--muted);margin-top:14px;padding-top:12px;
+  border-top:1px solid var(--rule);line-height:1.55}
+figcaption b{color:var(--ink-2)}
+
+pre{margin:0 0 18px;background:var(--sunk);border:1px solid var(--rule);border-radius:4px;
+  padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.62}
+pre code{font-family:"IBM Plex Mono",monospace;color:var(--ink-2);background:none;border:0;padding:0;white-space:pre}
+.k{color:var(--air);font-weight:500} .s{color:var(--ok)} .cm{color:var(--faint);font-style:italic}
+.nm{color:var(--clay)} .fn{color:var(--ink);font-weight:600}
+
+.chip{display:inline-flex;align-items:center;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:2px 7px;border-radius:2px;
+  border:1px solid;white-space:nowrap}
+.c-ok{color:var(--ok);background:var(--ok-soft);border-color:currentColor}
+.c-no{color:var(--no);background:var(--no-soft);border-color:currentColor}
+.c-cau{color:var(--caution);background:var(--caution-soft);border-color:currentColor}
+.c-mute{color:var(--muted);background:var(--sunk);border-color:var(--rule-2)}
+
+.grid{display:grid;gap:14px;margin:0 0 20px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:15px 16px}
+.card h3{margin:0 0 6px;font-size:14.5px}
+.card p{font-size:13.5px;color:var(--muted);margin:0}
+.card .big{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:26px;font-weight:700;
+  line-height:1.05;font-variant-numeric:tabular-nums;display:block}
+.card .unit{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);display:block;margin:2px 0 8px}
+.card.no{border-top:3px solid var(--no)} .card.ok{border-top:3px solid var(--ok)}
+.card.cau{border-top:3px solid var(--caution)}
+
+.foot{border-top:1px solid var(--rule);margin-top:44px;padding-top:20px;
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);line-height:1.7;
+  overflow-wrap:anywhere}
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <div>
+      <div class="eyebrow">Painting rover &middot; ArduRover evaluation &middot; technical note</div>
+      <h1>The Parallel Lane Problem</h1>
+      <p class="sub">Why heading correction alone cannot hold a vertical lane, what the required angle accuracy actually works out to, and the control architecture that follows from it.</p>
+    </div>
+    <div class="tblock" aria-label="Document control block">
+      <div>Subject</div><div>Cross&#8209;track control</div>
+      <div>Vehicle</div><div>4WD skid&#8209;steer</div>
+      <div>Surface</div><div>Vertical, ~40&nbsp;m</div>
+      <div>Nav</div><div>GPS &amp; compass denied</div>
+      <div>Basis</div><div>ArduPilot 2cd33afd</div>
+      <div>Status</div><div>For discussion</div>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+<section>
+  <p class="lede">Three findings, each checked against ArduPilot source rather than documentation. The first two say the current approach cannot reach the required accuracy no matter how well it is tuned. The third says the fix is available to us, but we have to build it.</p>
+
+  <div class="grid">
+    <div class="card no">
+      <span class="big">279&#8202;mm</span>
+      <span class="unit">drift per 40&#8202;m pass</span>
+      <p>A sustained 0.4&deg; tilt , the figure already raised in the thread , produces 279&nbsp;mm of lateral drift over a full pass. Angle accuracy alone cannot close this.</p>
+    </div>
+    <div class="card cau">
+      <span class="big">0.014&deg;</span>
+      <span class="unit">needed for 10&#8202;mm over 40&#8202;m</span>
+      <p>That is 0.86&nbsp;arcmin, sustained, for seven minutes. Not achievable from a MEMS accelerometer plus a mechanical mount.</p>
+    </div>
+    <div class="card ok">
+      <span class="big">Lua</span>
+      <span class="unit">is the only path</span>
+      <p>ArduRover's built-in cross-track works in the horizontal plane only. On a vertical wall it degenerates. We have to implement the outer loop ourselves.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>The question being asked</h2>
+  <p>Restated precisely: <strong>a controller that corrects heading returns the rover to the correct heading, but on a line parallel to the one it started on.</strong> The lateral offset accumulated during the excursion is never removed, because nothing in the loop measures it. Repeat that a few times over a 40&nbsp;m pass and the rover is painting a different lane from the one it was commissioned to paint.</p>
+  <p>This has been asked four times in the thread and has not yet been answered. It is the correct question, and it has a clean answer.</p>
+</section>
+
+<section>
+  <h2><span class="n">2</span>Why angle control cannot answer it</h2>
+
+  <figure>
+    <svg viewBox="0 0 780 440" role="img" aria-label="Two panels comparing angle-only correction, which leaves the rover on a parallel offset line, with lateral position correction, which returns it to the original lane centreline.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+        </marker>
+        <marker id="arN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" class="fN"/>
+        </marker>
+        <marker id="arO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" class="fO"/>
+        </marker>
+      </defs>
+
+      <!-- panel titles -->
+      <text x="30" y="24" font-size="13" font-weight="700" fill="currentColor">A , Angle control only</text>
+      <text x="30" y="41" font-size="11.5" fill="currentColor" opacity=".6">what ACRO and heading-hold do today</text>
+      <text x="410" y="24" font-size="13" font-weight="700" fill="currentColor">B , Lateral position control</text>
+      <text x="410" y="41" font-size="11.5" fill="currentColor" opacity=".6">outer loop closes on offset, not angle</text>
+
+      <!-- up-the-wall indicator -->
+      <line x1="358" y1="390" x2="358" y2="330" stroke="currentColor" stroke-width="1" opacity=".45" marker-end="url(#ar)"/>
+      <text x="352" y="405" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".55">up</text>
+
+      <!-- ================= PANEL A ================= -->
+      <line x1="130" y1="400" x2="130" y2="62" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 5" opacity=".45"/>
+      <text x="122" y="424" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".55">lane centreline</text>
+
+      <!-- on-line leg -->
+      <line x1="130" y1="400" x2="130" y2="312" stroke="currentColor" stroke-width="3"/>
+      <!-- disturbance -->
+      <circle cx="130" cy="312" r="4" fill="currentColor"/>
+      <text x="142" y="309" font-size="11" fill="currentColor">disturbance , tilts by &theta;</text>
+      <!-- drifting leg -->
+      <line x1="130" y1="312" x2="174" y2="205" class="sN" stroke-width="3"/>
+      <!-- angle arc -->
+      <path d="M 130 272 A 40 40 0 0 0 146 264" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".7"/>
+      <text x="151" y="272" font-size="11" fill="currentColor" opacity=".8">&theta;</text>
+      <!-- correction point -->
+      <circle cx="174" cy="205" r="4" fill="currentColor"/>
+      <text x="186" y="202" font-size="11" fill="currentColor">angle corrected</text>
+      <!-- parallel leg -->
+      <line x1="174" y1="205" x2="174" y2="72" class="sN" stroke-width="3" marker-end="url(#arN)"/>
+
+      <!-- offset dimension -->
+      <line x1="130" y1="96" x2="174" y2="96" class="sN" stroke-width="1.2"/>
+      <line x1="130" y1="90" x2="130" y2="102" class="sN" stroke-width="1.2"/>
+      <line x1="174" y1="90" x2="174" y2="102" class="sN" stroke-width="1.2"/>
+      <text x="184" y="93" font-size="11.5" font-weight="600" class="fN">&Delta;v persists</text>
+      <text x="184" y="108" font-size="10.5" class="fN" opacity=".85">heading right, lane wrong</text>
+
+      <!-- ================= PANEL B ================= -->
+      <line x1="510" y1="400" x2="510" y2="62" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 5" opacity=".45"/>
+      <text x="502" y="424" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".55">lane centreline</text>
+
+      <line x1="510" y1="400" x2="510" y2="312" stroke="currentColor" stroke-width="3"/>
+      <circle cx="510" cy="312" r="4" fill="currentColor"/>
+      <text x="522" y="309" font-size="11" fill="currentColor">same disturbance</text>
+      <line x1="510" y1="312" x2="554" y2="205" class="sN" stroke-width="3"/>
+      <circle cx="554" cy="205" r="4" fill="currentColor"/>
+      <text x="566" y="202" font-size="11" fill="currentColor">offset detected</text>
+      <!-- counter-tilt leg -->
+      <line x1="554" y1="205" x2="510" y2="118" class="sO" stroke-width="3"/>
+      <text x="566" y="160" font-size="11" class="fO">counter-tilt</text>
+      <text x="566" y="175" font-size="11" class="fO">commanded</text>
+      <line x1="510" y1="118" x2="510" y2="72" class="sO" stroke-width="3" marker-end="url(#arO)"/>
+      <text x="522" y="96" font-size="11.5" font-weight="600" class="fO">back on the line</text>
+    </svg>
+    <figcaption><b>Angles are exaggerated for clarity</b> , the real excursion is a fraction of a degree. Both panels take the same disturbance. In <b>A</b> the controller sees only angle, so once the angle is back to vertical it reports success and the offset &Delta;v is frozen in permanently. In <b>B</b> the controller sees lateral offset, so it deliberately tilts the <em>other</em> way, drives back onto the centreline, and only then straightens. Nulling an offset requires temporarily commanding an angle error , which an angle-only controller is built to prevent.</figcaption>
+  </figure>
+
+  <h3>The arithmetic that settles it</h3>
+  <p>Lateral drift for a sustained tilt &theta; over a travelled distance <em>L</em> is simply <code>&Delta;v = L &middot; sin&theta;</code>. Over a full 40&nbsp;m pass:</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Sustained tilt</th><th class="num">Drift over 40&#8202;m</th><th>Comment</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0.1&deg;</td><td class="num">70&#8202;mm</td><td>Already outside any sensible overlap budget.</td></tr>
+      <tr><td class="mono">0.2&deg;</td><td class="num">140&#8202;mm</td><td>The 0.2&deg; detection threshold proposed in the thread.</td></tr>
+      <tr><td class="mono">0.4&deg;</td><td class="num">279&#8202;mm</td><td>The weld-joint case already raised. Nearly a third of a metre.</td></tr>
+      <tr><td class="mono">0.5&deg;</td><td class="num">349&#8202;mm</td><td>,</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note n-key"><span class="lbl">The design lever</span>Required angle accuracy scales inversely with the distance travelled between absolute position fixes. This is the parameter we actually get to choose , and it is far easier to move than sensor accuracy.</div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Distance between absolute fixes</th><th class="num">Tilt accuracy needed to hold 10&#8202;mm</th><th>Realistic?</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">40&#8202;m , once per pass</td><td class="num">0.014&deg; (0.86&prime;)</td><td><span class="chip c-no">no</span></td></tr>
+      <tr><td class="mono">20&#8202;m</td><td class="num">0.029&deg; (1.7&prime;)</td><td><span class="chip c-no">no</span></td></tr>
+      <tr><td class="mono">10&#8202;m</td><td class="num">0.057&deg; (3.4&prime;)</td><td><span class="chip c-cau">marginal</span></td></tr>
+      <tr><td class="mono">5&#8202;m</td><td class="num">0.115&deg; (6.9&prime;)</td><td><span class="chip c-ok">plausible</span></td></tr>
+      <tr><td class="mono">2&#8202;m</td><td class="num">0.286&deg; (17&prime;)</td><td><span class="chip c-ok">comfortable</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <p><strong>Conclusion.</strong> The programme needs an absolute lateral reference roughly every 5&ndash;10&nbsp;m of travel, or an overlap budget sized for the worst-case single-pass drift. Chasing tighter angle thresholds , 0.5&deg; to 0.2&deg; to 0.1&deg; , buys a linear improvement against a requirement that is two orders of magnitude away. It is the wrong axis to optimise on.</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>What ArduRover gives us, and what it does not</h2>
+  <p>ArduRover already implements exactly the control in panel B , its waypoint navigation steers to a <em>line between two waypoints</em>, not to a heading, and actively drives cross-track error to zero. Two facts about it matter, and they pull in opposite directions.</p>
+
+  <div class="note n-cau"><span class="lbl">First , it is off in ACRO</span><code>Rover::get_wp_crosstrack_error_m()</code> returns <code>false</code> unless <code>control_mode-&gt;is_autopilot_mode()</code>. That is true for <strong>AUTO, GUIDED, LOITER, RTL, SMART_RTL, CIRCLE, FOLLOW, DOCK</strong> and false for <strong>ACRO, MANUAL, HOLD, STEERING, SIMPLE</strong>. All bench and ramp testing so far has been in ACRO, where ArduRover holds a turn rate and nothing else. The parallel-lane behaviour we are seeing is the defined behaviour of that mode, not a sensor limitation.</div>
+
+  <div class="note n-no"><span class="lbl">Second , it will not transfer to the tank</span><code>AR_WPNav::calc_crosstrack_error()</code> computes <code>orig.get_distance_NE(dest)</code> into a <code>Vector2f</code>. It is a <strong>purely horizontal-plane calculation</strong>; altitude does not appear in it. A 40&nbsp;m vertical climb produces near-zero North-East displacement, so on a vertical wall the track length collapses toward zero and the function degenerates. Rover's built-in cross-track cannot track a vertical line.</div>
+
+  <p>So AUTO mode is worth testing on the inclined ramp , it will demonstrate that the cascade principle works and that our wheel odometry is good enough to feed it , but the production solution has to reimplement the outer loop in the <em>wall plane</em>. That is a Lua job, and it is the reason the Lua capability review matters to this problem rather than being a parallel exercise.</p>
+
+  <div class="note n-key"><span class="lbl">Two more constraints worth knowing now</span>Rover has <strong>no <code>poscontrol</code> binding</strong> , unlike Copter, we cannot inject a position offset into the running controller, so our script must own the outer loop outright. Rover also has <strong>no <code>register_custom_mode()</code></strong>, so a "painting mode" has to be GUIDED with streamed commands, or a behaviour layer overlaid on an existing mode via an RC aux switch.</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>The observation that makes this tractable</h2>
+  <p>The single most useful result in the thread so far is Rohit's 13&nbsp;August note that <em>heading changes are being detected as roll changes</em>. That is not an artefact , it is the geometry, and it is very good news.</p>
+  <p>On a vertical wall the rover's forward axis points along gravity. Rotation about the wall normal , exactly the quantity we care about , therefore appears directly in the gravity vector. That gives us an <strong>absolute, drift-free angular reference</strong>, which a ground rover normally cannot have without a compass. No gyro integration, no accumulating bias on the angle channel. It is the inclinometer principle the mechanical design already relies on, now available to the flight controller.</p>
+  <div class="note n-cau"><span class="lbl">One caveat on how to read it</span>At pitch near &plusmn;90&deg; the Euler decomposition is singular, so <code>ahrs:get_roll_rad()</code> and <code>get_yaw_rad()</code> become coupled and noisy. Do not build the loop on Euler angles. Rotate the body forward axis into the earth frame instead , <code>ahrs:body_to_earth(Vector3f(1,0,0))</code>, or take <code>ahrs:get_quaternion()</code> directly , and measure its departure from vertical. Both are singularity-free and both exist in the Lua binding set.</div>
+  <p>What gravity <em>cannot</em> give us is position. An absolute angle reference with zero drift still produces unbounded lateral drift, because the offset is the integral of the angle error over distance. That is the whole content of section 2.</p>
+</section>
+
+<section>
+  <h2><span class="n">5</span>Proposed control architecture</h2>
+
+  <figure>
+    <svg viewBox="0 0 860 306" role="img" aria-label="Control cascade: gravity gives a drift-free tilt angle and wheel encoders give along-track speed; both feed a dead-reckoned lateral offset which drifts and must be reset by an absolute lateral reference at least once per pass; an outer loop closes on lateral offset and commands a tilt to an inner angle loop, whose output is a turn rate command.">
+      <defs>
+        <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+        </marker>
+        <marker id="a2c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" class="fC"/>
+        </marker>
+      </defs>
+
+      <!-- sensors -->
+      <rect x="14" y="22" width="140" height="56" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="84" y="45" font-size="12" font-weight="600" text-anchor="middle" fill="currentColor">Gravity vector</text>
+      <text x="84" y="62" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".65">accel + EKF quaternion</text>
+
+      <rect x="14" y="176" width="140" height="56" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="84" y="199" font-size="12" font-weight="600" text-anchor="middle" fill="currentColor">Wheel encoders</text>
+      <text x="84" y="216" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".65">via RoboClaw</text>
+
+      <!-- theta rail across the top -->
+      <polyline points="154,50 668,50 668,104" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#a2)"/>
+      <text x="300" y="42" font-size="11.5" font-weight="600" fill="currentColor">&theta; , absolute, no drift</text>
+      <!-- theta branch down into dead reckoning -->
+      <polyline points="252,50 252,110" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#a2)"/>
+
+      <!-- V into dead reckoning -->
+      <polyline points="154,204 290,204 290,178" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#a2)"/>
+      <text x="164" y="196" font-size="11.5" font-weight="600" fill="currentColor">V</text>
+
+      <!-- dead reckoning -->
+      <rect x="196" y="110" width="176" height="68" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="284" y="133" font-size="12" font-weight="600" text-anchor="middle" fill="currentColor">Dead-reckon offset</text>
+      <text x="284" y="151" font-size="11" text-anchor="middle" fill="currentColor" opacity=".8">v = &int; V&#183;sin&theta; dt</text>
+      <text x="284" y="168" font-size="10.5" text-anchor="middle" class="fC">drifts with slip and &theta; bias</text>
+
+      <!-- outer loop -->
+      <line x1="372" y1="144" x2="410" y2="144" stroke="currentColor" stroke-width="1.4" marker-end="url(#a2)"/>
+      <text x="391" y="136" font-size="11.5" font-weight="600" text-anchor="middle" fill="currentColor">v</text>
+      <rect x="416" y="110" width="150" height="68" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="491" y="140" font-size="12" font-weight="600" text-anchor="middle" fill="currentColor">Outer loop</text>
+      <text x="491" y="158" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".65">PD on lateral offset</text>
+
+      <!-- inner loop -->
+      <line x1="566" y1="144" x2="602" y2="144" stroke="currentColor" stroke-width="1.4" marker-end="url(#a2)"/>
+      <text x="584" y="136" font-size="11.5" font-weight="600" text-anchor="middle" fill="currentColor">&theta;<tspan font-size="9">cmd</tspan></text>
+      <rect x="608" y="110" width="150" height="68" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <text x="683" y="140" font-size="12" font-weight="600" text-anchor="middle" fill="currentColor">Inner loop</text>
+      <text x="683" y="158" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".65">PD on angle, gyro damped</text>
+
+      <!-- output -->
+      <line x1="758" y1="144" x2="826" y2="144" stroke="currentColor" stroke-width="1.4" marker-end="url(#a2)"/>
+      <text x="790" y="134" font-size="11" font-weight="600" text-anchor="middle" fill="currentColor">turn rate</text>
+      <text x="790" y="163" font-size="10" text-anchor="middle" fill="currentColor" opacity=".6">to the rover</text>
+
+      <!-- absolute reference -->
+      <rect x="182" y="238" width="212" height="50" rx="3" fill="none" class="sC" stroke-width="1.4" stroke-dasharray="6 4"/>
+      <text x="288" y="259" font-size="12" font-weight="600" text-anchor="middle" class="fC">Absolute lateral reference</text>
+      <text x="288" y="276" font-size="10.5" text-anchor="middle" class="fC" opacity=".85">the piece we do not yet have</text>
+      <polyline points="340,238 340,180" fill="none" class="sC" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#a2c)"/>
+      <text x="352" y="216" font-size="10.5" class="fC">resets v, every 5&ndash;10&#8202;m</text>
+    </svg>
+    <figcaption>The loop we need. Everything drawn in the page's foreground colour <b>we already have</b>; everything in ochre is where the error enters and where it has to be bounded. The outer loop is the piece missing from today's implementation , without it, a perfect inner loop still produces panel&nbsp;A.</figcaption>
+  </figure>
+
+  <p>Commanding is straightforward from Lua. <code>vehicle:set_desired_turn_rate_and_speed()</code> is a Rover-only binding and sits at exactly the right level , it leaves ArduRover's speed controller and slew limiting in place. <code>vehicle:set_steering_and_throttle()</code> is available if we need to bypass those, but it makes the script responsible for rate limiting and stopping, which on a tethered vehicle on a wall is a responsibility worth avoiding.</p>
+
+<pre><code><span class="cm">-- Outer loop sketch. Angle from gravity, offset by dead reckoning,</span>
+<span class="cm">-- commanded through Rover's own turn-rate controller.</span>
+<span class="k">local</span> RATE_MS = <span class="nm">20</span>                         <span class="cm">-- 50 Hz</span>
+<span class="k">local</span> KP_V, KD_V = <span class="nm">0.8</span>, <span class="nm">0.15</span>              <span class="cm">-- offset -> commanded tilt, to be tuned</span>
+<span class="k">local</span> TILT_MAX = math.<span class="fn">rad</span>(<span class="nm">6</span>)                 <span class="cm">-- never command more than 6 deg off vertical</span>
+<span class="k">local</span> v_est, last_ms = <span class="nm">0.0</span>, <span class="fn">millis</span>():<span class="fn">toint</span>()
+
+<span class="k">local</span> <span class="k">function</span> <span class="fn">tilt_from_vertical</span>()
+  <span class="cm">-- body forward axis expressed in earth NED; singularity-free at pitch 90</span>
+  <span class="k">local</span> fwd = ahrs:<span class="fn">body_to_earth</span>(<span class="fn">Vector3f</span>())    <span class="cm">-- set x=1 before calling</span>
+  <span class="k">local</span> up   = -fwd:<span class="fn">z</span>()                        <span class="cm">-- NED down is negative up</span>
+  <span class="k">local</span> lat  = fwd:<span class="fn">y</span>()                         <span class="cm">-- lateral component, sign = drift direction</span>
+  <span class="k">return</span> math.<span class="fn">atan</span>(lat, up)                   <span class="cm">-- radians, signed</span>
+<span class="k">end</span>
+
+<span class="k">function</span> <span class="fn">update</span>()
+  <span class="k">local</span> now = <span class="fn">millis</span>():<span class="fn">toint</span>()
+  <span class="k">local</span> dt  = (now - last_ms) * <span class="nm">0.001</span>
+  last_ms = now
+  <span class="k">if</span> dt &lt;= <span class="nm">0</span> <span class="k">or</span> dt &gt; <span class="nm">0.5</span> <span class="k">then</span> <span class="k">return</span> update, RATE_MS <span class="k">end</span>
+
+  <span class="k">local</span> theta = <span class="fn">tilt_from_vertical</span>()
+  <span class="k">local</span> speed = <span class="nm">0.0</span>
+  <span class="k">local</span> vel   = ahrs:<span class="fn">get_velocity_NED</span>()
+  <span class="k">if</span> vel <span class="k">then</span> speed = vel:<span class="fn">length</span>() <span class="k">end</span>
+
+  v_est = v_est + speed * math.<span class="fn">sin</span>(theta) * dt   <span class="cm">-- accumulates; must be reset by a fix</span>
+
+  <span class="k">local</span> theta_cmd = -(KP_V * v_est + KD_V * speed * math.<span class="fn">sin</span>(theta))
+  <span class="k">if</span> theta_cmd &gt;  TILT_MAX <span class="k">then</span> theta_cmd =  TILT_MAX <span class="k">end</span>
+  <span class="k">if</span> theta_cmd &lt; -TILT_MAX <span class="k">then</span> theta_cmd = -TILT_MAX <span class="k">end</span>
+
+  <span class="k">local</span> turn_rate = math.<span class="fn">deg</span>(theta_cmd - theta) * <span class="nm">2.0</span>   <span class="cm">-- inner P term</span>
+  vehicle:<span class="fn">set_desired_turn_rate_and_speed</span>(turn_rate, speed)
+
+  logger:<span class="fn">write</span>(<span class="s">"XTRK"</span>, <span class="s">"Th,Vest,Tcmd,Spd"</span>, <span class="s">"ffff"</span>, <span class="s">"----"</span>, <span class="s">"----"</span>,
+               math.<span class="fn">deg</span>(theta), v_est, math.<span class="fn">deg</span>(theta_cmd), speed)
+  <span class="k">return</span> update, RATE_MS
+<span class="k">end</span>
+
+<span class="k">return</span> update, RATE_MS</code></pre>
+  <p style="font-size:13px;color:var(--muted)">Sketch only , gains are placeholders, the <code>Vector3f</code> needs its x component set before the frame conversion, and <code>v_est</code> has no reset path until section&nbsp;6 is decided. It is here to show the shape of the loop and which bindings it uses, not to be flashed.</p>
+</section>
+
+<section>
+  <h2><span class="n">6</span>The absolute lateral reference , options</h2>
+  <p>Every option raised in the thread is assessed here on one criterion: <strong>does it observe lateral position, or only angle?</strong> Only the first group can bound the drift.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Option</th><th>Observes offset?</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Re-datum at each end of the pass</strong><br><span style="color:var(--muted);font-size:12.5px">mechanical stop, tether anchor, or operator-set marker</span></td>
+        <td><span class="chip c-ok">yes</span></td>
+        <td>Cheapest real answer, and not yet proposed. Bounds drift per pass instead of letting it accumulate across passes. On its own it needs the overlap budget to cover a full-pass worst case , so it pairs naturally with the next row.</td>
+      </tr>
+      <tr>
+        <td><strong>Edge-follow the previously painted strip</strong><br><span style="color:var(--muted);font-size:12.5px">line-scan sensor or camera on the painted side</span></td>
+        <td><span class="chip c-ok">yes</span></td>
+        <td>Strongest continuous option. The wet-dry paint boundary is a genuine high-contrast <em>edge</em>, which is a far easier detection problem than tracking texture. Mount it <strong>behind</strong> the spray in the direction of travel and on the already-painted side, which answers the lens-fouling objection. Fails on the first pass of a tank , covered by the row above.</td>
+      </tr>
+      <tr>
+        <td><strong>Tether angle at the rover</strong><br><span style="color:var(--muted);font-size:12.5px">two-axis encoder or pot at the tether entry</span></td>
+        <td><span class="chip c-ok">yes</span></td>
+        <td>The tether is already there and already anchored. Sensitivity is <em>inverse</em> to remaining tether length, so it is precise near the anchor and poor far from it , useful as a partial fix rather than a full-pass solution. Cheap enough to be worth prototyping.</td>
+      </tr>
+      <tr>
+        <td><strong>Laser pointer plus receiver</strong></td>
+        <td><span class="chip c-ok">yes</span></td>
+        <td>Optically feasible at 40&nbsp;m with the right aperture. The real cost is operational: the pointer must be re-aimed for every lane change, on a tank. Rank below the three above for that reason, not on physics.</td>
+      </tr>
+      <tr>
+        <td><strong>Optical flow</strong></td>
+        <td><span class="chip c-cau">partly</span></td>
+        <td>Both objections raised in the thread stand: a uniform painted steel surface is feature-poor, sub-300&nbsp;mm standoff restricts FOV, and paint will foul the lens. Not recommended as the primary reference. Edge-following gets the same information from a much easier signal.</td>
+      </tr>
+      <tr>
+        <td><strong>Faster angle detection</strong> (0.5&deg; &rarr; 0.2&deg;)</td>
+        <td><span class="chip c-no">no</span></td>
+        <td>Reduces the rate of accumulation, does not remove accumulated offset. Section 2 shows the requirement is around 0.014&deg; over a full pass, so this is a linear gain against a gap of roughly 30&times;. Worth doing, cannot be the answer.</td>
+      </tr>
+      <tr>
+        <td><strong>Gyro integration</strong></td>
+        <td><span class="chip c-no">no</span></td>
+        <td>The gyro's proper job here is rate damping in the inner loop. We do not need it for absolute angle , gravity already gives that without drift , and integrating it for position compounds two error sources instead of one.</td>
+      </tr>
+      <tr>
+        <td><strong>Omni wheels</strong></td>
+        <td><span class="chip c-no">no</span></td>
+        <td>Provides lateral <em>actuation</em>, which is the half of the loop we already have , a skid-steer rover can correct laterally by tilting. It does not tell us that we have drifted. Significant mechanical change for the wrong half of the problem.</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <div class="note n-ok"><span class="lbl">Recommendation</span>Pair <strong>per-pass re-datum</strong> with <strong>paint-edge following</strong>. Between them the first pass is bounded mechanically and every subsequent pass is bounded continuously, with no new failure mode introduced on the tank. Prototype the tether-angle sensor in parallel , it is nearly free and would give an independent cross-check.</div>
+</section>
+
+<section>
+  <h2><span class="n">7</span>Next tests</h2>
+  <p>Three experiments, in priority order. The first is the one that converts this argument from opinion into data, and it has not been proposed yet.</p>
+
+  <h3>Test 1 , measure the actual drift distribution</h3>
+  <p>On the ramp, at the steepest angle available. Mark a start line. Drive a fixed distance under the current ACRO heading-hold logic. Measure lateral offset at the finish. Repeat ten times. Plot the distribution.</p>
+  <p>This gives the number the overlap budget actually needs: worst-case drift per metre travelled. Everything in section 6 is a trade-off against that single figure, and right now nobody has it.</p>
+
+  <h3>Test 2 , quantify the sustained angle bias</h3>
+  <p>Run <a href="https://ardupilot.org/rover/docs/savetrim.html">SAVE_TRIM</a> , confirmed not yet done , then log <code>tilt_from_vertical()</code> for a full straight run at constant speed. The mean is our sustained bias; the standard deviation is our noise floor. Compare against the table in section 2 to read off how often we must re-datum. This single number decides whether per-pass re-datum alone is sufficient or whether edge-following is mandatory.</p>
+
+  <h3>Test 3 , AUTO waypoint mission on the ramp</h3>
+  <p>Two waypoints defining a straight line up the ramp, wheel encoders configured as the EKF velocity source, logging <code>XTRACK</code>. This proves the cascade works and that our odometry is good enough to feed an outer loop, before we spend effort reimplementing it in Lua.</p>
+  <div class="note n-cau"><span class="lbl">Read the result carefully</span>A pass here validates the <em>principle</em> only. Section 3 shows this will not carry to the vertical tank, because the built-in cross-track is computed in the horizontal plane. Do not let a good ramp result close the question.</div>
+  <p style="font-size:13.5px;color:var(--muted)">ArduPilot supports exactly two wheel encoders (<code>WHEELENCODER_MAX_INSTANCES = 2</code>), which for a skid-steer platform is precisely what is needed , one per side. The two-encoder limit noted earlier in the thread is real but not a constraint for us.</p>
+</section>
+
+<section>
+  <h2><span class="n">8</span>Open questions</h2>
+  <ul>
+    <li><strong>What is the actual overlap budget?</strong> The 10&nbsp;mm figure has been used informally. Section 2's conclusions move roughly linearly with it, so it is worth pinning down before committing to a sensor.</li>
+    <li><strong>How much wheel slip do we get on a painted magnetic surface?</strong> Dead reckoning is only as good as the speed estimate, and slip is invisible to an encoder. Test 1 will show it indirectly.</li>
+    <li><strong>Does the EKF stay well-conditioned at pitch 90&deg; over a long run?</strong> The quaternion is singularity-free, but ArduPilot's estimator is not designed for a vehicle that lives at the pole. Worth watching <code>ahrs:get_variances()</code> during Test 1.</li>
+    <li><strong>Does the rover ever need to hold a lane while stationary?</strong> If it pauses mid-pass to paint, the dead-reckoning term stops updating but real drift from sag or slip does not. That changes the sensor requirement.</li>
+  </ul>
+</section>
+
+<div class="foot">
+  Findings verified against ArduPilot master @ 2cd33afd (2026-08-20, 4.7-dev):<br>
+  Rover/Rover.cpp &middot; Rover/mode.h &middot; libraries/AR_WPNav/AR_WPNav.cpp &middot;
+  libraries/AP_WheelEncoder/AP_WheelEncoder.h &middot; libraries/AP_Scripting/docs/docs.lua &middot;
+  libraries/AP_Scripting/generator/description/bindings.desc<br><br>
+  Companion document: ArduPilot Lua Field Manual , full binding surface, limits and shipped-script catalogue.
+</div>
+
+</div>
