@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gen5 CAD Material Audit</title>
+<style>
+:root{--ink:#1c2128;--ink2:#57606a;--ink3:#8b949e;--line:#d8dee4;--bg:#f6f8fa;
+--accent:#1f4e79;--accent-soft:#e8f0f7;--red:#b42318;--red-soft:#fdecea;--amber:#92400e;--amber-soft:#fdf3e7;--good:#1a7f37;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-size:15px}
+header{background:var(--accent);color:#fff;padding:30px 24px}
+.wrap{max-width:980px;margin:0 auto}
+header h1{font-size:23px;font-weight:650}
+header .sub{margin-top:5px;color:#c9d9ea;font-size:14px}
+section{padding:26px 24px 4px}
+h2{font-size:18px;font-weight:650;margin-bottom:10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat .v{font-size:24px;font-weight:650} .stat .l{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.note{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:11px 15px;font-size:14px;margin:12px 0}
+.warn{border-left:4px solid var(--red);background:var(--red-soft);border-radius:0 8px 8px 0;padding:11px 15px;font-size:14px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);padding:8px 10px;border-bottom:2px solid var(--line);position:sticky;top:0;background:#fff}
+td{padding:7px 10px;border-bottom:1px solid #eef1f4;vertical-align:top}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.bad td{background:#fdf3f2}
+tr.warnrow td{background:var(--amber-soft)}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px;background:#eef1f4;color:var(--ink2);white-space:nowrap}
+.tag.bad-t{background:var(--red-soft);color:var(--red)}
+.tag.warn-t{background:var(--amber-soft);color:var(--amber)}
+input.filter{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;margin-bottom:10px}
+.scroll{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+footer{padding:26px 24px 40px;color:var(--ink3);font-size:12px;text-align:center}
+ol{margin:6px 0 6px 22px;font-size:14.5px} ol li{margin-bottom:7px}
+</style></head><body>
+<header><div class="wrap">
+<h1>Gen5 CAD Material Audit — for the Design Team</h1>
+<div class="sub">Source: <b>GEN5 V1 MAIN.step</b> (exported 13 Aug 2026, AP214, Autodesk toolchain) · every number below read directly from the file, verified independently on two machines</div>
+</div></header>
+
+<section><div class="wrap">
+<div class="warn"><b>The one-line finding: no part in this CAD has a weight, and 205 of 233 materials are an untouched default.</b>
+The file stores materials + densities, never masses. Weight can only be computed from material × volume — so with the battery marked "Steel", the CAD "weighs" <b>~31 kg</b> against the real, scale-measured <b>12.0 kg</b>. Off by 2.6×.</div>
+<div class="stats">
+<div class="stat"><div class="v">233</div><div class="l">parts with material data</div></div>
+<div class="stat"><div class="v">28</div><div class="l">deliberately assigned</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">205</div><div class="l">default "Steel" (never chosen)</div></div>
+<div class="stat"><div class="v" style="color:var(--red)">25</div><div class="l">of those certainly wrong (electronics etc.)</div></div>
+<div class="stat"><div class="v">0</div><div class="l">mass values anywhere in the file</div></div>
+</div>
+<div class="note"><b>How we know "Steel" is a default, not a decision:</b> when a part is mirrored, the mirror loses its material and falls back to Steel — see the pairs table below. A carbon-fibre part whose mirror copy is "Steel" is not a materials choice; it is an unfilled field.</div>
+</div></section>
+
+<section><div class="wrap">
+<h2>Mirrored parts that lost their material</h2>
+<div class="card"><table>
+<thead><tr><th>Original part</th><th>Its material</th><th>Mirror copy</th><th>Mirror's material</th></tr></thead>
+<tbody><tr><td>Component1</td><td>Plástico ABS</td><td>Component1(Mirror)</td><td>Steel (default)</td></tr>
+<tr><td>Component397</td><td>CFRP</td><td>Component397(Mirror)</td><td>Steel (default)</td></tr>
+<tr><td>GPS LOWER MOUNT</td><td>PA 12 - PA 2200 - 120µm - Balance (with EOS 3D printers)</td><td>GPS LOWER MOUNT(Mirror)</td><td>Steel (default)</td></tr>
+<tr><td>GUIDE WHEEL</td><td>ABS Plastic</td><td>GUIDE WHEEL v4(Mirror)</td><td>Steel (default)</td></tr>
+<tr><td>MOTOR-ESC COVER_RD ESC</td><td>PA 12 - Nylon - PA 603-CF (with EOS P 3D Printers)</td><td>MOTOR-ESC COVER_RD ESC v1(Mirror)</td><td>Steel (default)</td></tr></tbody></table></div>
+</div></section>
+
+<section><div class="wrap">
+<h2>The 28 parts WITH a deliberately assigned material</h2>
+<p style="color:var(--ink2);font-size:14px;margin-bottom:8px">These have real materials — but still no mass values. Note the two screws: assigned "Aluminum 6061" while their names say steel — even the assigned set needs a review pass.</p>
+<div class="card" style="padding:0"><div class="scroll"><table>
+<thead><tr><th>Part</th><th>Material</th><th>Density kg/m³</th><th>Remark</th></tr></thead>
+<tbody><tr><td>91294A006_Black-Oxide Alloy Steel Hex Drive Flat Head Screw</td><td>Aluminum 6061</td><td class='num'>2700</td><td>⚠ name says steel screw — label mismatch</td></tr>
+<tr><td>92000A003_Passivated 18-8 Stainless Steel Pan Head Phillips Screws</td><td>Aluminum 6061</td><td class='num'>2700</td><td>⚠ name says steel screw — label mismatch</td></tr>
+<tr><td>arm_holder</td><td>Aluminum 6061</td><td class='num'>2700</td><td></td></tr>
+<tr><td>B3B-ZR</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>BOOM HARNESS CLAMP</td><td>PA 12 - Nylon - PA 603-CF (with EOS P 3D Printers)</td><td class='num'>1100</td><td></td></tr>
+<tr><td>Bottom Casing</td><td>Aluminum 6061</td><td class='num'>2700</td><td></td></tr>
+<tr><td>Clik-Mate-6M</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>Component1</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>Component11</td><td>Aluminum 7075</td><td class='num'>2810</td><td></td></tr>
+<tr><td>Component1_1</td><td>CFRP</td><td class='num'>1430</td><td></td></tr>
+<tr><td>Component1_3</td><td>ABS Plastic</td><td class='num'>1060</td><td></td></tr>
+<tr><td>Component1_4</td><td>Aluminum 6061</td><td class='num'>2700</td><td></td></tr>
+<tr><td>Component2_1</td><td>Zinc</td><td class='num'>7000</td><td></td></tr>
+<tr><td>Component397</td><td>CFRP</td><td class='num'>1430</td><td></td></tr>
+<tr><td>Front Housing</td><td>Aluminum 6061</td><td class='num'>2700</td><td></td></tr>
+<tr><td>GEL TANK LID</td><td>PA 12 - PA 2200 - 120µm - Balance (with EOS 3D printers)</td><td class='num'>990</td><td></td></tr>
+<tr><td>GPS LOWER MOUNT</td><td>PA 12 - PA 2200 - 120µm - Balance (with EOS 3D printers)</td><td class='num'>990</td><td></td></tr>
+<tr><td>GUIDE WHEEL</td><td>ABS Plastic</td><td class='num'>1060</td><td></td></tr>
+<tr><td>LOWER CANOPY</td><td>PA 12 - PA 2200 - 120µm - Balance (with EOS 3D printers)</td><td class='num'>990</td><td></td></tr>
+<tr><td>MOTOR-ESC COVER_RD ESC</td><td>PA 12 - Nylon - PA 603-CF (with EOS P 3D Printers)</td><td class='num'>1100</td><td></td></tr>
+<tr><td>Prop</td><td>CFRP</td><td class='num'>1430</td><td></td></tr>
+<tr><td>Rear Housing</td><td>Aluminum 6061</td><td class='num'>2700</td><td></td></tr>
+<tr><td>SM03B-GHS-TB</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>SM04B-GHS-TB</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>SM06B-GHS-TB</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>SM08B-GHS-TB</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr>
+<tr><td>Top Casing</td><td>Aluminum 6061</td><td class='num'>2700</td><td></td></tr>
+<tr><td>ZX62-B-5P</td><td>Plástico ABS</td><td class='num'>1060</td><td></td></tr></tbody></table></div></div>
+</div></section>
+
+<section><div class="wrap">
+<h2>The 205 parts on default "Steel" (7850 kg/m³)</h2>
+<p style="color:var(--ink2);font-size:14px;margin-bottom:8px">Red rows are certainly wrong (electronics and purchased parts). Unmarked rows say <i>verify</i> — steel may be correct for fasteners and brackets, but someone must confirm it was chosen, not inherited.</p>
+<input class="filter" id="f" type="text" placeholder="Type to filter parts… (e.g. battery, washer, mirror)">
+<div class="card" style="padding:0"><div class="scroll"><table id="steel">
+<thead><tr><th>Part</th><th>Status</th><th>Note</th></tr></thead>
+<tbody><tr class='bad'><td>026xxxC MIPI PLUG CABLE ASS&#x27;Y</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>10 MM SPACER</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>12S BATTERY</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>12V DC PUMP</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>18x16x225 LANDING GEAR TUBE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>18x16x225 LANDING GEAR TUBE v2(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>18x16x225 LANDING GEAR TUBE v2(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>18x16x225 LANDING GEAR TUBE v2(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>2026-06-25-16-35-20-619</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>2026-06-25-16-35-20-619_1</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (10)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (10)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (11)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (2)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (2)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (4)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (6)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (6)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (7)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (8)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror) (9)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>3 mm washer v2(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>4 mm washer</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='warnrow'><td>80.5G DUMMY WEIGHT</td><td><span class='tag warn-t'>see note</span></td><td>real weight is in the NAME only (80.5 g each) — not a property</td></tr>
+<tr class='warnrow'><td>80.5G DUMMY WEIGHT v1(Mirror)</td><td><span class='tag warn-t'>see note</span></td><td>real weight is in the NAME only (80.5 g each) — not a property</td></tr>
+<tr class='warnrow'><td>80.5G DUMMY WEIGHT v1(Mirror)(Mirror) (1)</td><td><span class='tag warn-t'>see note</span></td><td>real weight is in the NAME only (80.5 g each) — not a property</td></tr>
+<tr class='warnrow'><td>80.5G DUMMY WEIGHT v6(Mirror)</td><td><span class='tag warn-t'>see note</span></td><td>real weight is in the NAME only (80.5 g each) — not a property</td></tr>
+<tr class=''><td>AIR UNIT HOLDER_DJI04</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>ANTENNA HOLDER_DJI04</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>BATTERY DECK PLATE</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>BATTERY SUPPORT TUBE</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>BM6B-SRSS-TB v1</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>CAMERA HOLDING PLATE_DJI04</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>CAMERA MOUNT</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>CAMERA MOUNT_DJI04</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>Ceramic cap 0603 (1.6x0.8x0.7)</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>Ceramic cap 0805 (2.1x1.2x1.2)</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>Ceramic Cap 2220 (5.9x5x2.5)</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>Component1(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component1(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component1(Mirror) (2)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component1(Mirror) (3)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component1(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component1_2</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component1_5</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component2</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component2(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component2(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component2(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component2_2</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Component397(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>DO-214AB Diode</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>Engraved ID plate</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>GPS LOWER MOUNT(Mirror)</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>gps_here3_btm_case20200307</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>gps_here3_btm_case20200307_1</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>gps_here3_led_lens20200307.stp</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>gps_here3_led_lens20200307.stp_1</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>GPS_HERE3_TOCASE.stp</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>GPS_HERE3_TOCASE.stp_1</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>GUIDE WHEEL v4(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>HARNESS CF TUBE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>HARNESS CF TUBE(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>HARNESS CLAMP NEW</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>HERELINK AIR UNIT</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>IHLP2525CZ v1</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>LANDING GEAR ANGLED - G5 v5(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>LANDING GEAR ANGLED - G5 v5(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>LANDING GEAR ANGLED - G5 v5(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>LANDING GEAR PLATE Copy</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>LANGING GEAR_HORIZONTAL TUBE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>LANGING GEAR_HORIZONTAL TUBE (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>LIDAR</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>LM2596S DC TO DC ­°À£¼Ò²
+Õ WF-101</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>LOCKING CF TUBE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>LOWER DECK PLATE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3 Nyloc Nut</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_1</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_10</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_11</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_12</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_13</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_14</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_15</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_16</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_17</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_2</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_3</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_4</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_5</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_6</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_7</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_8</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3 Nyloc Nut_9</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M3X10mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X10mm v5(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X10mm v5(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X12mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X12mm v2(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X12mm v2(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X12mm v2(Mirror) (2)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X12mm v2(Mirror) (2)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X12mm v2(Mirror) (3)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X16mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X20mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X20mm v1(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X20mm v1(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X25mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X25mm v2(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X25mm v2(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X25mm v2(Mirror) (2)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm v3(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm v3(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm v3(Mirror) (1)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm v3(Mirror) (3)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm v3(Mirror) (3)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M3X30mm v3(Mirror) (4)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>M4 Nyloc Nut</td><td><span class='tag'>likely OK</span></td><td>nylon-insert nut — body is steel, insert is not; probably acceptable</td></tr>
+<tr class=''><td>M4X45mm</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD &amp; KDE ESC</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD &amp; KDE ESC v5(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD &amp; KDE ESC v5(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD &amp; KDE ESC v5(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD ESC v1(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD ESC v1(Mirror) (2)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR-ESC COVER_RD ESC v1(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR/ESC PLATE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR/ESC PLATE v6(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR/ESC PLATE v6(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>MOTOR/ESC PLATE v6(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>NUT_M2-5MM.stp</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>NUT_M2-5MM.stp_1</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Nylon Standoff</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_27</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_28</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_29</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_30</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_31</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_32</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_33</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_34</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_35</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_36</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_37</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_38</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_39</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_40</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_41</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_42</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_43</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_44</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_45</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_46</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_47</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_48</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_49</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_50</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_51</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>part_object_id_52</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>PCB</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>PROBE CF TUBE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>PROBE REAR MOUNTING CLAMP_UPDATED</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>product0_1</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>product0_2</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>product0_3</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Prop_1</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Prop_2</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Prop_3</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>R0603 1.55x0.85x0.45</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>Regulator SOIC-8</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>Resistor</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>ROTOR</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>ROTOR(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>ROTOR(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>ROTOR(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SANDWICH PEDESTAL</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SCREW</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SCREW(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SCREW(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SCREW(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPACER</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPONGE CF TUBE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPSI 500 LANDING GEAR MOUNT TOP</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPSI 503 LANDING GEAR FIXTURE-R</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPSI 503 LANDING GEAR FIXTURE-R v1(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPSI 503 LANDING GEAR FIXTURE-R v1(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>SPSI 503 LANDING GEAR FIXTURE-R v1(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class='bad'><td>SPSI 516 BATTERY STANDOFF</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class='bad'><td>SPSI 516 BATTERY STANDOFF v2(Mirror)</td><td><span class='tag bad-t'>certainly wrong</span></td><td>electronics / purchased part — certainly not solid steel</td></tr>
+<tr class=''><td>STATOR BODY</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>STATOR BODY(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>STATOR BODY(Mirror) (1)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>STATOR BODY(Mirror)(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>T series V2 (T mini) _Enclosure</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>T series V2 (T mini) _Enclosure_1</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>T series V2 (T mini) _Enclosure_2</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>TUBE CLAMP</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>UPPER DECK PLATE</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>USB C</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>WHEEL SIDE SUPPORT</td><td><span class='tag'>verify</span></td><td></td></tr>
+<tr class=''><td>WHEEL SIDE SUPPORT v4(Mirror)</td><td><span class='tag'>verify</span></td><td></td></tr></tbody></table></div></div>
+</div></section>
+
+<section><div class="wrap">
+<h2>What the design team should do</h2>
+<div class="card"><ol>
+<li><b>Assign real materials to the red rows first</b> — battery, pump, LIDAR, Herelink, GPS, connectors, capacitors, diodes. For purchased parts, the honest fix is a vendor-datasheet <b>mass override</b> in CAD rather than a density guess.</li>
+<li><b>Re-apply materials to every mirrored body.</b> Mirrors silently reset to Steel in this toolchain — check each one after mirroring.</li>
+<li><b>Fix the two mislabelled screws</b> (assigned Aluminum, named steel).</li>
+<li><b>Turn the four "80.5G DUMMY WEIGHT" names into real mass properties</b> — the weight currently lives only in the part's name, which no software can read.</li>
+<li><b>Sanity target:</b> after the pass, the assembly's computed mass should come out near the scale-measured <b>12.0 kg</b>. If it doesn't, the materials are still wrong.</li>
+</ol></div>
+<div class="note"><b>For the record:</b> the flight simulation was never affected — it uses the measured 12.0 kg (and the weighed 0.55 kg UT gauge), and its accuracy was proven in flight. This audit is about making the <i>CAD's own</i> numbers trustworthy for the next design.</div>
+</div></section>
+
+<footer>SPS · Gen5 CAD material audit · parsed from GEN5 V1 MAIN.step (126 MB, 1.68 M entities) · counts cross-checked against an independent audit on the simulation PC — identical: 233 / 28 / 205</footer>
+<script>
+document.getElementById('f').addEventListener('input',function(){
+ var q=this.value.toLowerCase();
+ document.querySelectorAll('#steel tbody tr').forEach(function(r){
+  r.style.display = r.textContent.toLowerCase().includes(q)?'':'none';});
+});
+</script>
+</body></html>
