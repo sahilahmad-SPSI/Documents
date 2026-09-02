@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gen5 Weekly Update</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --ground:   #edf1f3;
+    --surface:  #ffffff;
+    --sunken:   #e3e9ec;
+    --ink:      #121a1f;
+    --muted:    #5e717c;
+    --faint:    #8a9aa3;
+    --line:     #cbd6dc;
+    --line-soft:#dde5e9;
+    --accent:   #10617f;
+    --accent-soft: #e2eef3;
+    --pass:     #2e6a4f;
+    --warn:     #8c6410;
+    --fail:     #a03a22;
+    --code-bg:  #12242c;
+    --code-ink: #d6e6ec;
+    --code-dim: #7c9aa6;
+
+    --f-display: "IBM Plex Sans Condensed", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --f-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+    --measure: 68ch;
+    --pad: clamp(1.1rem, 3vw, 2.6rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#0d1418; --surface:#141e23; --sunken:#101a1e;
+      --ink:#d9e3e8; --muted:#90a4ad; --faint:#6b7f88;
+      --line:#253238; --line-soft:#1d282d;
+      --accent:#55b4d8; --accent-soft:#17303a;
+      --pass:#6fc196; --warn:#d9a53f; --fail:#e08163;
+      --code-bg:#0a1417; --code-ink:#cfe0e6; --code-dim:#6d8892;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#0d1418; --surface:#141e23; --sunken:#101a1e;
+    --ink:#d9e3e8; --muted:#90a4ad; --faint:#6b7f88;
+    --line:#253238; --line-soft:#1d282d;
+    --accent:#55b4d8; --accent-soft:#17303a;
+    --pass:#6fc196; --warn:#d9a53f; --fail:#e08163;
+    --code-bg:#0a1417; --code-ink:#cfe0e6; --code-dim:#6d8892;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .masthead-in { max-width: 1000px; margin: 0 auto; padding: 0 var(--pad); }
+  .brand {
+    display: flex; align-items: baseline; gap: .85rem; flex-wrap: wrap;
+    padding: 1.15rem 0 .9rem;
+  }
+  .brand h1 {
+    font-family: var(--f-display); font-weight: 700; font-size: 1.32rem;
+    letter-spacing: .012em; margin: 0; text-wrap: balance;
+  }
+  .brand .sub {
+    font-family: var(--f-mono); font-size: .705rem; color: var(--faint);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  .tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    appearance: none; border: 0; background: none;
+    font-family: var(--f-display); font-weight: 600; font-size: .93rem;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
+    padding: .62rem 1.05rem .72rem; cursor: pointer;
+    border-bottom: 2.5px solid transparent; white-space: nowrap;
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; border-radius: 2px; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 0 var(--pad) 5rem; }
+  .panel[hidden] { display: none; }
+  .panel { padding-top: 2.1rem; }
+
+  .lede {
+    max-width: var(--measure); font-size: 1.045rem; color: var(--muted); margin: 0 0 2.3rem;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  section { margin: 0 0 3rem; }
+  .eyebrow {
+    font-family: var(--f-mono); font-size: .69rem; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--accent); display: block; margin: 0 0 .45rem;
+  }
+  h2 {
+    font-family: var(--f-display); font-weight: 700; font-size: 1.42rem;
+    margin: 0 0 .6rem; padding-bottom: .5rem; border-bottom: 1px solid var(--line);
+    letter-spacing: .008em; text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--f-display); font-weight: 600; font-size: 1.07rem;
+    margin: 1.75rem 0 .45rem; letter-spacing: .01em; text-wrap: balance;
+  }
+  p, ul, ol { max-width: var(--measure); }
+  p { margin: 0 0 .95rem; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; }
+  li { margin-bottom: .4rem; }
+
+  code {
+    font-family: var(--f-mono); font-size: .855em; background: var(--sunken);
+    padding: .1em .34em; border-radius: 2px; border: 1px solid var(--line-soft);
+  }
+
+  .cmd {
+    background: var(--code-bg); color: var(--code-ink);
+    font-family: var(--f-mono); font-size: .8rem; line-height: 1.75;
+    padding: .95rem 1.1rem; border-radius: 3px; overflow-x: auto;
+    margin: 0 0 1.15rem; border-left: 3px solid var(--accent);
+  }
+  .cmd .c { color: var(--code-dim); }
+
+  .twrap { overflow-x: auto; margin: 0 0 1.3rem; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+  th, td { padding: .58rem .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line-soft); }
+  th {
+    font-family: var(--f-mono); font-size: .68rem; letter-spacing: .085em;
+    text-transform: uppercase; color: var(--muted); font-weight: 500;
+    background: var(--sunken); white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ---------- contents strip ---------- */
+  .contents {
+    display: grid; gap: 0; margin: 0 0 3.2rem;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    border: 1px solid var(--line); border-radius: 3px;
+    background: var(--surface); overflow: hidden;
+  }
+  .contents a {
+    display: block; padding: .95rem 1.1rem; text-decoration: none;
+    border-right: 1px solid var(--line-soft); color: var(--ink);
+  }
+  .contents a:last-child { border-right: 0; }
+  .contents a:hover { background: var(--accent-soft); }
+  .contents a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .contents .n {
+    font-family: var(--f-mono); font-size: .68rem; letter-spacing: .1em;
+    color: var(--accent); display: block; margin-bottom: .15rem;
+  }
+  .contents .t { font-family: var(--f-display); font-weight: 600; font-size: 1rem; }
+
+  /* ---------- the three updates ---------- */
+  .update {
+    border-top: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 3px;
+    padding: 1.9rem clamp(1.1rem, 2.6vw, 2.1rem) 1.6rem;
+    margin: 0 0 2.6rem;
+    box-shadow: 0 1px 2px rgba(18, 26, 31, .05);
+  }
+  .update-head {
+    display: grid; grid-template-columns: auto 1fr; gap: .1rem 1.05rem;
+    align-items: center;
+    padding-bottom: .9rem; margin-bottom: 1.3rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .update-num {
+    font-family: var(--f-display); font-weight: 700;
+    font-size: 1.55rem; line-height: 1;
+    color: var(--surface); background: var(--accent);
+    width: 2.5rem; height: 2.5rem; border-radius: 3px;
+    display: grid; place-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .update-head h2 {
+    border-bottom: 0; padding-bottom: 0; margin: 0;
+    font-size: clamp(1.25rem, 2.6vw, 1.55rem);
+  }
+  .update-head .kick {
+    grid-column: 2;
+    font-family: var(--f-mono); font-size: .67rem; letter-spacing: .11em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .update h3:first-of-type { margin-top: 0; }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: .8rem 1rem; margin: 0 0 1.25rem; max-width: var(--measure); font-size: .93rem;
+  }
+  .note.warn { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, var(--surface)); }
+  .note.stop { border-left-color: var(--fail); background: color-mix(in srgb, var(--fail) 10%, var(--surface)); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl {
+    font-family: var(--f-mono); font-size: .66rem; letter-spacing: .12em;
+    text-transform: uppercase; display: block; margin-bottom: .28rem; color: var(--accent);
+  }
+  .note.warn .lbl { color: var(--warn); }
+  .note.stop .lbl { color: var(--fail); }
+
+  ol.steps { list-style: none; padding: 0; counter-reset: s; max-width: none; }
+  ol.steps > li {
+    counter-increment: s; display: grid; grid-template-columns: 2rem 1fr;
+    gap: .1rem 1rem; padding: 0 0 1.4rem;
+  }
+  ol.steps > li::before {
+    content: counter(s);
+    font-family: var(--f-mono); font-size: .8rem; font-weight: 600; color: var(--accent);
+    border: 1px solid var(--line); border-radius: 50%;
+    width: 1.7rem; height: 1.7rem; display: grid; place-items: center; background: var(--surface);
+  }
+  ol.steps > li > * { grid-column: 2; }
+  ol.steps h3 { margin-top: .05rem; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1.1rem;
+    font-size: .8rem; color: var(--faint); max-width: var(--measure);
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div class="brand">
+      <h1>Gen5 Weekly Update</h1>
+      <span class="sub">Week ending 2 September 2026</span>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-updates" aria-controls="p-updates" aria-selected="true">Updates</button>
+      <button class="tab" role="tab" id="tab-testing" aria-controls="p-testing" aria-selected="false" tabindex="-1">Testing</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ==================== UPDATES ==================== -->
+<div class="panel" id="p-updates" role="tabpanel" aria-labelledby="tab-updates" tabindex="0">
+
+  <p class="lede">Three developments to report this week on the Gen5 inspection simulation:
+  <strong>propeller-strike crash detection</strong>, now active during normal flight;
+  <strong>the onboard forward camera</strong>, aimed and verified; and
+  <strong>a substantially more detailed plant world</strong>. Each has been tested, and the results
+  are given below.</p>
+
+  <nav class="contents" aria-label="The three updates">
+    <a href="#u1"><span class="n">Update 1</span><span class="t">Crash detection</span></a>
+    <a href="#u2"><span class="n">Update 2</span><span class="t">FPV camera</span></a>
+    <a href="#u3"><span class="n">Update 3</span><span class="t">New plant world</span></a>
+  </nav>
+
+  <!-- ---------- 1 ---------- -->
+  <article class="update" id="u1">
+    <header class="update-head">
+      <div class="update-num">1</div>
+      <h2>Propeller-strike crash detection</h2>
+      <span class="kick">Now active by default in both flight worlds</span>
+    </header>
+
+    <p>Previously the aircraft could not crash. An impact stopped it dead and it carried on flying,
+    which was unrealistic and made collision behaviour impossible to demonstrate. Prop-strike
+    behaviour existed, but only inside a separate test world that had to be selected deliberately.</p>
+
+    <p><strong>It is now active in normal flight.</strong> When a propeller's swept disc contacts
+    structure &mdash; the chimney, a building or the ground &mdash; with the propeller turning, all
+    four rotors stop. Thrust is lost, the aircraft falls, and the autopilot disarms itself, reporting
+    <code>Crash: Disarming</code>.</p>
+
+    <p>The trigger requires the propeller to be turning above 150&nbsp;rad/s, roughly a third of hover
+    speed, and the contact to persist for three consecutive physics steps. Those two conditions
+    distinguish a genuine strike from a light graze or a propeller that is merely windmilling.</p>
+
+    <h3>Test results</h3>
+    <p>Two questions had to be answered: does it fire when it should, and does it stay silent when it
+    should. Both flight worlds were tested this week.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Test</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td>Deliberate chimney strike</td><td>Rotors stopped, aircraft fell from 20 m, disarmed</td></tr>
+          <tr><td>Deliberate building strike</td><td>Rotors stopped, disarmed</td></tr>
+          <tr><td>Deliberate strike, new plant world</td><td>Rotors stopped, disarmed</td></tr>
+          <tr><td>Chimney inspection mission &times; 5</td><td class="num">No false trigger</td></tr>
+          <tr><td>Three take-offs and landings</td><td class="num">No false trigger</td></tr>
+          <tr><td>Armed ground handling</td><td class="num">No false trigger</td></tr>
+          <tr><td>Full camera lap of the new world</td><td class="num">No false trigger</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Detection behaved identically in both flight worlds, matching the previously recorded results
+    from the dedicated test world to within a few millimetres of approach distance.</p>
+
+    <h3>Scope of the model</h3>
+    <p>The propellers stop and the aircraft falls. <strong>No structural damage is modelled</strong> &mdash;
+    the airframe and propellers remain intact on the ground, because the physics engine provides no
+    means of representing a component breaking. What is simulated is the consequence of a strike, not
+    the damage itself, and no conclusion about surviving a real impact should be drawn from the
+    aircraft appearing undamaged.</p>
+
+    <p>Recovery after a crash is a single command, returning the simulation to a flight-ready state in
+    approximately 20 seconds.</p>
+  </article>
+
+  <!-- ---------- 2 ---------- -->
+  <article class="update" id="u2">
+    <header class="update-head">
+      <div class="update-num">2</div>
+      <h2>Onboard forward camera (FPV)</h2>
+      <span class="kick">Aimed, verified and publishing live</span>
+    </header>
+
+    <p>The aircraft carries a camera on the nose deck looking forward along the airframe, published
+    live throughout the flight. It provides the view an inspection pilot would work from, and it is
+    the view in which a chimney contact is actually judged.</p>
+
+    <h3>Framing</h3>
+    <p>The camera position was selected against three stated criteria rather than aimed by eye, and
+    each was verified by projecting the aircraft geometry into the camera frame:</p>
+    <ul>
+      <li>the <strong>orange-tipped UT probe sits low in the frame</strong>, keeping the contact point
+      visible throughout a chimney touch;</li>
+      <li>the <strong>horizon sits in the upper half</strong>, preserving attitude reference for the
+      pilot;</li>
+      <li>the landing gear is kept clear of the centre of the image.</li>
+    </ul>
+    <p>The camera is mounted 180&nbsp;mm forward and 250&nbsp;mm above the aircraft centre, pitched
+    2&deg; below horizontal &mdash; close to level, because the probe disc sits high on the airframe.</p>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Property</th><th class="num">Value</th></tr></thead>
+        <tbody>
+          <tr><td>Topic</td><td class="num">/gen5/fpv</td></tr>
+          <tr><td>Resolution</td><td class="num">1280 &times; 720</td></tr>
+          <tr><td>Frame rate</td><td class="num">30 Hz</td></tr>
+          <tr><td>View range</td><td class="num">0.05 &ndash; 500 m</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The view can be displayed in the simulator window during flight, and individual frames can be
+    captured to file for reporting.</p>
+  </article>
+
+  <!-- ---------- 3 ---------- -->
+  <article class="update" id="u3">
+    <header class="update-head">
+      <div class="update-num">3</div>
+      <h2>New plant world</h2>
+      <span class="kick">Detailed inspection site, flight-tested</span>
+    </header>
+
+    <p>A considerably more detailed representation of the inspection site is now available. It
+    contains <strong>12 models and 78 collision bodies</strong>, compared with 2 and 1 in the world
+    used to date &mdash; the same site, with the 45&nbsp;m striped chimney, the buildings and the gas
+    holder, but with real geometry throughout rather than a largely bare ground plane.</p>
+
+    <p>It has been flown this week: a complete camera lap end to end, recorded clean, and a deliberate
+    propeller strike within it to confirm crash detection behaves the same there as in the established
+    world.</p>
+
+    <h3>Which world is used for what</h3>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>World</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="num">gen5_plant_v3</td>
+            <td><strong>Demonstration.</strong> The detailed site, for presentation and visual review.</td>
+          </tr>
+          <tr>
+            <td class="num">gen5_plant</td>
+            <td><strong>Validation.</strong> Every measured and reported result was flown here, so it
+                remains the reference world for any figure that must stand up to scrutiny.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Both worlds now carry crash detection and the forward camera, so the two differ only in the
+    level of site detail.</p>
+  </article>
+</div>
+
+<!-- ==================== TESTING ==================== -->
+<div class="panel" id="p-testing" role="tabpanel" aria-labelledby="tab-testing" tabindex="0" hidden>
+
+  <p class="lede">Everything below was run on this machine before it was written down.
+  Open a terminal and work top to bottom &mdash; <strong>the first block is needed once per
+  session</strong>, the rest is per flight.</p>
+
+  <section>
+    <span class="eyebrow">Step 0</span>
+    <h2>Set up the terminal</h2>
+    <div class="cmd">cd ~/gz_ws/src/GazebooAssets
+
+export GZ_SIM_RESOURCE_PATH="$PWD/Models/converted:$PWD/Gen5Flight/models:$PWD/InspectionYard/exports:$GZ_SIM_RESOURCE_PATH"
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/gz_ws/build:$PWD/MagnetPlugin/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"</div>
+    <p>The second line is what lets the crash detector load. Without it the world still opens, but
+    a prop strike does nothing.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">The quick way</span>
+    <h2>One command for the whole stack</h2>
+    <div class="cmd"><span class="c"># the new showcase world</span>
+Gen5Flight/scripts/sim_stack.sh reset --world gen5_plant_v3.sdf
+
+<span class="c"># or the validated flight world (the default)</span>
+Gen5Flight/scripts/sim_stack.sh reset</div>
+    <p>It opens the world and the autopilot in their own windows, waits until both are genuinely
+    ready, and prints <strong>READY TO FLY</strong>. Use the same command after a crash.</p>
+    <div class="cmd">Gen5Flight/scripts/sim_stack.sh status   <span class="c"># what is running</span>
+Gen5Flight/scripts/sim_stack.sh stop     <span class="c"># shut it down cleanly</span></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">The manual way</span>
+    <h2>Load the world and start the simulation</h2>
+    <ol class="steps">
+      <li>
+        <h3>Start the world &mdash; terminal 1</h3>
+        <div class="cmd"><span class="c"># the new detailed world</span>
+gz sim -r Gen5Flight/worlds/gen5_plant_v3.sdf
+
+<span class="c"># the validated one</span>
+gz sim -r Gen5Flight/worlds/gen5_plant.sdf</div>
+        <p>Wait until the drone and the striped chimney are on screen.</p>
+      </li>
+      <li>
+        <h3>Start the autopilot &mdash; terminal 2</h3>
+        <div class="cmd">Gen5Flight/scripts/start_sitl.sh</div>
+        <p>Wait for the <code>STABILIZE&gt;</code> prompt.</p>
+      </li>
+      <li>
+        <h3>Wind, if you want it &mdash; terminal 3</h3>
+        <div class="cmd">python3 Gen5Flight/scripts/wind_panel.py</div>
+        <p>Tick <strong>Enable wind</strong>, set speed and direction, press <strong>Apply</strong>.
+        Wind takes about 30 seconds to arrive.</p>
+        <div class="note warn">
+          <span class="lbl">Every time the world restarts</span>
+          <p>Restarting switches the wind off. The panel tells you in red, but it does not come back
+          on its own &mdash; <strong>press Apply again</strong>.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <span class="eyebrow">Testing the camera</span>
+    <h2>Put the FPV view on screen</h2>
+    <p>In the <strong>Gazebo</strong> window:</p>
+    <ol>
+      <li>open the <strong>&#8942; menu</strong>, top right;</li>
+      <li>search for <strong>Image Display</strong> and add it;</li>
+      <li>choose the topic <strong><code>/gen5/fpv</code></strong>.</li>
+    </ol>
+    <p>The orange-tipped probe should sit in the lower centre of the picture with the horizon up in
+    the top half. To save a single frame to a file instead:</p>
+    <div class="cmd">python3 Gen5Flight/scripts/grab_fpv.py ~/fpv_shot.png</div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Testing the crash</span>
+    <h2>Make it hit the chimney on purpose</h2>
+    <p>This flies the aircraft into the chimney <strong>side-on</strong> so a propeller disc meets the
+    steel, then records what happened.</p>
+    <div class="cmd"><span class="c"># bring up the crash stack on the flight world</span>
+bash PropStrikePlugin/scripts/start_stack.sh "$PWD/Gen5Flight/worlds/gen5_plant.sdf"
+
+<span class="c"># fly the strike — chimney is at N 40, E 25</span>
+PROPSTRIKE_WORLD=gen5_plant python3 PropStrikePlugin/scripts/crash_battery.py strike \
+    /tmp/strike.json --target 40,25 --radius 2.0 --speed 4.0 --alt 20 --yaw-offset -90
+
+<span class="c"># tidy up</span>
+bash PropStrikePlugin/scripts/stop_stack.sh</div>
+    <p>You should see <code>Crash: Disarming</code> in the output, and <code>"latched": true</code>
+    in <code>/tmp/strike.json</code>. Swap the target to <code>0,25</code> with
+    <code>--radius 7.35 --alt 5</code> to hit the building instead.</p>
+
+    <div class="note">
+      <span class="lbl">Why side-on</span>
+      <p><code>--yaw-offset -90</code> turns the aircraft so the <strong>propellers</strong> lead.
+      A nose-first approach will <em>not</em> trigger: the forward UT probe contacts first and holds
+      the propellers clear of the surface, exactly as the real aircraft is designed to. That is
+      correct behaviour rather than a fault, and it is worth knowing before running the test.</p>
+    </div>
+
+    <h3>Check nothing false-triggers</h3>
+    <div class="cmd"><span class="c"># three take-offs and landings plus ground handling — nothing should latch</span>
+PROPSTRIKE_WORLD=gen5_plant python3 PropStrikePlugin/scripts/crash_battery.py landings \
+    /tmp/landings.json --n 3 --alt 8</div>
+    <p>Every cycle should report <code>latched: false</code>.</p>
+  </section>
+
+  <footer>
+    <p>Fuller detail lives in <strong>SIM_HANDBOOK.html</strong> (worlds, startup, rovers) and
+    <strong>GEN5_MODEL_SPEC.html</strong> (drone specifications and centre of gravity), both in this
+    same folder.</p>
+  </footer>
+</div>
+
+</main>
+
+<script>
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (focus) tab.focus();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { select(tab, false); });
+      tab.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length], true); }
+        else if (e.key === 'Home') { e.preventDefault(); select(tabs[0], true); }
+        else if (e.key === 'End')  { e.preventDefault(); select(tabs[tabs.length - 1], true); }
+      });
+    });
+  })();
+</script>
+</body>
+</html>
