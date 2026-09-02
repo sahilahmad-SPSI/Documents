@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gen5 Simulation Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --ground:   #edf1f3;
+    --surface:  #ffffff;
+    --sunken:   #e3e9ec;
+    --ink:      #121a1f;
+    --muted:    #5e717c;
+    --faint:    #8a9aa3;
+    --line:     #cbd6dc;
+    --line-soft:#dde5e9;
+    --accent:   #10617f;
+    --accent-soft: #e2eef3;
+    --pass:     #2e6a4f;
+    --warn:     #8c6410;
+    --fail:     #a03a22;
+    --code-bg:  #12242c;
+    --code-ink: #d6e6ec;
+    --code-dim: #7c9aa6;
+
+    --f-display: "IBM Plex Sans Condensed", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --f-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+    --measure: 68ch;
+    --pad: clamp(1.1rem, 3vw, 2.6rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #0d1418;
+      --surface:  #141e23;
+      --sunken:   #101a1e;
+      --ink:      #d9e3e8;
+      --muted:    #90a4ad;
+      --faint:    #6b7f88;
+      --line:     #253238;
+      --line-soft:#1d282d;
+      --accent:   #55b4d8;
+      --accent-soft: #17303a;
+      --pass:     #6fc196;
+      --warn:     #d9a53f;
+      --fail:     #e08163;
+      --code-bg:  #0a1417;
+      --code-ink: #cfe0e6;
+      --code-dim: #6d8892;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:   #0d1418;
+    --surface:  #141e23;
+    --sunken:   #101a1e;
+    --ink:      #d9e3e8;
+    --muted:    #90a4ad;
+    --faint:    #6b7f88;
+    --line:     #253238;
+    --line-soft:#1d282d;
+    --accent:   #55b4d8;
+    --accent-soft: #17303a;
+    --pass:     #6fc196;
+    --warn:     #d9a53f;
+    --fail:     #e08163;
+    --code-bg:  #0a1417;
+    --code-ink: #cfe0e6;
+    --code-dim: #6d8892;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- masthead + tabs ---------- */
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .masthead-in {
+    max-width: 1180px; margin: 0 auto; padding: 0 var(--pad);
+  }
+  .brand {
+    display: flex; align-items: baseline; gap: .8rem;
+    flex-wrap: wrap;
+    padding: 1.15rem 0 .9rem;
+  }
+  .brand h1 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 1.32rem;
+    letter-spacing: .012em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .brand .sub {
+    font-family: var(--f-mono);
+    font-size: .705rem;
+    color: var(--faint);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .tabs {
+    display: flex; gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    appearance: none; border: 0; background: none;
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: .93rem;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .62rem 1.05rem .72rem;
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    white-space: nowrap;
+    transition: color .12s ease, border-color .12s ease;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -3px;
+    border-radius: 2px;
+  }
+
+  /* ---------- layout ---------- */
+  main { max-width: 1180px; margin: 0 auto; padding: 0 var(--pad) 5rem; }
+  .panel[hidden] { display: none; }
+  .panel { padding-top: 2.1rem; }
+
+  .lede {
+    max-width: var(--measure);
+    font-size: 1.045rem;
+    color: var(--muted);
+    margin: 0 0 2.2rem;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  section { margin: 0 0 2.9rem; }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: .69rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 .45rem;
+    display: block;
+  }
+  h2 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 1.42rem;
+    letter-spacing: .008em;
+    margin: 0 0 .55rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--line);
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: 1.09rem;
+    margin: 1.9rem 0 .5rem;
+    letter-spacing: .01em;
+    text-wrap: balance;
+  }
+  p, ul, ol { max-width: var(--measure); }
+  p { margin: 0 0 .95rem; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; }
+  li { margin-bottom: .38rem; }
+  a { color: var(--accent); }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: .855em;
+    background: var(--sunken);
+    padding: .1em .34em;
+    border-radius: 2px;
+    border: 1px solid var(--line-soft);
+  }
+
+  /* ---------- command blocks ---------- */
+  .cmd {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: var(--f-mono);
+    font-size: .8rem;
+    line-height: 1.72;
+    padding: .95rem 1.1rem;
+    border-radius: 3px;
+    overflow-x: auto;
+    margin: 0 0 1.15rem;
+    border-left: 3px solid var(--accent);
+  }
+  .cmd .c { color: var(--code-dim); }
+  .cmd b { color: #7fd0ee; font-weight: 500; }
+
+  /* ---------- tables ---------- */
+  .twrap { overflow-x: auto; margin: 0 0 1.3rem; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+  th, td { padding: .58rem .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line-soft); }
+  th {
+    font-family: var(--f-mono);
+    font-size: .68rem; letter-spacing: .085em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+    background: var(--sunken);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.path { font-family: var(--f-mono); font-size: .8rem; white-space: nowrap; }
+
+  /* ---------- chips ---------- */
+  .chip {
+    display: inline-block;
+    font-family: var(--f-mono);
+    font-size: .64rem; letter-spacing: .09em; text-transform: uppercase;
+    padding: .16rem .42rem; border-radius: 2px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .chip.flight { color: var(--accent); }
+  .chip.rover  { color: var(--pass); }
+  .chip.diag   { color: var(--warn); }
+  .chip.arch   { color: var(--faint); }
+
+  /* ---------- spec grid ---------- */
+  .spec { border-top: 1px solid var(--line); margin: 0 0 1.4rem; max-width: var(--measure); }
+  .spec div {
+    display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 1rem;
+    padding: .42rem 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .spec dt, .spec .k { color: var(--muted); font-size: .88rem; }
+  .spec .v { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: .855rem; text-align: right; }
+
+  /* ---------- callouts ---------- */
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: .8rem 1rem;
+    margin: 0 0 1.25rem;
+    max-width: var(--measure);
+    font-size: .93rem;
+  }
+  .note.warn { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, var(--surface)); }
+  .note.stop { border-left-color: var(--fail); background: color-mix(in srgb, var(--fail) 10%, var(--surface)); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl {
+    font-family: var(--f-mono); font-size: .66rem; letter-spacing: .12em;
+    text-transform: uppercase; display: block; margin-bottom: .28rem;
+  }
+  .note .lbl        { color: var(--accent); }
+  .note.warn .lbl   { color: var(--warn); }
+  .note.stop .lbl   { color: var(--fail); }
+
+  /* ---------- step list ---------- */
+  ol.steps { list-style: none; padding: 0; counter-reset: s; max-width: none; }
+  ol.steps > li {
+    counter-increment: s;
+    display: grid; grid-template-columns: 2rem 1fr; gap: .1rem 1rem;
+    padding: 0 0 1.35rem;
+  }
+  ol.steps > li::before {
+    content: counter(s);
+    font-family: var(--f-mono); font-size: .8rem; font-weight: 600;
+    color: var(--accent);
+    border: 1px solid var(--line); border-radius: 50%;
+    width: 1.7rem; height: 1.7rem;
+    display: grid; place-items: center;
+    background: var(--surface);
+  }
+  ol.steps > li > * { grid-column: 2; }
+  ol.steps h3 { margin-top: .05rem; }
+
+  .cards { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); margin: 0 0 1.5rem; }
+  .card { border: 1px solid var(--line); border-radius: 3px; padding: 1rem 1.1rem; background: var(--surface); }
+  .card h3 { margin: 0 0 .1rem; font-size: 1.02rem; }
+  .card .role { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: .55rem; }
+  .card p { font-size: .89rem; margin-bottom: .55rem; max-width: none; }
+  .card .spec { max-width: none; margin-bottom: 0; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 3rem; padding-top: 1.1rem;
+    font-size: .8rem; color: var(--faint);
+    max-width: var(--measure);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-in">
+    <div class="brand">
+      <h1>Gen5 Simulation Handbook</h1>
+      <span class="sub">gz-sim 8 Harmonic &middot; ArduPilot SITL &middot; no ROS</span>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Handbook sections">
+      <button class="tab" role="tab" id="tab-maps" aria-controls="p-maps" aria-selected="true">Maps</button>
+      <button class="tab" role="tab" id="tab-model" aria-controls="p-model" aria-selected="false" tabindex="-1">Model</button>
+      <button class="tab" role="tab" id="tab-summary" aria-controls="p-summary" aria-selected="false" tabindex="-1">Summary</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ==================== MAPS ==================== -->
+<div class="panel" id="p-maps" role="tabpanel" aria-labelledby="tab-maps" tabindex="0">
+
+  <p class="lede">Every world in the project, and how to bring one up. The flight worlds carry
+  the drone and the plant; the rig worlds carry one rover against one steel target.
+  <strong>Only two worlds matter for a demo</strong> &mdash; <code>gen5_plant.sdf</code> to fly,
+  and whichever rig world shows the rover you want to talk about.</p>
+
+  <section>
+    <span class="eyebrow">Before anything else</span>
+    <h2>Set up the terminal</h2>
+    <p>Once per session. Most of this already lives in <code>~/.bashrc</code>; running it
+    again is harmless.</p>
+    <div class="cmd"><span class="c"># everything below assumes you are here</span>
+cd ~/gz_ws/src/GazebooAssets
+
+export GZ_SIM_RESOURCE_PATH="$PWD/Models/converted:$PWD/Gen5Flight/models:$PWD/InspectionYard/exports:$GZ_SIM_RESOURCE_PATH"
+export GZ_SIM_SYSTEM_PLUGIN_PATH="$HOME/gz_ws/build:$PWD/MagnetPlugin/build:$GZ_SIM_SYSTEM_PLUGIN_PATH"</div>
+    <p>The first path lets Gazebo find the models; the second lets it find the two C++
+    plugins &mdash; the magnet force and the prop-strike crash detector. Skip them and the
+    world loads with invisible models and no magnetism.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Flight worlds</span>
+    <h2>Worlds that carry the drone</h2>
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th>World</th><th>Kind</th><th>What it is for</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="path">gen5_plant.sdf</td>
+            <td><span class="chip flight">Flight</span></td>
+            <td><strong>The validated flight world.</strong> Every validated mission has flown here.
+                Use it for anything that must be defensible.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_plant_v3.sdf</td>
+            <td><span class="chip flight">Showcase</span></td>
+            <td>Approved showcase &mdash; the same site with far more detail (12 models, 78 collision
+                bodies against the flight world's 2 and 1). Prettier; use it to impress, not to prove.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_plant_v2.sdf</td>
+            <td><span class="chip arch">Archived</span></td>
+            <td>Previous showcase, kept as a fallback.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_hover.sdf</td>
+            <td><span class="chip flight">Flight</span></td>
+            <td>Bare ground plane. Hover validation and rotor-speed checks &mdash; nothing to hit.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_plant_crashdemo.sdf</td>
+            <td><span class="chip diag">Crash</span></td>
+            <td>Prop-strike crash demo: a strike latches the rotors and the aircraft falls.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_plant_crashdiag.sdf</td>
+            <td><span class="chip diag">Diagnostic</span></td>
+            <td>Same, but the detector runs in <em>detect-only</em> &mdash; it logs every prop-disc
+                contact and never brakes. This is how "zero strikes" gets proven by a detector that
+                would have fired.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_openloop_diag.sdf</td>
+            <td><span class="chip diag">Diagnostic</span></td>
+            <td>Open-loop free-air test &mdash; rotors commanded directly, no autopilot.</td>
+          </tr>
+          <tr>
+            <td class="path">gen5_zerog_diag.sdf</td>
+            <td><span class="chip diag">Diagnostic</span></td>
+            <td>Gravity off. Isolates aerodynamic and plugin forces from weight.</td>
+          </tr>
+          <tr>
+            <td class="path">contact_unit_diag.sdf</td>
+            <td><span class="chip diag">Diagnostic</span></td>
+            <td>Contact-sensor unit test.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What is inside the plant</h3>
+    <p>A 150&nbsp;&times;&nbsp;150&nbsp;m site holding a 45&nbsp;m striped steel chimney, a medium
+    building, a small building and a gas holder. The chimney is <em>tapered</em> &mdash; the mission
+    code reads its radius per segment rather than assuming one, which is why the touch works at any
+    height. The drone spawns nose-east with its nose camera on <code>/gen5/fpv</code>.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Rig worlds</span>
+    <h2>Worlds that carry a rover</h2>
+    <p>A rig world is one rover, one steel target, and nothing else. That is deliberate: a hold
+    result means "the magnets carried it", and anything else in the scene would muddy that.
+    There are <strong>203</strong> rover worlds and <strong>35</strong> orbit worlds, because each
+    pull force, diameter and orientation is its own world.</p>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th>Family</th><th>Rover</th><th>What varies across the family</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="path">v22*</td><td>OMNI</td>
+              <td>The current acceptance battery. <code>dcA</code>/<code>daA</code> = seeded
+                  circumferential / axial, <code>flat*</code> = flat plate, <code>*_up</code>/<code>*_inv</code>
+                  = upright or hanging underneath, <code>50/55/60kgf</code> = magnet strength.</td></tr>
+          <tr><td class="path">hold_*, crawl_*</td><td>OMNI</td>
+              <td>Older static-hold and driven-crawl worlds. <code>hold_pipe_inv_v4_55kgf.sdf</code> is
+                  the upside-down &Oslash;500 hold that passed.</td></tr>
+          <tr><td class="path">dynaflux_v5_*, v6_*</td><td>Dyna Flux</td>
+              <td>Exact-CAD globe wheel. <code>pipe</code>/<code>flat</code>/<code>axial</code> target,
+                  <code>held</code>/<code>free</code> inspection head, wheel profile (<code>sph75</code>,
+                  <code>cyl75</code>, <code>band75</code>).</td></tr>
+          <tr><td class="path">orbit4_cycle_*</td><td>Orbit</td>
+              <td>Full inspection cycle. <code>stiff</code>/<code>ctr</code>/<code>soft</code> = suspension
+                  spring rate. <code>orbit4_cycle_stiff_dt1ms</code> is the permanent default.</td></tr>
+          <tr><td class="path">diag_*</td><td>any</td>
+              <td>Deliberately separated diagnostic sweeps. <strong>Never</strong> quote a result from a
+                  <code>diag_</code> world as an acceptance result.</td></tr>
+          <tr><td class="path">rover_showcase.sdf</td><td>OMNI</td>
+              <td>The one built to look at: a rover on top of a pipe and one hanging underneath it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Starting up</span>
+    <h2>Bring the simulation up</h2>
+
+    <h3>The short way, after a crash or a bad start</h3>
+    <div class="cmd">Gen5Flight/scripts/sim_stack.sh reset      <span class="c"># world + autopilot, ~20 s</span>
+Gen5Flight/scripts/sim_stack.sh status     <span class="c"># what is running, which ports</span>
+Gen5Flight/scripts/sim_stack.sh stop       <span class="c"># kill only what it started</span></div>
+    <p>It opens the world and the autopilot in their own terminal windows, waits for both to be
+    genuinely ready, and prints <strong>READY TO FLY</strong>. Add <code>--bridge</code> if you are
+    flying on the transmitter, or <code>--world gen5_plant_v3.sdf</code> for the showcase.</p>
+
+    <div class="note warn">
+      <span class="lbl">After every restart</span>
+      <p>Restarting the world switches the wind <strong>off</strong>. The panel says so in red, but it
+      does not come back by itself &mdash; <strong>press Apply again</strong>. This is exactly what went
+      wrong in the 22 August demo.</p>
+    </div>
+
+    <h3>The manual way, one terminal per part</h3>
+    <ol class="steps">
+      <li>
+        <h3>The world</h3>
+        <div class="cmd">gz sim -r Gen5Flight/worlds/gen5_plant.sdf</div>
+        <p>Wait until the drone and the striped chimney are on screen.</p>
+      </li>
+      <li>
+        <h3>The autopilot</h3>
+        <div class="cmd">Gen5Flight/scripts/start_sitl.sh</div>
+        <p>Wait for the <code>STABILIZE&gt;</code> prompt. This launcher is mandatory &mdash; it sets the
+        joystick flag the transmitter dongle needs.</p>
+      </li>
+      <li>
+        <h3>The transmitter, only if you are flying by hand</h3>
+        <div class="cmd">SDL_LINUX_JOYSTICK_CLASSIC=1 python3 Gen5Flight/scripts/rc_bridge.py --check</div>
+        <p>Move every stick once. A stick that has not moved reports itself as centred wherever it
+        really is.</p>
+      </li>
+      <li>
+        <h3>Wind</h3>
+        <div class="cmd">python3 Gen5Flight/scripts/wind_panel.py            <span class="c"># window with Apply / STOP WIND</span>
+
+<span class="c"># or from the command line:</span>
+python3 Gen5Flight/scripts/set_wind.py --from-heading 0 --speed 10
+python3 Gen5Flight/scripts/set_wind.py --off</div>
+        <p>Wind takes about 30&nbsp;s to arrive and settle. Do not read a number early.</p>
+      </li>
+    </ol>
+  </section>
+</div>
+
+<!-- ==================== MODEL ==================== -->
+<div class="panel" id="p-model" role="tabpanel" aria-labelledby="tab-model" tabindex="0" hidden>
+
+  <p class="lede">Three magnetic crawlers, all converted from your STEP files with their real masses.
+  Each is driven by its own harness script rather than a joystick &mdash; the harness commands the
+  wheels, records the magnets at full rate, and writes a result file.
+  <strong>Watching one is a two-terminal job:</strong> the harness runs headless, and you attach the
+  3-D window to it.</p>
+
+  <section>
+    <span class="eyebrow">The fleet</span>
+    <h2>The three rovers</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>OMNI</h3>
+        <span class="role">Pipe &amp; plate crawler</span>
+        <p>Free rear rocker with a suspended Halbach arc case. <strong>No magnets in the wheels</strong>
+        &mdash; the pull comes from the curved case, and the free rocker is what brings both rear wheels
+        down onto the steel.</p>
+        <div class="spec">
+          <div><span class="k">Mass</span><span class="v">7.0 kg</span></div>
+          <div><span class="k">Package</span><span class="v">omniwheel_v22</span></div>
+          <div><span class="k">Inverted &Oslash;500 hold</span><span class="v">~170 N</span></div>
+          <div><span class="k">Acceptance bar</span><span class="v">39.24 N</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Orbit</h3>
+        <span class="role">Circumferential inspector</span>
+        <p>Sprung suspension on four corners, driving a full inspection cycle: pivot, orbit lap,
+        pivot back, advance along the pipe.</p>
+        <div class="spec">
+          <div><span class="k">Mass</span><span class="v">18.0 kg</span></div>
+          <div><span class="k">Package</span><span class="v">orbit11_drive4_stiff</span></div>
+          <div><span class="k">Spring rate</span><span class="v">35 409 N/m</span></div>
+          <div><span class="k">Travel</span><span class="v">0&ndash;9 mm</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Dyna Flux</h3>
+        <span class="role">Globe-wheel tank turner</span>
+        <p>Exact-CAD spherical tread. Turns on the spot on a pipe &mdash; 608&ndash;622&deg; measured.
+        <strong>Behaviour is bimodal</strong>: most runs are textbook, some let go entirely.</p>
+        <div class="spec">
+          <div><span class="k">Mass</span><span class="v">14.0 kg</span></div>
+          <div><span class="k">Package</span><span class="v">dynaflux_rig_v5/v6</span></div>
+          <div><span class="k">Wheel radius</span><span class="v">75.000 mm</span></div>
+          <div><span class="k">Track</span><span class="v">273.443 mm</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Watching one</span>
+    <h2>Attach the 3-D window to a running rover</h2>
+    <p>The harness runs the simulation headless in terminal&nbsp;A. Terminal&nbsp;B opens a viewer and
+    joins it. <strong>Both terminals must share the same <code>GZ_PARTITION</code></strong> &mdash; that
+    is the whole trick, and getting it wrong is why a viewer sometimes shows an empty world.</p>
+    <div class="cmd"><span class="c"># terminal A — the run</span>
+GZ_PARTITION=demo python3 RoverRig/scripts/run_v2.py crawl_pipe_axial crawl 20
+
+<span class="c"># terminal B — the window that joins it</span>
+GZ_PARTITION=demo gz sim -g</div>
+    <p>For a world you only want to <em>look</em> at, with no harness driving anything, one terminal
+    is enough:</p>
+    <div class="cmd">gz sim -r RoverRig/worlds/rover_showcase.sdf          <span class="c"># rover on a pipe + one hanging under it</span>
+gz sim -r RoverRig/worlds/hold_pipe_inv_v4_55kgf.sdf  <span class="c"># the upside-down hold that passed</span></div>
+    <div class="note">
+      <span class="lbl">In a hold world, nothing happening is the result</span>
+      <p>The rover simply stays put &mdash; hanging underneath a pipe on simulated magnets. That
+      stillness <em>is</em> the measurement.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Driving each rover</span>
+    <h2>Run a rover test</h2>
+
+    <h3>OMNI &mdash; hold and creep on a pipe</h3>
+    <p>The trace harness records the target's own contact sensor, the rocker angle and the magnet
+    forces, so you can tell <em>which</em> wheels are actually touching.</p>
+    <div class="cmd"><span class="c"># world key, seconds, sample interval, manifest</span>
+python3 RoverRig/scripts/run_v22_trace.py v22dcA_55kgf 900 10.0 rig_manifest_v22d.json
+
+<span class="c"># the same arm seeded axially instead of circumferentially</span>
+python3 RoverRig/scripts/run_v22_trace.py v22daA_55kgf 900 10.0 rig_manifest_v22d.json</div>
+    <p>Results land in <code>RoverRig/output/trace_&lt;world&gt;_&lt;secs&gt;s.json</code>. The
+    interesting fields are <code>convergence.rear_F_mean_N</code> (the hold), and
+    <code>contacts.arc_case_ever</code>, which must be <code>false</code> &mdash; the case is
+    <em>suspended</em> and must never touch.</p>
+    <div class="note">
+      <span class="lbl">Worth knowing</span>
+      <p>Seed the OMNI circumferentially and it <strong>turns itself axial within about 100 seconds</strong>
+      and stays there. Circumferential is not a stable state; the machine finds axial on its own.</p>
+    </div>
+
+    <h3>Orbit &mdash; the full inspection cycle</h3>
+    <div class="cmd">python3 OrbitRig/scripts/run_orbit_cycle_paired4.py \
+    --world orbit4_cycle_stiff_dt1ms \
+    --package orbit11_drive4_stiff \
+    --tag my_run --cycles 2</div>
+    <p>It scores twelve stages per run. Two of them are the ones that count:
+    <strong>S3 orbit lap</strong> and <strong>S5 advance</strong>. The pivot stages
+    (S2a/S2b/S4a/S4b) fail by design &mdash; that is the known pivot-angle scrub, a parked
+    investigation, not a regression.</p>
+
+    <h3>Dyna Flux &mdash; the tank turn</h3>
+    <div class="cmd"><span class="c"># world, mode, tread speed m/s, seconds, run tag</span>
+python3 RoverRig/scripts/dynaflux_v5_run.py dynaflux_v5_pipe_sph75_held skidv 0.026 180 MYRUN</div>
+    <div class="note warn">
+      <span class="lbl">Expect variation here</span>
+      <p>This cell is <strong>bimodal</strong>. Roughly one run in four to one in three, the rover
+      leaves the pipe entirely instead of turning on it &mdash; measured across 30 replicates, and the
+      archived older wheel does it too, so it is the pipe cell rather than the new wheel. A single run
+      proves nothing; run replicates.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">House rules</span>
+    <h2>Three rules that keep runs honest</h2>
+    <ul>
+      <li><strong>Never <code>pkill</code> by pattern.</strong> Kill by process ID, from a file.
+      A pattern on a kill line has taken down a live session on this machine. Use
+      <code>sim_stack.sh stop</code> or <code>stop_stack.sh</code>, which only kill what they started
+      and refuse to touch anything else.</li>
+      <li><strong>Check the ports before starting.</strong> <code>udp/9002</code> is bound by every
+      Gazebo world and <code>tcp/5760</code> by the autopilot. A stale autopilot holding 5760 while
+      talking to a dead world is the nastiest failure here, because everything <em>looks</em>
+      connected.</li>
+      <li><strong>Replicate anything contact-heavy.</strong> Contact simulation is not deterministic.
+      One sample is an anecdote.</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ==================== SUMMARY ==================== -->
+<div class="panel" id="p-summary" role="tabpanel" aria-labelledby="tab-summary" tabindex="0" hidden>
+
+  <p class="lede">What was built, how it was built, and how each piece works.
+  Everything here came from your CAD and your measurements &mdash;
+  <strong>the masses, the magnet pull, the motor thrust and the propeller geometry are all
+  anchored to something real</strong>, not tuned until the picture looked right.</p>
+
+  <section>
+    <span class="eyebrow">Method</span>
+    <h2>How the models were built</h2>
+    <p>Every model started as one of your STEP files. The pipeline is the same each time:
+    read the analytic CAD surfaces to get true dimensions, decimate the mesh <em>before</em>
+    the millimetre-to-metre scale step, then write the SDF with masses anchored to the real
+    machine and joints placed where the CAD puts them.</p>
+    <p>Two habits did most of the work. First, <strong>a bounding box is not a measurement</strong>
+    &mdash; wheel radii and track widths are probed off the CAD surfaces, which is how an 8.2&nbsp;%
+    oversized wheel radius was caught and corrected. Second, <strong>predict blind, then measure</strong>:
+    the number goes on the record before the run, so a match means something.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">The models</span>
+    <h2>What exists and how each one works</h2>
+
+    <h3>Gen5 drone</h3>
+    <p>A 12.000&nbsp;kg quadrotor from <code>GEN5 V1 MAIN.step</code>, carrying a 550&nbsp;g Tritex
+    UT kit and a forward probe boom. It flies on <strong>ArduPilot SITL &mdash; the same flight code as
+    a real aircraft</strong>, not a scripted animation. Thrust comes from the KDE motor bench table:
+    hover was predicted at 4&nbsp;399&nbsp;RPM from that table before flying, and the simulator settled
+    at exactly that.</p>
+    <p>Each rotor is modelled as three aerofoil blades at 120&deg;, with thrust applied at the propeller
+    disc plane rather than at the motor bell. Full specifications, the weight breakdown and how to
+    move the centre of gravity are in the companion sheet.</p>
+
+    <h3>The magnet plugin &mdash; the rovers' heart</h3>
+    <p>Gazebo has no magnetism, so it was written in C++. It pulls a link toward steel with a force
+    that fades with distance:</p>
+    <div class="cmd">F(d) = f0 &times; ( d0 / (d0 + d) )<sup>2</sup>        <span class="c"># d = gap to the steel surface</span></div>
+    <p>The curve is calibrated from two measurements <em>you</em> took on the real rover: the rear
+    magnet pulls 50&ndash;60&nbsp;kgf touching, and 20&nbsp;kgf at its 4.5&nbsp;mm riding gap. The rear
+    magnet is not a point &mdash; it is five magnets along a curved case, and the plugin models the
+    whole curve as 21 sample points. <strong>That detail is what made the upside-down pipe test finally
+    pass</strong>: same total strength, spread along the arc, holding the tail in.</p>
+    <p>It knows the target's shape (cylinder or plate) and projects the pull onto the real surface,
+    so a rover on a &Oslash;500 pipe is pulled toward the curve rather than straight down.</p>
+
+    <h3>The prop-strike crash plugin</h3>
+    <p>When a propeller's swept disc meets structure with the prop turning above 150&nbsp;rad/s, all
+    four rotor joints latch to zero. Thrust dies, the aircraft falls, and the autopilot disarms with
+    <code>Crash: Disarming</code>. It is <strong>on by default</strong> in both flight worlds.</p>
+    <div class="note stop">
+      <span class="lbl">The limit, stated plainly</span>
+      <p><strong>Nothing fractures.</strong> The engine has no structural failure model at all, so the
+      airframe and propellers are intact on the ground. The props stopping and the aircraft falling is a
+      realistic <em>consequence</em> &mdash; it is not a damage model, and no survivability claim can be
+      read into an intact aircraft.</p>
+    </div>
+
+    <h3>The rovers</h3>
+    <p>OMNI (7&nbsp;kg), Dyna Flux (14&nbsp;kg) and Orbit (18&nbsp;kg), all from your STEP files with
+    wheels, joints, magnet positions and body shapes taken from the CAD. The front magnetic wheel's
+    120&nbsp;kgf pull is your measurement.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Results</span>
+    <h2>What has been proven</h2>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Result</th><th class="num">Measured</th><th class="num">Bar / prediction</th></tr></thead>
+        <tbody>
+          <tr><td>Hover rotor speed</td><td class="num">460.70 rad/s</td><td class="num">460.6 &plusmn;1&nbsp;%</td></tr>
+          <tr><td>Lean into 10 m/s wind</td><td class="num">5.010&deg;</td><td class="num">4.965&deg; predicted blind</td></tr>
+          <tr><td>Lean, independent log cross-check</td><td class="num">5.009&deg;</td><td class="num">&mdash;</td></tr>
+          <tr><td>Chimney touch mission</td><td class="num">5 / 5 pass</td><td class="num">100 % contact duty</td></tr>
+          <tr><td>OMNI inverted &Oslash;500 hold</td><td class="num">169.7&ndash;170.4 N</td><td class="num">&ge; 39.24 N</td></tr>
+          <tr><td>Orbit cycle, gated stages</td><td class="num">16 / 16 pass</td><td class="num">gap &le; 5 mm</td></tr>
+          <tr><td>Dyna Flux tank turn</td><td class="num">608&ndash;622&deg;</td><td class="num">turns on the spot</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>All of these are re-run by one command &mdash; <code>tools/regression/run.sh --full</code> &mdash;
+    which checks each against its recorded bar, so no future change can quietly break a proven result.
+    The bars live in a file the runner is only allowed to read, and the run is voided if that file
+    changes while it is being measured against.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Honesty</span>
+    <h2>What this simulation does not claim</h2>
+    <ul>
+      <li><strong>No structural failure.</strong> Props stop and the aircraft falls; nothing breaks.</li>
+      <li><strong>Thrust is exact at hover, optimistic in fast climb.</strong> The propeller model has no
+      induced inflow. Fine for hover-dominated inspection flying; do not quote climb rates.</li>
+      <li><strong>The Dyna Flux tank turn is bimodal.</strong> Most runs hold and are reproducible to the
+      decimal; roughly a quarter leave the pipe. The original three-replicate result simply never
+      happened to catch one.</li>
+      <li><strong>The Orbit pivot stops a few degrees short</strong> and the static sag is 1.3&ndash;1.8&times;
+      what the spring rate predicts. Both are open, both are recorded, and spring rates are not quoted
+      outward because of it.</li>
+      <li><strong>The chimney mission is validated in steady wind only.</strong> Gusting is future work.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Companion sheet: <strong>Gen5 Model Datasheet</strong> &mdash; specifications, weight
+    distribution and how to move the centre of gravity.<br>
+    Source of record for every number here: <code>SYNC_LOG.md</code> on the Windows share.</p>
+  </footer>
+</div>
+
+</main>
+
+<script>
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (focus) tab.focus();
+      if (history.replaceState) {
+        history.replaceState(null, '', '#' + tab.id.replace('tab-', ''));
+      }
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { select(tab, false); });
+      tab.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (d) {
+          e.preventDefault();
+          select(tabs[(i + d + tabs.length) % tabs.length], true);
+        } else if (e.key === 'Home') {
+          e.preventDefault(); select(tabs[0], true);
+        } else if (e.key === 'End') {
+          e.preventDefault(); select(tabs[tabs.length - 1], true);
+        }
+      });
+    });
+
+    var want = (location.hash || '').replace('#', '');
+    var match = want && document.getElementById('tab-' + want);
+    if (match) select(match, false);
+  })();
+</script>
+</body>
+</html>
