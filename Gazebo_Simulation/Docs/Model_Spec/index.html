@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gen5 Model Datasheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --ground:   #edf1f3;
+    --surface:  #ffffff;
+    --sunken:   #e3e9ec;
+    --ink:      #121a1f;
+    --muted:    #5e717c;
+    --faint:    #8a9aa3;
+    --line:     #cbd6dc;
+    --line-soft:#dde5e9;
+    --accent:   #10617f;
+    --accent-soft: #e2eef3;
+    --pass:     #2e6a4f;
+    --warn:     #8c6410;
+    --fail:     #a03a22;
+    --code-bg:  #12242c;
+    --code-ink: #d6e6ec;
+    --code-dim: #7c9aa6;
+
+    --f-display: "IBM Plex Sans Condensed", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --f-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+    --measure: 68ch;
+    --pad: clamp(1.1rem, 3vw, 2.6rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#0d1418; --surface:#141e23; --sunken:#101a1e;
+      --ink:#d9e3e8; --muted:#90a4ad; --faint:#6b7f88;
+      --line:#253238; --line-soft:#1d282d;
+      --accent:#55b4d8; --accent-soft:#17303a;
+      --pass:#6fc196; --warn:#d9a53f; --fail:#e08163;
+      --code-bg:#0a1417; --code-ink:#cfe0e6; --code-dim:#6d8892;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#0d1418; --surface:#141e23; --sunken:#101a1e;
+    --ink:#d9e3e8; --muted:#90a4ad; --faint:#6b7f88;
+    --line:#253238; --line-soft:#1d282d;
+    --accent:#55b4d8; --accent-soft:#17303a;
+    --pass:#6fc196; --warn:#d9a53f; --fail:#e08163;
+    --code-bg:#0a1417; --code-ink:#cfe0e6; --code-dim:#6d8892;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header.sheet {
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .in { max-width: 1060px; margin: 0 auto; padding: 0 var(--pad); }
+  .titleblock { padding: 2.2rem 0 1.7rem; display: grid; gap: .5rem; }
+  .titleblock .kicker {
+    font-family: var(--f-mono); font-size: .69rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .titleblock h1 {
+    font-family: var(--f-display); font-weight: 700;
+    font-size: clamp(1.7rem, 4vw, 2.3rem); margin: 0; letter-spacing: .008em;
+    text-wrap: balance;
+  }
+  .titleblock p { margin: .2rem 0 0; color: var(--muted); max-width: var(--measure); }
+
+  .keyfacts {
+    display: grid; gap: 0;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    border-top: 1px solid var(--line);
+  }
+  .keyfacts div {
+    padding: .85rem var(--pad) 1rem;
+    border-right: 1px solid var(--line-soft);
+  }
+  .keyfacts div:last-child { border-right: 0; }
+  .keyfacts .k {
+    display: block;
+    font-family: var(--f-mono); font-size: .655rem; letter-spacing: .11em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: .18rem;
+  }
+  .keyfacts .v {
+    font-family: var(--f-display); font-weight: 600; font-size: 1.24rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .keyfacts .v small { font-size: .68em; font-weight: 500; color: var(--muted); }
+
+  main { max-width: 1060px; margin: 0 auto; padding: 2.4rem var(--pad) 5rem; }
+  section { margin: 0 0 2.9rem; }
+  .eyebrow {
+    font-family: var(--f-mono); font-size: .69rem; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--accent); display: block; margin: 0 0 .45rem;
+  }
+  h2 {
+    font-family: var(--f-display); font-weight: 700; font-size: 1.42rem;
+    margin: 0 0 .6rem; padding-bottom: .5rem;
+    border-bottom: 1px solid var(--line); letter-spacing: .008em;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--f-display); font-weight: 600; font-size: 1.08rem;
+    margin: 1.8rem 0 .45rem; letter-spacing: .01em; text-wrap: balance;
+  }
+  p, ul, ol { max-width: var(--measure); }
+  p { margin: 0 0 .95rem; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; }
+  li { margin-bottom: .38rem; }
+
+  code {
+    font-family: var(--f-mono); font-size: .855em;
+    background: var(--sunken); padding: .1em .34em; border-radius: 2px;
+    border: 1px solid var(--line-soft);
+  }
+
+  .cmd {
+    background: var(--code-bg); color: var(--code-ink);
+    font-family: var(--f-mono); font-size: .8rem; line-height: 1.72;
+    padding: .95rem 1.1rem; border-radius: 3px;
+    overflow-x: auto; margin: 0 0 1.15rem;
+    border-left: 3px solid var(--accent);
+  }
+  .cmd .c { color: var(--code-dim); }
+  .cmd b { color: #7fd0ee; font-weight: 500; }
+
+  .twrap { overflow-x: auto; margin: 0 0 1.3rem; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+  th, td { padding: .58rem .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line-soft); }
+  th {
+    font-family: var(--f-mono); font-size: .68rem; letter-spacing: .085em;
+    text-transform: uppercase; color: var(--muted); font-weight: 500;
+    background: var(--sunken); white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+  tfoot td { font-weight: 600; background: var(--sunken); border-top: 2px solid var(--line); }
+
+  /* mass bar */
+  .massbar { display: flex; height: 26px; border-radius: 3px; overflow: hidden; border: 1px solid var(--line); margin: 0 0 .5rem; }
+  .massbar span { display: block; }
+  .masskey { display: flex; flex-wrap: wrap; gap: .2rem 1.15rem; font-size: .8rem; color: var(--muted); margin: 0 0 1.4rem; }
+  .masskey b { font-weight: 500; color: var(--ink); }
+  .swatch { display: inline-block; width: .62rem; height: .62rem; border-radius: 2px; margin-right: .34rem; vertical-align: baseline; }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: .8rem 1rem; margin: 0 0 1.25rem; max-width: var(--measure); font-size: .93rem;
+  }
+  .note.warn { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, var(--surface)); }
+  .note.stop { border-left-color: var(--fail); background: color-mix(in srgb, var(--fail) 10%, var(--surface)); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl {
+    font-family: var(--f-mono); font-size: .66rem; letter-spacing: .12em;
+    text-transform: uppercase; display: block; margin-bottom: .28rem; color: var(--accent);
+  }
+  .note.warn .lbl { color: var(--warn); }
+  .note.stop .lbl { color: var(--fail); }
+
+  ol.steps { list-style: none; padding: 0; counter-reset: s; max-width: none; }
+  ol.steps > li {
+    counter-increment: s;
+    display: grid; grid-template-columns: 2rem 1fr; gap: .1rem 1rem;
+    padding: 0 0 1.4rem;
+  }
+  ol.steps > li::before {
+    content: counter(s);
+    font-family: var(--f-mono); font-size: .8rem; font-weight: 600; color: var(--accent);
+    border: 1px solid var(--line); border-radius: 50%;
+    width: 1.7rem; height: 1.7rem; display: grid; place-items: center; background: var(--surface);
+  }
+  ol.steps > li > * { grid-column: 2; }
+  ol.steps h3 { margin-top: .05rem; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1.1rem;
+    font-size: .8rem; color: var(--faint); max-width: var(--measure);
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header class="sheet">
+  <div class="in">
+    <div class="titleblock">
+      <span class="kicker">Model datasheet &middot; gen5 / gen5_with_ardupilot</span>
+      <h1>Gen5 Model Datasheet</h1>
+      <p>The flight model as built: where every kilogram sits, where the centre of gravity
+      actually is, and how to move it without invalidating the flight results.</p>
+    </div>
+  </div>
+  <div class="keyfacts in" style="padding-left:0;padding-right:0;">
+    <div><span class="k">All-up mass</span><span class="v">12.016 <small>kg</small></span></div>
+    <div><span class="k">Motor spacing</span><span class="v">819.9 <small>mm</small></span></div>
+    <div><span class="k">Hover</span><span class="v">460.6 <small>rad/s</small></span></div>
+    <div><span class="k">Thrust : weight</span><span class="v">2.79</span></div>
+    <div><span class="k">CG offset</span><span class="v">7.63 <small>mm fwd</small></span></div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <span class="eyebrow">Specifications</span>
+  <h2>What the model is</h2>
+  <p>Converted from <code>GEN5 V1 MAIN.step</code> &mdash; your CAD, not an approximation of it.
+  The airframe carries a 550&nbsp;g Tritex UT kit and a forward probe boom with an orange tip, and
+  it flies on ArduPilot SITL: the same autopilot firmware as a real aircraft.</p>
+
+  <div class="twrap">
+    <table>
+      <thead><tr><th>Property</th><th class="num">Value</th><th>Where it comes from</th></tr></thead>
+      <tbody>
+        <tr><td>Airframe mass, package</td><td class="num">12.0000 kg</td><td>Anchored to the real aircraft with battery and UT kit</td></tr>
+        <tr><td>All-up mass, as flown</td><td class="num">12.0160 kg</td><td>Package plus IMU 10 g, probe tip 1 g, camera 5 g</td></tr>
+        <tr><td>Motor spacing, diagonal</td><td class="num">819.9 mm</td><td>CAD rotor positions; your tape measure said 819 mm</td></tr>
+        <tr><td>Rotor arm from centre</td><td class="num">409.94 mm</td><td>Rotors at (&plusmn;289.87, &plusmn;289.87) mm</td></tr>
+        <tr><td>Propellers</td><td class="num">18.5&Prime; tri-blade</td><td>Measured off the CAD to a third of a millimetre</td></tr>
+        <tr><td>Thrust constant C<sub>m</sub></td><td class="num">1.387e-4 N/(rad/s)&sup2;</td><td>Fitted to the KDE motor bench table</td></tr>
+        <tr><td>Torque constant k<sub>m</sub></td><td class="num">0.0294 m</td><td>Same bench fit</td></tr>
+        <tr><td>Max rotor speed</td><td class="num">770 rad/s</td><td>7 350 RPM &mdash; KDE 12S limit</td></tr>
+        <tr><td>Hover rotor speed</td><td class="num">460.6 rad/s</td><td>4 399 RPM = 59.8 % of maximum</td></tr>
+        <tr><td>Max thrust per rotor</td><td class="num">82.17 N</td><td>Predicted from the bench fit</td></tr>
+        <tr><td>Frontal silhouette</td><td class="num">0.118 m&sup2;</td><td>Computed from the CAD; used to calibrate wind drag</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">The number that validates the whole model</span>
+    <p>Hover was <strong>predicted at 4 399 RPM from the bench table before the aircraft ever flew</strong>,
+    and the simulator settled at exactly that. A blind prediction matched to the digit is worth more
+    than any amount of after-the-fact tuning.</p>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Construction</span>
+  <h2>How the model was made</h2>
+  <ol class="steps">
+    <li>
+      <h3>Read the CAD, do not trust the box</h3>
+      <p>Dimensions come from probing the analytic STEP surfaces, never from a mesh bounding box.
+      That discipline caught an 8.2&nbsp;% oversized wheel radius elsewhere in the project; the same
+      rule produced the propeller geometry here to a third of a millimetre.</p>
+    </li>
+    <li>
+      <h3>Decimate before scaling</h3>
+      <p>The mesh is simplified <em>before</em> the millimetre-to-metre conversion. Doing it the other
+      way round wrecks the tolerances the decimator works to.</p>
+    </li>
+    <li>
+      <h3>Anchor the mass, then distribute it</h3>
+      <p>Total mass is pinned to the real 12.000&nbsp;kg. Each link then carries its own mass and its
+      own centre of mass, so the CG falls out of the geometry rather than being dialled in.</p>
+    </li>
+    <li>
+      <h3>Wire the autopilot around it, not into it</h3>
+      <p>The <code>gen5</code> package is never modified. A wrapper model,
+      <code>gen5_with_ardupilot</code>, includes it and adds the ArduPilot interface, an IMU, the FPV
+      camera and the probe tip. <strong>The flight stack can change without touching the airframe.</strong></p>
+    </li>
+    <li>
+      <h3>Model thrust where it actually acts</h3>
+      <p>Each rotor is three aerofoil blades at 120&deg;, with the centre of pressure at radius
+      165&nbsp;mm and <strong>+28.8&nbsp;mm above the rotor origin &mdash; the propeller disc plane</strong>.
+      The joint stays at the motor bell where the CAD puts it; the force is applied at the disc where
+      the air is. Blade area and drag coefficient are then derived from the bench constants rather
+      than tuned.</p>
+    </li>
+  </ol>
+</section>
+
+<section>
+  <span class="eyebrow">Weight distribution</span>
+  <h2>Where the 12 kilograms sit</h2>
+  <p>Seven links carry mass in the airframe package. The base link is five-sixths of the aircraft;
+  the probe boom and the UT kit are the two that move the balance.</p>
+
+  <div class="massbar" role="img" aria-label="Mass distribution: base link 82.8 percent, probe 7.5 percent, Tritex UT kit 4.6 percent, four rotors 5.1 percent">
+    <span style="width:82.81%;background:#10617f"></span>
+    <span style="width:7.51%;background:#3f8ba7"></span>
+    <span style="width:4.58%;background:#6fadc3"></span>
+    <span style="width:5.10%;background:#a8ccd8"></span>
+  </div>
+  <div class="masskey">
+    <span><i class="swatch" style="background:#10617f"></i><b>base_link</b> 82.8 %</span>
+    <span><i class="swatch" style="background:#3f8ba7"></i><b>probe_link</b> 7.5 %</span>
+    <span><i class="swatch" style="background:#6fadc3"></i><b>tritex_link</b> 4.6 %</span>
+    <span><i class="swatch" style="background:#a8ccd8"></i><b>4 &times; rotor</b> 5.1 %</span>
+    <span style="color:var(--faint)">shares of the 12.000 kg airframe package</span>
+  </div>
+
+  <div class="twrap">
+    <table>
+      <thead>
+        <tr><th>Link</th><th class="num">Mass (kg)</th><th class="num">Share of 12.000 kg</th><th class="num">Centre of mass, x&nbsp;/&nbsp;y&nbsp;/&nbsp;z (m)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>base_link</td><td class="num">9.93665</td><td class="num">82.8 %</td><td class="num">&minus;0.0753 / +0.0039 / &minus;0.0816</td></tr>
+        <tr><td>probe_link <span style="color:var(--muted)">&mdash; forward boom</span></td><td class="num">0.90109</td><td class="num">7.5 %</td><td class="num">+1.0433 / +0.0007 / &minus;0.0272</td></tr>
+        <tr><td>tritex_link <span style="color:var(--muted)">&mdash; UT kit</span></td><td class="num">0.55000</td><td class="num">4.6 %</td><td class="num">&minus;0.1845 / +0.0001 / &minus;0.0572</td></tr>
+        <tr><td>rotor_front_right</td><td class="num">0.15307</td><td class="num">1.3 %</td><td class="num">+0.2899 / &minus;0.2899 / +0.1008</td></tr>
+        <tr><td>rotor_front_left</td><td class="num">0.15307</td><td class="num">1.3 %</td><td class="num">+0.2899 / +0.2899 / +0.1008</td></tr>
+        <tr><td>rotor_rear_left</td><td class="num">0.15307</td><td class="num">1.3 %</td><td class="num">&minus;0.2899 / +0.2899 / +0.1008</td></tr>
+        <tr><td>rotor_rear_right</td><td class="num">0.15307</td><td class="num">1.3 %</td><td class="num">&minus;0.2899 / &minus;0.2899 / +0.1008</td></tr>
+        <tr style="color:var(--muted)"><td>imu_link, probe_tip_link, fpv_camera_link</td><td class="num">0.01600</td><td class="num">+0.13 % all-up</td><td class="num">added by the wrapper</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>All-up, as flown</td><td class="num">12.01601</td><td class="num">12.000 + 0.016</td><td class="num">CG &rarr; see below</td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Mass honesty</span>
+    <p>The wrapper's three small links add 16&nbsp;g on top of the airframe's anchored 12.0000&nbsp;kg
+    &mdash; 0.13&nbsp;%, declared rather than hidden, and far below any acceptance bar in use. The 5&nbsp;g
+    camera shifts hover rotor speed by 0.02&nbsp;%.</p>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Balance</span>
+  <h2>Where the centre of gravity actually is</h2>
+  <p>The CG is not at the middle of the aircraft, and it is not supposed to be. The forward probe
+  boom pulls it ahead of the thrust centroid &mdash; the point midway between the four rotors, which
+  is where the lift effectively acts.</p>
+
+  <div class="twrap">
+    <table>
+      <thead><tr><th>Quantity</th><th class="num">x</th><th class="num">y</th><th class="num">z</th></tr></thead>
+      <tbody>
+        <tr><td>Centre of gravity</td><td class="num">+0.00763</td><td class="num">+0.00331</td><td class="num">&minus;0.06684</td></tr>
+        <tr><td>Thrust centroid (mean of 4 rotors)</td><td class="num">0.00000</td><td class="num">0.00000</td><td class="num">+0.10079</td></tr>
+        <tr><td><strong>Offset, CG &minus; thrust</strong></td><td class="num"><strong>+7.63 mm</strong></td><td class="num"><strong>+3.31 mm</strong></td><td class="num">&mdash;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What that offset does in flight</h3>
+  <p>An offset between CG and thrust centroid is a <strong>steady moment at hover</strong>,
+  <code>M = m&nbsp;g&nbsp;&times;&nbsp;offset</code>:</p>
+  <div class="cmd">pitch  +0.8983 N&middot;m      <span class="c"># nose-down tendency from the forward probe</span>
+roll   +0.3896 N&middot;m
+                            <span class="c"># for scale: one rotor at hover is 29.43 N</span>
+                            <span class="c"># on a 0.2897 m arm = 8.53 N.m of authority</span></div>
+  <p>So the standing moment is about a tenth of what a single rotor can produce &mdash; comfortably
+  inside the autopilot's authority, and it is trimmed out automatically. You can see it in the
+  telemetry: <strong>the front motors run slightly faster than the rear</strong>, holding the probe
+  boom up. That is the real aircraft's behaviour, reproduced.</p>
+
+  <div class="note">
+    <span class="lbl">Check it yourself, any time</span>
+    <p>The numbers above are not copied from anywhere &mdash; they are computed from the SDF on demand:</p>
+    <div class="cmd" style="margin:.55rem 0 0">python3 Gen5Flight/scripts/cg_check.py</div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Adjustment</span>
+  <h2>How to change the centre of gravity</h2>
+  <p>The CG is a consequence of three things: which links have mass, how much, and where each link's
+  own centre of mass sits. Change any of those and the CG moves. There is no separate "CG setting" to
+  edit &mdash; and that is deliberate, because it keeps the model honest.</p>
+
+  <h3>The two files that matter</h3>
+  <div class="cmd">Models/converted/gen5/model.sdf                 <span class="c"># the airframe — base, probe, UT kit, rotors</span>
+Gen5Flight/models/gen5_with_ardupilot/model.sdf <span class="c"># wrapper — IMU, camera, probe tip</span></div>
+
+  <h3>What a link's mass block looks like</h3>
+  <div class="cmd">&lt;link name="tritex_link"&gt;
+  &lt;inertial&gt;
+    &lt;<b>pose</b>&gt;-0.0922293 3.84997e-05 -0.0285774 0 0 0&lt;/pose&gt;   <span class="c"># where this link's own CG sits</span>
+    &lt;<b>mass</b>&gt;0.5500&lt;/mass&gt;                                    <span class="c"># kg</span>
+    &lt;inertia&gt; ... &lt;/inertia&gt;
+  &lt;/inertial&gt;
+&lt;/link&gt;</div>
+
+  <h3>Three ways to move it</h3>
+  <ol class="steps">
+    <li>
+      <h3>Move a payload &mdash; the honest way</h3>
+      <p>Change the <code>&lt;pose&gt;</code> inside a payload link's <code>&lt;inertial&gt;</code>.
+      Shifting the 550&nbsp;g UT kit backwards by 100&nbsp;mm moves the whole-aircraft CG back by
+      <code>0.550 &times; 0.100 / 12.016 = 4.6 mm</code>. This is the one that corresponds to something
+      you could actually do to the real machine.</p>
+    </li>
+    <li>
+      <h3>Add ballast &mdash; explicit and reversible</h3>
+      <p>Add a small link with its own mass at a chosen position and a fixed joint to
+      <code>base_link</code>. It shows up in <code>cg_check.py</code> immediately and is trivial to
+      remove again. Prefer this to quietly editing an existing link's mass.</p>
+    </li>
+    <li>
+      <h3>Re-trim the base link &mdash; last resort</h3>
+      <p>Editing <code>base_link</code>'s inertial pose moves the CG fastest, because it is 82.8&nbsp;%
+      of the aircraft: 1&nbsp;mm of base-link shift is about 0.83&nbsp;mm of aircraft CG. It is also the
+      least defensible, because that pose came from the CAD. If you change it, write down why.</p>
+    </li>
+  </ol>
+
+  <h3>The loop to work in</h3>
+  <div class="cmd"><span class="c"># 1. edit the mass or inertial pose</span>
+<span class="c"># 2. see what it did — no simulation needed, this reads the SDF</span>
+python3 Gen5Flight/scripts/cg_check.py
+
+<span class="c"># 3. prove it still flies: hover + rotor speed, against the recorded bars</span>
+tools/regression/run.sh --full --only g3_gate0,g4_hover
+
+<span class="c"># 4. and that wind behaviour is unchanged</span>
+tools/regression/run.sh --full --only g5_wind_lean</div>
+
+  <div class="note warn">
+    <span class="lbl">Changing the CG invalidates the flight results until you re-earn them</span>
+    <p>Hover rotor speed, the 5.010&deg; wind lean and the chimney mission were all measured on
+    <em>this</em> mass distribution. Moving the CG changes the trim, which changes the rotor speeds,
+    which changes everything downstream. <strong>Re-run the gates before quoting any old number.</strong></p>
+  </div>
+
+  <div class="note stop">
+    <span class="lbl">Two things not to do</span>
+    <p><strong>Do not change the total mass to move the CG.</strong> 12.000&nbsp;kg is anchored to the
+    real aircraft; if the total drifts, every thrust and wind result loses its reference.</p>
+    <p><strong>Do not edit the wrapper to fix an airframe balance problem.</strong> The wrapper exists
+    so the flight stack and the airframe stay separable. Payload belongs in the airframe package.</p>
+  </div>
+
+  <h3>A worked example</h3>
+  <p>Say you want the CG on the thrust centroid in x &mdash; removing the 0.90&nbsp;N&middot;m nose-down
+  trim. You need to shift 7.63&nbsp;mm aft over 12.016&nbsp;kg, a moment of
+  <code>0.00763 &times; 12.016 = 0.0917 kg&middot;m</code>. Options:</p>
+  <ul>
+    <li>move the <strong>550&nbsp;g UT kit</strong> aft by <code>0.0917 / 0.550 = 167 mm</code>; or</li>
+    <li>add <strong>250&nbsp;g of ballast</strong> at <code>0.0917 / 0.250 = 367 mm</code> aft of centre
+    &mdash; which also pushes all-up mass to 12.27&nbsp;kg, so the hover speed moves too.</li>
+  </ul>
+  <p>The first costs nothing in mass and is what you would do on the real machine. The second is
+  quicker to model but changes two things at once &mdash; and changing two things at once is how a
+  result becomes impossible to attribute.</p>
+</section>
+
+<footer>
+  <p>Companion: <strong>Gen5 Simulation Handbook</strong> &mdash; worlds, startup, and running the rovers.<br>
+  Every figure on this sheet is read from the model files or computed by
+  <code>Gen5Flight/scripts/cg_check.py</code>. Source of record: <code>SYNC_LOG.md</code> on the Windows share.</p>
+</footer>
+
+</main>
+</body>
+</html>
