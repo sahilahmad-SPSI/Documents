@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hangout Summons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap">
+<style>
+  /* ---------------------------------------------------------------
+     EDIT ME — everything you'd want to change is in the CONFIG
+     block at the bottom of this file, just above </body>.
+  ---------------------------------------------------------------- */
+  :root{
+    color-scheme: light;
+    --desk:#241f19;
+    --desk-hi:#3a3127;
+    --paper:#ede2c8;
+    --paper-2:#e3d5b4;
+    --ink:#211c15;
+    --ink-soft:#5e5343;
+    --rule:#c6b590;
+    --stamp:#b32b2b;
+    --pen:#27406e;
+    --gold:#a8863f;
+    --mono:"Courier Prime","Courier New",Courier,monospace;
+    --type:"Special Elite","Courier New",Courier,monospace;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    padding:28px 16px 40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(120% 90% at 50% 0%, var(--desk-hi) 0%, var(--desk) 62%),
+      var(--desk);
+    font-family:var(--mono);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- the document ---------- */
+  .doc{
+    position:relative;
+    width:100%;
+    max-width:600px;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.014) 0 1px, transparent 1px 3px),
+      linear-gradient(168deg, var(--paper) 0%, var(--paper-2) 100%);
+    border:1px solid #a2916d;
+    border-radius:2px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.35) inset,
+      0 18px 44px rgba(0,0,0,.5),
+      0 3px 10px rgba(0,0,0,.4);
+    overflow:hidden;
+  }
+  .doc::before{ /* punched filing holes */
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:26px;
+    background:
+      radial-gradient(circle at 13px 16%, var(--desk) 4.5px, transparent 5px),
+      radial-gradient(circle at 13px 50%, var(--desk) 4.5px, transparent 5px),
+      radial-gradient(circle at 13px 84%, var(--desk) 4.5px, transparent 5px);
+    opacity:.5;
+    pointer-events:none;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    padding:20px 26px 14px 34px;
+    border-bottom:3px double var(--rule);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .seal{
+    flex:0 0 auto;
+    width:52px;height:52px;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-family:var(--type);
+    font-size:.55rem;
+    line-height:1.05;
+    text-align:center;
+    color:var(--gold);
+    letter-spacing:.04em;
+    box-shadow:0 0 0 3px rgba(168,134,63,.16) inset;
+  }
+  .court{
+    font-family:var(--type);
+    font-size:.95rem;
+    letter-spacing:.05em;
+    margin:0 0 4px;
+    line-height:1.25;
+  }
+  .caseno{
+    font-size:.66rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0;
+  }
+
+  /* ---------- body ---------- */
+  .sheet{ padding:26px 26px 8px 34px; }
+
+  .label{
+    font-size:.63rem;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--stamp);
+    margin:0 0 14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .label::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  h1,h2{
+    font-family:var(--type);
+    font-weight:400;
+    line-height:1.18;
+    text-wrap:balance;
+    margin:0 0 10px;
+  }
+  h1{font-size:1.72rem}
+  h2{font-size:1.42rem}
+
+  p{margin:0 0 14px;font-size:.9rem;line-height:1.62;max-width:52ch}
+  .lede{color:var(--ink-soft)}
+  .whisper{font-size:.78rem;color:var(--ink-soft);font-style:italic}
+
+  /* ---------- screens ---------- */
+  .exhibit{display:none}
+  .exhibit.is-active{display:block;animation:page .32s ease-out both}
+  @keyframes page{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:var(--mono);
+    font-size:.92rem;
+    font-weight:700;
+    letter-spacing:.03em;
+    color:var(--paper);
+    background:var(--ink);
+    border:none;
+    border-radius:2px;
+    padding:13px 26px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 rgba(33,28,21,.28);
+    transition:transform .12s ease, box-shadow .12s ease, background .2s ease;
+  }
+  .btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 rgba(33,28,21,.32)}
+  .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(33,28,21,.28)}
+  .btn.accept{background:var(--pen)}
+  .btn.stampish{background:var(--stamp)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn.wide{width:100%}
+
+  .linkbtn{
+    font-family:var(--mono);
+    font-size:.78rem;
+    background:none;border:none;padding:6px 2px;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+  }
+  .linkbtn:hover{color:var(--ink)}
+
+  :focus-visible{outline:2px solid var(--pen);outline-offset:3px}
+
+  /* ---------- the ask ---------- */
+  .verdict{margin-top:20px;text-align:center}
+  #acceptBtn{font-size:1.05rem;padding:15px 40px;transition:font-size .25s ease, padding .25s ease}
+  .dodge-zone{position:relative;height:120px;margin-top:10px}
+  #declineBtn{
+    position:absolute;left:50%;top:14px;
+    transform:translateX(-50%);
+    background:var(--paper);
+    color:var(--ink-soft);
+    border:1px solid var(--rule);
+    box-shadow:2px 2px 0 rgba(33,28,21,.14);
+    font-weight:400;
+    padding:11px 22px;
+    transition:left .16s ease, top .16s ease, opacity .3s ease;
+  }
+  #declineBtn.overruled{
+    text-decoration:line-through;
+    opacity:.35;
+    pointer-events:none;
+  }
+  .overrule-note{
+    position:absolute;left:50%;bottom:4px;transform:translateX(-50%) rotate(-4deg);
+    font-family:var(--type);
+    color:var(--stamp);
+    border:2px solid var(--stamp);
+    padding:3px 10px;
+    font-size:.72rem;
+    letter-spacing:.1em;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .overrule-note.show{opacity:.85}
+
+  /* ---------- form bits ---------- */
+  .field{margin:0 0 18px}
+  .field > label{
+    display:block;
+    font-size:.66rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+  }
+  input[type="text"],input[type="date"]{
+    font-family:var(--mono);
+    font-size:.95rem;
+    color:var(--pen);
+    width:100%;
+    padding:9px 2px;
+    background:transparent;
+    border:none;
+    border-bottom:1.5px solid var(--rule);
+    border-radius:0;
+  }
+  input[type="text"]:focus,input[type="date"]:focus{
+    outline:none;border-bottom-color:var(--pen);
+  }
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip input{position:absolute;opacity:0;width:0;height:0}
+  .chip span{
+    display:block;
+    padding:8px 14px;
+    font-size:.82rem;
+    border:1px solid var(--rule);
+    border-radius:2px;
+    cursor:pointer;
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .chip input:checked + span{background:var(--pen);color:var(--paper);border-color:var(--pen)}
+  .chip input:focus-visible + span{outline:2px solid var(--pen);outline-offset:2px}
+
+  .menu{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .menu .chip span{
+    text-align:center;
+    padding:14px 4px 10px;
+    font-size:.72rem;
+    letter-spacing:.04em;
+  }
+  .menu .emoji{display:block;font-size:1.55rem;margin-bottom:6px;line-height:1}
+
+  .slider-row{display:flex;align-items:center;gap:12px}
+  input[type="range"]{flex:1;accent-color:var(--stamp);height:22px}
+  .chaos-num{
+    font-family:var(--type);
+    font-size:1.3rem;
+    min-width:2.4ch;
+    text-align:right;
+    color:var(--stamp);
+    font-variant-numeric:tabular-nums;
+  }
+  .chaos-desc{font-size:.78rem;color:var(--ink-soft);font-style:italic;margin-top:6px;min-height:1.4em}
+
+  .warn{color:var(--stamp);font-size:.78rem;margin:-6px 0 12px;min-height:1.2em}
+
+  /* ---------- the fee ---------- */
+  .invoice{
+    border:1px solid var(--rule);
+    padding:16px 18px;
+    margin:0 0 18px;
+    background:rgba(255,255,255,.22);
+  }
+  .invoice-row{
+    display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  }
+  .invoice-row .item{font-weight:700;font-size:.92rem}
+  .amount{
+    font-family:var(--type);
+    font-size:1.5rem;
+    color:var(--stamp);
+    font-variant-numeric:tabular-nums;
+    transition:opacity .3s ease;
+  }
+  .amount.void{text-decoration:line-through;opacity:.4}
+  .invoice .terms{font-size:.7rem;color:var(--ink-soft);margin:8px 0 0;letter-spacing:.03em}
+  .waived{
+    display:none;
+    font-family:var(--type);
+    color:var(--stamp);
+    border:2px solid var(--stamp);
+    padding:2px 10px;
+    font-size:.8rem;
+    letter-spacing:.12em;
+    transform:rotate(-5deg);
+  }
+  .waived.show{display:inline-block;animation:thunk .4s cubic-bezier(.2,1.5,.5,1) both}
+
+  /* ---------- the order ---------- */
+  .order{position:relative;border:1px solid var(--rule);padding:18px;background:rgba(255,255,255,.24)}
+  .order dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:9px 16px;font-size:.86rem}
+  .order dt{
+    font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink-soft);padding-top:3px;white-space:nowrap;
+  }
+  .order dd{margin:0;color:var(--pen);font-weight:700;overflow-wrap:anywhere}
+  .stamp{
+    position:absolute;right:-4px;top:-18px;
+    font-family:var(--type);
+    font-size:1.35rem;
+    letter-spacing:.16em;
+    color:var(--stamp);
+    border:3px solid var(--stamp);
+    border-radius:4px;
+    padding:5px 14px;
+    transform:rotate(-13deg);
+    opacity:.88;
+    background:rgba(237,226,200,.72);
+    animation:thunk .5s cubic-bezier(.2,1.6,.45,1) both;
+  }
+  @keyframes thunk{
+    from{transform:rotate(-32deg) scale(2.6);opacity:0}
+    to{transform:rotate(-13deg) scale(1);opacity:.88}
+  }
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+
+  /* ---------- footer ---------- */
+  .footer{
+    margin-top:22px;
+    padding:12px 26px 16px 34px;
+    border-top:1px solid var(--rule);
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    font-size:.62rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft);
+  }
+  .footer .page{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  #confetti{
+    position:fixed;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:20;
+  }
+
+  @media (max-width:420px){
+    .sheet{padding:22px 18px 8px 30px}
+    .masthead{padding:16px 18px 12px 30px}
+    .footer{padding:12px 18px 14px 30px;flex-direction:column;align-items:flex-start;gap:6px}
+    h1{font-size:1.42rem}
+    h2{font-size:1.2rem}
+    .menu{grid-template-columns:repeat(2,1fr)}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<main class="doc">
+
+  <header class="masthead">
+    <div>
+      <p class="court">IN THE COURT OF<br>UNRESOLVED PLANS</p>
+      <p class="caseno">Case No. <span id="caseNo">—</span></p>
+    </div>
+    <div class="seal" aria-hidden="true">EST.<br>RIGHT<br>NOW</div>
+  </header>
+
+  <div class="sheet">
+
+    <!-- 1 ................................................. SERVED -->
+    <section class="exhibit is-active" id="s-served">
+      <p class="label">Notice of service</p>
+      <h1>You have been served.</h1>
+      <p class="lede">A claim has been filed against you for prolonged and unreasonable absence from the group chat, and for saying <em>"yeah we should definitely do something soon"</em> on <span id="ghostCount">four</span> separate occasions without doing anything.</p>
+      <p class="whisper">You have the right to remain silent. It will not work.</p>
+      <p style="margin-top:20px"><button class="btn" data-go="s-ask">Open the document &rarr;</button></p>
+    </section>
+
+    <!-- 2 ................................................. THE ASK -->
+    <section class="exhibit" id="s-ask">
+      <p class="label">Count I — the ask</p>
+      <h1 id="theQuestion">Will you hang out with me?</h1>
+      <p class="lede">Answer honestly. This is being recorded.</p>
+      <div class="verdict">
+        <button class="btn accept" id="acceptBtn">YES, obviously</button>
+        <div class="dodge-zone" id="dodgeZone">
+          <button class="btn" id="declineBtn" type="button">no thanks</button>
+          <span class="overrule-note" id="overruleNote">OBJECTION OVERRULED</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 ................................................. REACTION -->
+    <section class="exhibit" id="s-react">
+      <p class="label">Off the record</p>
+      <h1>WAIT. YOU ACTUALLY SAID YES??</h1>
+      <p class="lede">I had a whole appeal drafted. Seventeen pages. My lawyer is furious. 😭</p>
+      <p style="margin-top:20px"><button class="btn" data-go="s-when">okay okay, continue &rarr;</button></p>
+    </section>
+
+    <!-- 4 ................................................. SCHEDULING -->
+    <section class="exhibit" id="s-when">
+      <p class="label">Count II — scheduling order</p>
+      <h2>So&hellip; when are you free?</h2>
+      <p class="lede">The court requires specifics. "Sometime next week" is not a date.</p>
+
+      <div class="field">
+        <label for="nameIn">Your name, for the record</label>
+        <input type="text" id="nameIn" placeholder="the defendant" autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label for="dateIn">Proposed date</label>
+        <input type="date" id="dateIn">
+      </div>
+
+      <div class="field">
+        <label id="timeLabel">Preferred hour</label>
+        <div class="chips" role="radiogroup" aria-labelledby="timeLabel" id="timeChips"></div>
+      </div>
+
+      <p class="warn" id="whenWarn"></p>
+      <p><button class="btn" id="whenNext">File it &rarr;</button></p>
+    </section>
+
+    <!-- 5 ................................................. SUSTENANCE -->
+    <section class="exhibit" id="s-food">
+      <p class="label">Exhibit A — terms of engagement</p>
+      <h2>What are we feeling?</h2>
+      <p class="lede">Pick one. You may amend this later under duress.</p>
+
+      <div class="field">
+        <div class="menu" role="radiogroup" aria-label="Food" id="foodMenu"></div>
+      </div>
+
+      <div class="field">
+        <label for="chaosIn">Chaos level</label>
+        <div class="slider-row">
+          <input type="range" id="chaosIn" min="1" max="10" value="6">
+          <span class="chaos-num" id="chaosNum">6</span>
+        </div>
+        <p class="chaos-desc" id="chaosDesc"></p>
+      </div>
+
+      <p class="warn" id="foodWarn"></p>
+      <p><button class="btn" id="foodNext">Continue &rarr;</button></p>
+    </section>
+
+    <!-- 6 ................................................. THE FEE -->
+    <section class="exhibit" id="s-fee">
+      <p class="label">Schedule of fees</p>
+      <h2>One small fee.</h2>
+      <p class="lede">To finalise your acceptance, please complete the following transaction. Totally normal. Everyone does this.</p>
+
+      <div class="invoice">
+        <div class="invoice-row">
+          <span class="item">Hangout Agreement&trade;</span>
+          <span class="amount" id="feeAmount">$499</span>
+        </div>
+        <p class="terms">One-time &middot; non-refundable &middot; absolutely worth it</p>
+      </div>
+
+      <div id="feeBefore">
+        <p><button class="btn stampish wide" id="payBtn">pay $499 &amp; confirm 🥺</button></p>
+        <p style="text-align:center;margin:0"><button class="linkbtn" data-go="s-food">go back</button></p>
+      </div>
+
+      <div id="feeAfter" hidden>
+        <p><span class="waived show" id="waivedStamp">FEE WAIVED</span></p>
+        <p class="lede">Kidding. Obviously kidding. Payable in snacks, on arrival, in full.</p>
+        <p><button class="btn wide" id="feeNext">See the order &rarr;</button></p>
+      </div>
+    </section>
+
+    <!-- 7 ................................................. THE ORDER -->
+    <section class="exhibit" id="s-order">
+      <p class="label">Final order of the court</p>
+      <div class="order">
+        <span class="stamp" id="orderStamp">APPROVED</span>
+        <dl>
+          <dt>Parties</dt><dd id="oParties">—</dd>
+          <dt>Date</dt><dd id="oDate">—</dd>
+          <dt>Hour</dt><dd id="oTime">—</dd>
+          <dt>Sustenance</dt><dd id="oFood">—</dd>
+          <dt>Chaos</dt><dd id="oChaos">—</dd>
+          <dt>Fee</dt><dd id="oFee">$499 — waived, payable in snacks</dd>
+        </dl>
+      </div>
+      <p class="whisper" style="margin-top:14px">Send this back so it's on the record. Non-attendance is contempt.</p>
+      <div class="actions">
+        <button class="btn stampish" id="copyBtn">Copy the order</button>
+        <a class="linkbtn" id="waLink" href="#" target="_blank" rel="noopener">open WhatsApp</a>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="footer">
+    <span>Binding in exactly zero jurisdictions</span>
+    <span class="page" id="pageNo">Page 1 of 6</span>
+  </footer>
+
+</main>
+
+<script>
+/* ==================================================================
+   CONFIG — change these and you've made it your own.
+   ================================================================== */
+const CONFIG = {
+  from: "Mukesh",                              // you
+  question: "Will you hang out with me?",      // the big ask
+  yesLabel: "YES, obviously",
+  fee: 499,                                    // the fake fee
+  whatsapp: "",                                // optional: "919876543210" to prefill a chat
+  declineLabels: [                             // cycles as the button runs away
+    "no thanks", "nope", "still no", "are you sure?",
+    "think carefully", "wrong button", "last chance"
+  ],
+  times: ["Morning", "Afternoon", "Evening", "Late night"],
+  foods: [
+    { emoji: "🍕", name: "Pizza"   },
+    { emoji: "🍜", name: "Ramen"   },
+    { emoji: "🍔", name: "Burgers" },
+    { emoji: "🌮", name: "Tacos"   },
+    { emoji: "🍝", name: "Pasta"   },
+    { emoji: "🍣", name: "Sushi"   }
+  ],
+  chaos: [
+    [2,  "in bed by ten, like adults"],
+    [4,  "one drink. we swear."],
+    [6,  "someone is going to suggest karaoke"],
+    [8,  "questionable decisions, confidently made"],
+    [10, "neither of us is making it to work tomorrow"]
+  ]
+};
+
+/* ================================================================== */
+
+const $  = (id) => document.getElementById(id);
+const state = { name:"", date:"", time:"", food:"", chaos:6 };
+
+/* ---- case number: stable-ish, looks official ---- */
+const yr = new Date().getFullYear();
+$("caseNo").textContent = yr + "-HB-" + String(Math.floor(1000 + Math.random()*8999));
+
+/* ---- copy driven by config ---- */
+$("theQuestion").textContent = CONFIG.question;
+$("acceptBtn").textContent   = CONFIG.yesLabel;
+$("declineBtn").textContent  = CONFIG.declineLabels[0];
+$("feeAmount").textContent   = "$" + CONFIG.fee;
+$("payBtn").innerHTML        = "pay $" + CONFIG.fee + " &amp; confirm 🥺";
+$("oFee").textContent        = "$" + CONFIG.fee + " — waived, payable in snacks";
+
+/* ---- build the choice groups ---- */
+$("timeChips").innerHTML = CONFIG.times.map((t,i) => `
+  <label class="chip"><input type="radio" name="time" value="${t}"${i===2?" checked":""}><span>${t}</span></label>
+`).join("");
+state.time = CONFIG.times[2] || CONFIG.times[0];
+$("timeChips").addEventListener("change", e => { state.time = e.target.value; });
+
+$("foodMenu").innerHTML = CONFIG.foods.map(f => `
+  <label class="chip"><input type="radio" name="food" value="${f.name}">
+  <span><span class="emoji" aria-hidden="true">${f.emoji}</span>${f.name}</span></label>
+`).join("");
+$("foodMenu").addEventListener("change", e => {
+  const pick = CONFIG.foods.find(f => f.name === e.target.value);
+  state.food = pick ? pick.emoji + " " + pick.name : e.target.value;
+  $("foodWarn").textContent = "";
+});
+
+/* ---- navigation ---- */
+const ORDER = ["s-served","s-ask","s-react","s-when","s-food","s-fee","s-order"];
+function show(id){
+  document.querySelectorAll(".exhibit").forEach(s => s.classList.toggle("is-active", s.id === id));
+  const i = ORDER.indexOf(id);
+  $("pageNo").textContent = "Page " + Math.max(1, i) + " of " + (ORDER.length - 1);
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+document.querySelectorAll("[data-go]").forEach(b =>
+  b.addEventListener("click", () => show(b.dataset.go))
+);
+
+/* ---- the decline button runs away ---- */
+let dodges = 0;
+const MAX_DODGES = 6;
+const declineBtn = $("declineBtn"), dodgeZone = $("dodgeZone"), acceptBtn = $("acceptBtn");
+
+function dodge(){
+  dodges++;
+  if (dodges > MAX_DODGES){
+    declineBtn.classList.add("overruled");
+    $("overruleNote").classList.add("show");
+    return;
+  }
+  const zone = dodgeZone.getBoundingClientRect();
+  const btn  = declineBtn.getBoundingClientRect();
+  const maxX = Math.max(0, zone.width  - btn.width);
+  const maxY = Math.max(0, zone.height - btn.height);
+  declineBtn.style.transform = "none";
+  declineBtn.style.left = Math.random() * maxX + "px";
+  declineBtn.style.top  = Math.random() * maxY + "px";
+  declineBtn.textContent = CONFIG.declineLabels[dodges % CONFIG.declineLabels.length];
+  acceptBtn.style.fontSize = (1.05 + dodges * 0.09) + "rem";
+  acceptBtn.style.padding  = (15 + dodges * 2) + "px " + (40 + dodges * 6) + "px";
+}
+declineBtn.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") dodge(); });
+declineBtn.addEventListener("focus", dodge);
+declineBtn.addEventListener("click", e => { e.preventDefault(); dodge(); });
+
+acceptBtn.addEventListener("click", () => { show("s-react"); celebrate(); });
+
+/* ---- scheduling ---- */
+const today = new Date();
+$("dateIn").min = today.toISOString().slice(0,10);
+$("whenNext").addEventListener("click", () => {
+  state.name = $("nameIn").value.trim();
+  state.date = $("dateIn").value;
+  if (!state.date){
+    $("whenWarn").textContent = "Pick a day. The court needs a day.";
+    $("dateIn").focus();
+    return;
+  }
+  $("whenWarn").textContent = "";
+  show("s-food");
+});
+$("dateIn").addEventListener("change", () => { $("whenWarn").textContent = ""; });
+
+/* ---- chaos slider ---- */
+function chaosText(v){
+  for (const [max, text] of CONFIG.chaos) if (v <= max) return text;
+  return CONFIG.chaos[CONFIG.chaos.length - 1][1];
+}
+const chaosIn = $("chaosIn");
+function paintChaos(){
+  state.chaos = Number(chaosIn.value);
+  $("chaosNum").textContent  = state.chaos;
+  $("chaosDesc").textContent = chaosText(state.chaos);
+}
+chaosIn.addEventListener("input", paintChaos);
+paintChaos();
+
+$("foodNext").addEventListener("click", () => {
+  if (!state.food){
+    $("foodWarn").textContent = "Choose a food. This is the most important clause.";
+    return;
+  }
+  show("s-fee");
+});
+
+/* ---- the fee gag ---- */
+$("payBtn").addEventListener("click", () => {
+  $("feeAmount").classList.add("void");
+  $("feeBefore").hidden = true;
+  $("feeAfter").hidden  = false;
+  confettiBurst(40);
+});
+$("feeNext").addEventListener("click", () => { fillOrder(); show("s-order"); });
+
+/* ---- the order ---- */
+function prettyDate(iso){
+  if (!iso) return "—";
+  const [y,m,d] = iso.split("-").map(Number);
+  return new Date(y, m-1, d).toLocaleDateString(undefined,
+    { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+}
+function orderText(){
+  return [
+    "OFFICIAL HANGOUT ORDER · Case No. " + $("caseNo").textContent,
+    "Parties: " + (state.name || "me") + " & " + CONFIG.from,
+    "Date: " + prettyDate(state.date),
+    "Hour: " + state.time,
+    "Sustenance: " + state.food,
+    "Chaos: " + state.chaos + "/10 — " + chaosText(state.chaos),
+    "Fee: $" + CONFIG.fee + ", waived. Payable in snacks.",
+    "",
+    "Verdict: ACCEPTED. Non-attendance is contempt."
+  ].join("\n");
+}
+function fillOrder(){
+  $("oParties").textContent = (state.name || "me") + " & " + CONFIG.from;
+  $("oDate").textContent    = prettyDate(state.date);
+  $("oTime").textContent    = state.time;
+  $("oFood").textContent    = state.food;
+  $("oChaos").textContent   = state.chaos + "/10 — " + chaosText(state.chaos);
+  const wa = "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(orderText());
+  $("waLink").href = wa;
+  const stamp = $("orderStamp");
+  stamp.style.animation = "none";
+  void stamp.offsetWidth;
+  stamp.style.animation = "";
+  celebrate();
+}
+$("copyBtn").addEventListener("click", async () => {
+  const text = orderText();
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch {}
+    ta.remove();
+  }
+  $("copyBtn").textContent = "Copied — go send it";
+  setTimeout(() => { $("copyBtn").textContent = "Copy the order"; }, 2400);
+});
+
+/* ---- confetti ---- */
+const canvas = $("confetti"), ctx = canvas.getContext("2d");
+let bits = [], raf = null;
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const COLORS = ["#b32b2b","#27406e","#a8863f","#ede2c8","#d97b3a","#4f7a4a"];
+
+function sizeCanvas(){
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+sizeCanvas();
+window.addEventListener("resize", sizeCanvas);
+
+function confettiBurst(n){
+  if (reduced) return;
+  for (let i = 0; i < n; i++){
+    bits.push({
+      x: canvas.width * (0.2 + Math.random() * 0.6),
+      y: -20 - Math.random() * canvas.height * 0.3,
+      vx: (Math.random() - 0.5) * 3.2,
+      vy: 2 + Math.random() * 3.5,
+      w: 5 + Math.random() * 7,
+      h: 8 + Math.random() * 8,
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.22,
+      c: COLORS[(Math.random() * COLORS.length) | 0],
+      life: 1
+    });
+  }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function celebrate(){ confettiBurst(130); }
+
+function tick(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  bits = bits.filter(b => b.life > 0 && b.y < canvas.height + 40);
+  for (const b of bits){
+    b.x += b.vx; b.y += b.vy; b.vy += 0.045; b.rot += b.vr;
+    if (b.y > canvas.height * 0.72) b.life -= 0.016;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.rot);
+    ctx.globalAlpha = Math.max(0, b.life);
+    ctx.fillStyle = b.c;
+    ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+    ctx.restore();
+  }
+  if (bits.length){ raf = requestAnimationFrame(tick); }
+  else { ctx.clearRect(0, 0, canvas.width, canvas.height); raf = null; }
+}
+</script>
+</body>
+</html>
