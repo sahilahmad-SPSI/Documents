@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Tritex & Herelink Maintenance — R&D Account Handover checklist
+  Offline copy. Save this file anywhere and open it in any browser; no internet
+  needed except for the web fonts, which fall back cleanly if blocked.
+  Ticks in this copy are stored in that browser only. The hosted version on
+  claude.ai keeps your progress against your account and follows you between
+  computers.
+-->
+<meta name="color-scheme" content="light dark">
+<title>R&amp;D Account Handover</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#eceeec; --surface:#f8f9f8; --surface-2:#e3e6e3; --surface-3:#d7dbd7;
+    --ink:#14181a; --ink-2:#4a5250; --ink-3:#7b8481;
+    --rule:#cfd4d1; --rule-hard:#a9b0ad;
+    --accent:#b5510e; --accent-soft:#f4e5d8;
+    --ok:#2f6b3c; --ok-bg:#e4efe4; --ok-line:#a8ccb0;
+    --warn:#8a6100; --warn-bg:#f6ecd6; --warn-line:#dcc08a;
+    --bad:#a32216; --bad-bg:#f7e2df; --bad-line:#e0a9a2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#14181a; --surface:#1b2022; --surface-2:#242a2c; --surface-3:#2d3436;
+      --ink:#e8ebe9; --ink-2:#a8b1ae; --ink-3:#78827f;
+      --rule:#2e3538; --rule-hard:#454d50;
+      --accent:#e8843c; --accent-soft:#33231a;
+      --ok:#7cc08a; --ok-bg:#19281c; --ok-line:#2f5738;
+      --warn:#dfae4c; --warn-bg:#2b2211; --warn-line:#5b4a1d;
+      --bad:#f09489; --bad-bg:#2e1614; --bad-line:#66312b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#14181a; --surface:#1b2022; --surface-2:#242a2c; --surface-3:#2d3436;
+    --ink:#e8ebe9; --ink-2:#a8b1ae; --ink-3:#78827f;
+    --rule:#2e3538; --rule-hard:#454d50;
+    --accent:#e8843c; --accent-soft:#33231a;
+    --ok:#7cc08a; --ok-bg:#19281c; --ok-line:#2f5738;
+    --warn:#dfae4c; --warn-bg:#2b2211; --warn-line:#5b4a1d;
+    --bad:#f09489; --bad-bg:#2e1614; --bad-line:#66312b;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);padding:0 16px;
+       font:500 16px/1.6 Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .page{max-width:760px;margin:0 auto;padding-block:36px 90px}
+  .mono,code,kbd{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+  code{background:var(--surface-2);padding:1px 6px;border-radius:4px;font-size:.88em;font-weight:500}
+  kbd{background:var(--surface-2);border:1px solid var(--rule-hard);border-bottom-width:2px;
+      border-radius:5px;padding:1px 6px;font-size:.82em;font-weight:600;white-space:nowrap}
+  b{font-weight:700}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* masthead */
+  .mast{border-top:3px solid var(--ink);padding-top:14px}
+  .eyebrow{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;
+           text-transform:uppercase;color:var(--accent)}
+  h1{font:800 clamp(28px,5.6vw,42px)/1.05 Archivo,sans-serif;letter-spacing:-.025em;
+     margin:12px 0 0;text-wrap:balance}
+  .stand{color:var(--ink-2);font-size:17px;margin:12px 0 0;max-width:58ch;font-weight:500}
+
+  /* progress */
+  .prog{position:sticky;top:0;z-index:20;background:var(--ground);padding:14px 0 12px;
+        margin-top:22px;border-bottom:1px solid var(--rule)}
+  .prog .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .prog .cnt{font:700 14px/1 "IBM Plex Mono",monospace;color:var(--ink);white-space:nowrap}
+  .prog .cnt span{color:var(--accent)}
+  .prog .bar{flex:1;min-width:140px;height:6px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+  .prog .bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;
+               transition:width .25s ease}
+  .prog button{background:transparent;border:1px solid var(--rule-hard);color:var(--ink-3);
+               border-radius:8px;padding:6px 11px;font:600 12px/1 Archivo,sans-serif;cursor:pointer}
+  .prog button:hover{border-color:var(--accent);color:var(--accent)}
+  .prog .hint{font-size:11.5px;color:var(--ink-3);margin:7px 0 0;font-weight:500}
+
+  /* parts */
+  .part{margin-top:38px}
+  .parthead{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);
+            padding-bottom:8px;margin-bottom:14px}
+  .parthead .k{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.12em;
+               text-transform:uppercase;color:var(--accent);flex:0 0 auto}
+  .parthead h2{font:700 clamp(19px,3.2vw,23px)/1.2 Archivo,sans-serif;letter-spacing:-.015em;margin:0}
+
+  /* steps */
+  .step{display:flex;gap:0;background:var(--surface);border:1px solid var(--rule);
+        margin-bottom:6px;align-items:stretch;transition:opacity .15s,background .15s}
+  .step.done{opacity:.55;background:var(--surface-2)}
+  .step .tick{flex:0 0 auto;width:52px;border-right:1px solid var(--rule);background:var(--surface-2);
+              display:flex;align-items:flex-start;justify-content:center;padding-top:15px;cursor:pointer}
+  .step .tick input{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;margin:0}
+  .step .body{flex:1;min-width:0;padding:13px 16px}
+  .step .n{font:600 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--ink-3);
+           text-transform:uppercase}
+  .step .t{font:600 16px/1.4 Archivo,sans-serif;margin-top:5px}
+  .step.done .t{text-decoration:line-through;text-decoration-color:var(--ink-3)}
+  .step .d{font-size:14.5px;color:var(--ink-2);margin-top:6px;line-height:1.55;font-weight:500}
+  .step .d + .d{margin-top:7px}
+  .path{display:block;background:var(--surface-2);border-left:3px solid var(--accent);
+        padding:9px 12px;margin-top:9px;font:500 13.5px/1.6 "IBM Plex Mono",monospace;
+        color:var(--ink);overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  .see{display:block;margin-top:9px;font-size:13.5px;color:var(--ok);font-weight:600}
+  .see::before{content:"You should see: ";color:var(--ink-3);font-weight:600}
+
+  /* callouts */
+  .note{border:1px solid var(--rule);border-left:3px solid var(--accent);background:var(--surface);
+        padding:12px 15px;margin:14px 0 6px;font-size:14.5px;line-height:1.55;font-weight:500;
+        color:var(--ink-2)}
+  .note.warn{border-color:var(--warn-line);border-left-color:var(--warn);background:var(--warn-bg)}
+  .note.bad{border-color:var(--bad-line);border-left-color:var(--bad);background:var(--bad-bg)}
+  .note b{color:var(--ink)}
+  .note .lab{display:block;font:600 10px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;
+             text-transform:uppercase;color:var(--ink-3);margin-bottom:7px}
+
+  footer{margin-top:52px;padding-top:16px;border-top:3px solid var(--ink);
+         font:500 12.5px/1.7 "IBM Plex Mono",monospace;color:var(--ink-3)}
+
+  @media (max-width:520px){
+    .step .tick{width:44px}
+    .step .body{padding:12px 13px}
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="mast">
+    <div class="eyebrow">Tritex &amp; Herelink Maintenance</div>
+    <h1>R&amp;D Account Handover</h1>
+    <p class="stand">Thirty-six steps from your test build to a live system owned by the R&amp;D account. Nothing is copied — the system is rebuilt clean, because there is no data to preserve. Tick as you go; progress follows you between computers.</p>
+  </div>
+
+  <div class="prog">
+    <div class="row">
+      <div class="cnt"><span id="cDone">0</span> of <span id="cAll">36</span> done</div>
+      <div class="bar"><i id="bar"></i></div>
+      <button id="reset" type="button">Clear all ticks</button>
+    </div>
+    <p class="hint" id="syncHint">Checking where your progress is saved…</p>
+  </div>
+
+  <div class="note bad">
+    <span class="lab">Do not duplicate your test sheet</span>
+    <b>Making a copy of a Google Sheet copies its Apps Script project too.</b> You would be pasting new code on top of a stale copy, and the copied <code>Config</code> tab would carry <code>PHOTO_FOLDER_ID</code> pointing at a folder in <b>your</b> Drive — so evidence photos would keep landing in your account while everyone believed the handover was done. A copy also brings across neither the trigger nor the deployment, so it saves nothing. Build fresh.
+  </div>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 1</span><h2>Check these before you start</h2></div>
+
+    <div class="note bad">
+      <span class="lab">Step 1 is the one that can kill the whole thing</span>
+      Identity comes from the viewer's Google account, and that only works when the viewer and the script owner are on the <b>same Workspace domain</b>. If the R&amp;D account sits on a different domain to your technicians, every one of them sees <i>"Could not read your Google account"</i> and nothing can be done in code to fix it. Confirm this before you spend an hour on the rest.
+    </div>
+
+    <div class="step" data-id="s1">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 1</div>
+        <div class="t">The R&amp;D account is on the same domain as the technicians</div>
+        <div class="d">Its address ends <code>@spsig.com</code>, exactly like Suraj's and Naresh's. Not a personal Gmail, not a different company domain.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s2">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 2</div>
+        <div class="t">The R&amp;D account can send email</div>
+        <div class="d">Sign in as it and send yourself one test email from Gmail. A no-reply or licence-less account cannot send, and every reminder in this system would fail silently.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s3">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 3</div>
+        <div class="t">You have the seven real email addresses</div>
+        <div class="d">Suraj, Praveen, Naresh, Inderjeet, Uttam, Naved, Abhishek — confirmed, not guessed from first names. Wrong addresses fail silently; the log will still say "sent".</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s4">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 4</div>
+        <div class="t">You have the seven files to hand</div>
+        <div class="d">Five scripts — <code>00_Config.gs</code>, <code>01_Setup.gs</code>, <code>02_Api.gs</code>, <code>03_Notify.gs</code>, <code>04_Dashboard.gs</code> — and two pages, <code>Index.html</code> and <code>Admin.html</code>. Open each in a text editor now so you can copy from them without hunting.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 2</span><h2>Shut down your test build</h2></div>
+
+    <div class="note warn">
+      Do this <b>first</b>. Leave your test running and the seven men get two sets of reminders from two systems, and you will spend a week working out which one is real.
+      <br><br>Both steps here can legitimately find nothing to remove. An empty triggers list or an empty deployments list is the goal, not a problem — as long as you have confirmed you are in the right project, signed in as the account that built it.
+    </div>
+
+    <div class="step" data-id="s5">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 5</div>
+        <div class="t">Open the script editor of your test sheet</div>
+        <div class="d">Signed in as <b>you</b>, open your test spreadsheet.</div>
+        <span class="path">Extensions ▸ Apps Script</span>
+        <span class="see">A new browser tab with your project and the file list on the left.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s6">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 6</div>
+        <div class="t">Delete the daily trigger</div>
+        <div class="d">In the narrow icon strip on the far left, click the <b>alarm clock</b> icon (Triggers).</div>
+        <span class="path">Triggers ▸ hover the dailyTick row ▸ ⋮ (three dots, right-hand end) ▸ Delete trigger ▸ Delete forever</span>
+        <span class="see">An empty triggers list — "Showing 0 triggers".</span>
+        <div class="d"><b>Already showing 0 triggers?</b> Then there is nothing to delete and this step is done — but check two things before you believe it. First, click the <code>&lt;&gt;</code> icon on the left: if you cannot see your seven files, you are in the wrong project, and the project name at the top will usually say "Untitled project". Reach it from the spreadsheet with <b>Extensions ▸ Apps Script</b>, never from script.google.com. Second, check the avatar top right — triggers are invisible to every account except the one that created them, which is why there is an "Owned by" column.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s7">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 7</div>
+        <div class="t">Archive the old deployment</div>
+        <div class="d">Top right of the script editor.</div>
+        <span class="path">Deploy ▸ Manage deployments ▸ click the deployment row ▸ ⋮ ▸ Archive</span>
+        <span class="see">The deployment marked Archived. The old URL stops working — that is the point.</span>
+        <div class="d">If the list is empty, you never deployed from this project and there is nothing to archive. Tick and move on.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s8">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 8</div>
+        <div class="t">Rename the test sheet so nobody opens it by mistake</div>
+        <div class="d">Back on the spreadsheet tab, click the file name at the top left.</div>
+        <span class="path">Click the title ▸ type: OLD TEST — DO NOT USE ▸ Enter</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 3 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 3</span><h2>Build it in the R&amp;D account</h2></div>
+
+    <div class="step" data-id="s9">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 9</div>
+        <div class="t">Sign in as the R&amp;D account, in its own window</div>
+        <div class="d">Use a separate Chrome profile, or an Incognito window. Two Google accounts in one window is how people end up creating the sheet under the wrong one and not noticing for a week.</div>
+        <span class="see">Your avatar top-right showing the R&amp;D account, and nothing else signed in.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s10">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 10</div>
+        <div class="t">Create a blank spreadsheet</div>
+        <div class="d">In the address bar, type:</div>
+        <span class="path">sheets.new</span>
+        <span class="see">A new blank spreadsheet called "Untitled spreadsheet".</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s11">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 11</div>
+        <div class="t">Name it</div>
+        <span class="path">Click "Untitled spreadsheet" (top left) ▸ type: Tritex &amp; Herelink Maintenance ▸ Enter</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s12">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 12</div>
+        <div class="t">Open the script editor</div>
+        <span class="path">Extensions ▸ Apps Script</span>
+        <span class="see">A new tab, project called "Untitled project", with one file: <code>Code.gs</code>.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s13">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 13</div>
+        <div class="t">Name the project</div>
+        <span class="path">Click "Untitled project" (top, next to the Apps Script logo) ▸ type: Tritex &amp; Herelink Maintenance ▸ Rename</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s14">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 14</div>
+        <div class="t">Delete the empty Code.gs</div>
+        <span class="path">In the Files list (left) ▸ hover Code.gs ▸ ⋮ ▸ Delete ▸ OK</span>
+        <span class="see">An empty Files list.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s15">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 15</div>
+        <div class="t">Add the five script files, one at a time</div>
+        <div class="d">For each of <code>00_Config</code>, <code>01_Setup</code>, <code>02_Api</code>, <code>03_Notify</code>, <code>04_Dashboard</code>:</div>
+        <span class="path">Click + (next to "Files") ▸ Script ▸ type the name ▸ Enter
+Click in the code area ▸ <kbd>Ctrl</kbd>+<kbd>A</kbd> ▸ <kbd>Ctrl</kbd>+<kbd>V</kbd></span>
+        <div class="d">Type the name <b>without</b> <code>.gs</code> — the editor adds it. A new file arrives with a stub <code>myFunction</code> in it; <kbd>Ctrl</kbd>+<kbd>A</kbd> before pasting is what removes it.</div>
+        <span class="see">Five files, named exactly as above, each starting with a <code>/**</code> comment block.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s16">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 16</div>
+        <div class="t">Add the two pages</div>
+        <span class="path">Click + ▸ HTML ▸ type: Index ▸ Enter ▸ <kbd>Ctrl</kbd>+<kbd>A</kbd> ▸ paste Index.html
+Click + ▸ HTML ▸ type: Admin ▸ Enter ▸ <kbd>Ctrl</kbd>+<kbd>A</kbd> ▸ paste Admin.html</span>
+        <div class="d">These two names are not cosmetic — the server asks for templates called <code>Index</code> and <code>Admin</code> by name. A typo here shows up later as a blank page.</div>
+        <span class="see">Seven files in total.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s17">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 17</div>
+        <div class="t">Save</div>
+        <span class="path"><kbd>Ctrl</kbd>+<kbd>S</kbd> &nbsp;(or the floppy-disk icon in the toolbar)</span>
+        <span class="see">No red error underlines anywhere in the file list.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 4 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 4</span><h2>First run and authorisation</h2></div>
+
+    <div class="step" data-id="s18">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 18</div>
+        <div class="t">Reload the spreadsheet</div>
+        <div class="d">Switch back to the spreadsheet tab and press <kbd>F5</kbd>. Wait about five seconds after it loads.</div>
+        <span class="see">A new menu, <b>Maintenance System</b>, to the right of Help.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s19">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 19</div>
+        <div class="t">Run setup — it will stop and ask for permission</div>
+        <span class="path">Maintenance System ▸ 1. Run setup / repair</span>
+        <div class="d">An "Authorization required" box appears. This is expected and it means setup has <b>not</b> run yet.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s20">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 20</div>
+        <div class="t">Grant the permissions</div>
+        <span class="path">Continue ▸ choose the R&amp;D account ▸ "Google hasn't verified this app" ▸ Advanced ▸ Go to Tritex &amp; Herelink Maintenance (unsafe) ▸ Allow</span>
+        <div class="d"><b>The scary wording is normal.</b> "Unverified" means the script has not been through Google's review for public distribution — it is your own code, in your own account, and nobody outside the domain can run it.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s21">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 21</div>
+        <div class="t">Run setup again — the first attempt was consumed by the permission prompt</div>
+        <span class="path">Maintenance System ▸ 1. Run setup / repair</span>
+        <span class="see">A "Setup complete" box listing the tabs it created. Click OK.</span>
+        <div class="d">Along the bottom you should now have eight tabs: <code>Register</code>, <code>CheckLog</code>, <code>Checklists</code>, <code>Technicians</code>, <code>Config</code>, <code>Dashboard</code>, <code>SystemLog</code>, <code>ScheduleLog</code>. The Register should hold 17 devices.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 5 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 5</span><h2>Deploy the web app</h2></div>
+
+    <div class="step" data-id="s22">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 22</div>
+        <div class="t">Start a new deployment</div>
+        <div class="d">Switch to the Apps Script tab. The blue <b>Deploy</b> button is top right.</div>
+        <span class="path">Deploy ▸ New deployment</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s23">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 23</div>
+        <div class="t">Choose the Web app type</div>
+        <span class="path">Click the gear icon next to "Select type" ▸ Web app</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s24">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 24</div>
+        <div class="t">Set the three fields exactly</div>
+        <span class="path">Description:      v1
+Execute as:       Me (the R&amp;D account address)
+Who has access:   Anyone in Spsig
+
+▸ Deploy</span>
+        <div class="d"><b>Execute as: Me</b> is what lets the script write to the sheet and Drive on everyone's behalf without giving seven people edit rights. <b>Anyone in Spsig</b> is what lets it read their identity. Neither is optional.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s25">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 25</div>
+        <div class="t">Copy the web app URL</div>
+        <div class="d">The box shows a long URL ending in <code>/exec</code>. Copy it somewhere safe — this is the link your technicians will use.</div>
+        <span class="path">Copy the "Web app" URL ▸ Done</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 6 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 6</span><h2>Configure it</h2></div>
+
+    <div class="step" data-id="s26">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 26</div>
+        <div class="t">Paste the URL into the Config tab</div>
+        <span class="path">Spreadsheet ▸ Config tab ▸ find the WEBAPP_URL row ▸ paste into column B (Value)</span>
+        <div class="d">Skip this and every reminder email arrives with no button to press.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s27">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 27</div>
+        <div class="t">Open the admin console</div>
+        <span class="path">Maintenance System ▸ Open admin scheduler ▸ Open admin scheduler (the orange button)</span>
+        <div class="d">Or paste the web app URL into a tab and add <code>?page=admin</code> to the end.</div>
+        <span class="see">Four tabs across the top: Schedule, Checklists, People, Equipment.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s28">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 28</div>
+        <div class="t">Fix the people and set the admins</div>
+        <span class="path">People tab ▸ correct all eight email addresses
+▸ set Role to Administrator for yourself and anyone else who needs the console
+▸ Save changes</span>
+        <div class="d">The seeded addresses are guesses built from first names. At least one active Administrator must remain at all times — the save is refused otherwise.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s29">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 29</div>
+        <div class="t">Check the equipment register</div>
+        <span class="path">Equipment tab ▸ check the 17 devices, their applications and owners ▸ Save changes if you edit anything</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s30">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 30</div>
+        <div class="t">Check the checklists came across</div>
+        <span class="path">Checklists tab ▸ Tritex chip should read 7 ▸ Herelink chip should read 5</span>
+        <div class="d">If they read 9 and 10, you pasted an old <code>00_Config.gs</code>. Fix the file and re-run setup on a fresh sheet.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 7 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 7</span><h2>Prove it works before anyone relies on it</h2></div>
+
+    <div class="step" data-id="s31">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 31</div>
+        <div class="t">Run the health check</div>
+        <span class="path">Spreadsheet ▸ Maintenance System ▸ About / health check</span>
+        <span class="see">"Health check — all good", or a list of exactly what is still wrong.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s32">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 32</div>
+        <div class="t">Send yourself one real email</div>
+        <span class="path">Console ▸ Schedule tab ▸ pick ONE device ▸ set its Owner to yourself
+▸ set its Next service date to tomorrow ▸ Save changes</span>
+        <span class="see">Within a minute, an email titled "Equipment assigned to you: 1 item(s)". If it does not arrive, stop here and fix it — everything downstream depends on mail working.</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s33">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 33</div>
+        <div class="t">Open the app on your own phone</div>
+        <div class="d">Paste the web app URL into your phone's browser, signed in as your own <code>@spsig.com</code> account.</div>
+        <span class="see">Your name in the top right, a <b>Scheduler</b> button beside it, and the device you just scheduled under "Needs attention".</span>
+      </div>
+    </div>
+
+    <div class="step" data-id="s34">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 34</div>
+        <div class="t">Have one technician submit one real check</div>
+        <div class="d">Send the link to Suraj or Naresh and ask him to record one device, <b>with a photo</b>.</div>
+        <span class="path">Spreadsheet ▸ CheckLog tab ▸ check the new row</span>
+        <span class="see">His email in the "Submitted By Email" column — not yours. Click the Photo Link and confirm the image opens, and that it lives in the R&amp;D account's Drive under "Maintenance Evidence Photos".</span>
+        <div class="d">This single test proves identity, permissions, photo storage and the audit trail in one go. Do not skip it.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 8 ============ -->
+  <section class="part">
+    <div class="parthead"><span class="k">Part 8</span><h2>Go live</h2></div>
+
+    <div class="step" data-id="s35">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 35</div>
+        <div class="t">Set the remaining service dates</div>
+        <span class="path">Console ▸ Schedule tab ▸ Fill suggested dates ▸ adjust ▸ Save changes</span>
+        <div class="d"><b>Stagger them.</b> "Fill suggested dates" puts every device on the same day, which means one large mail to seven men on one morning and seventeen checks owed at once. Spread them across the month before you save.</div>
+        <div class="d">Saving is what sends each man his first email. Do it when you actually want them to start.</div>
+      </div>
+    </div>
+
+    <div class="step" data-id="s36">
+      <label class="tick"><input type="checkbox"></label>
+      <div class="body">
+        <div class="n">Step 36</div>
+        <div class="t">Send the link to the seven</div>
+        <div class="d">Tell them to open it once and add it to their home screen — Chrome: ⋮ ▸ Add to Home screen. Safari: Share ▸ Add to Home Screen.</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lab">One thing worth doing afterwards</span>
+      If Spsig has a <b>Shared Drive</b>, move the spreadsheet and the <code>Maintenance Evidence Photos</code> folder into it. The organisation then owns both, and the next time somebody changes role nobody has to work through this checklist again. The daily trigger and the deployment would still need re-establishing once by whoever takes it on — those always follow the person, never the file.
+    </div>
+  </section>
+
+  <footer>
+    Tritex &amp; Herelink Maintenance · handover checklist · 15 Sep 2026<br>
+    Build fresh, verify with one real check, then hand over the link.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var KEY = 'th-handover-v1';
+  var DOC = 'progress/handover';
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  var bar = document.getElementById('bar');
+  var cDone = document.getElementById('cDone');
+  var hint = document.getElementById('syncHint');
+  document.getElementById('cAll').textContent = steps.length;
+
+  var state = {};        // stepId -> true
+  var db = null;         // set once the store is reachable
+  var ref = null;
+  var writing = false;   // one write at a time
+  var pending = false;
+
+  // ---- local mirror: instant on load, and the fallback when there is no store
+  function loadLocal() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+    catch (e) { return {}; }
+  }
+  function saveLocal() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* private window */ }
+  }
+
+  function paint() {
+    var done = 0;
+    steps.forEach(function (el) {
+      var on = !!state[el.dataset.id];
+      el.classList.toggle('done', on);
+      el.querySelector('input').checked = on;
+      if (on) done++;
+    });
+    cDone.textContent = done;
+    bar.style.width = (steps.length ? Math.round(done / steps.length * 100) : 0) + '%';
+  }
+
+  function setHint(text, tone) {
+    hint.textContent = text;
+    hint.style.color = tone === 'ok' ? 'var(--ok)' : 'var(--ink-3)';
+  }
+
+  // ---- write, coalescing a burst of ticks into one call
+  function push() {
+    if (!ref) { saveLocal(); return; }
+    if (writing) { pending = true; return; }
+    writing = true;
+    var body = { steps: state, updatedAt: new Date().toISOString() };
+    ref.set(body).then(function () {
+      writing = false;
+      saveLocal();
+      if (pending) { pending = false; push(); }
+    }).catch(function (e) {
+      writing = false; pending = false;
+      saveLocal();
+      setHint('Could not save to your account (' + (e && e.code ? e.code : 'error') +
+              '). Progress is kept in this browser.');
+    });
+  }
+
+  steps.forEach(function (el) {
+    el.querySelector('input').addEventListener('change', function () {
+      if (this.checked) state[el.dataset.id] = true; else delete state[el.dataset.id];
+      paint();
+      push();
+    });
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    if (!confirm('Clear every tick and start again?')) return;
+    state = {};
+    paint();
+    push();
+  });
+
+  // ---- render immediately from the local mirror, then let the store win
+  state = loadLocal();
+  paint();
+  setHint('Saved in this browser.');
+
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('db').then(function (store) {
+      if (!store) { setHint('Saved in this browser only — not synced to other computers.'); return; }
+      db = store;
+      ref = db.doc(DOC);
+      ref.onSnapshot(function (snap) {
+        var server = snap.exists && snap.data() ? (snap.data().steps || {}) : null;
+        if (server) {
+          state = server;
+          paint();
+          saveLocal();
+        } else if (Object.keys(state).length) {
+          // first time on this artifact: seed the store from what this browser has
+          push();
+        }
+        setHint('Synced to your Claude account — open this page on any computer and your ticks follow.', 'ok');
+      }, function (e) {
+        setHint('Sync stopped (' + (e && e.code ? e.code : 'error') + '). Progress is kept in this browser.');
+        ref = null;
+      });
+    }).catch(function () {
+      setHint('Saved in this browser only — not synced to other computers.');
+    });
+  } else {
+    setHint('Local copy — ticks are saved in this browser only.');
+  }
+})();
+</script>
+
+</body>
+</html>
